@@ -1,0 +1,166 @@
+﻿@{
+	ViewData["Title"] = "Planer ładowania";
+}
+@model List<ASP_MVC_NoAuthentication.Data.Car>
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@{
+	string geoKey = Configuration.GetValue<string>("MyApiKey");
+	string key = Configuration.GetValue<string>("AuthKey");
+}
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+<head>
+	<img src="/images/top_image_wide.jpg" class="img-fluid" alt="Responsive image" style="position:relative; width:100%">
+</head>
+
+<body>
+
+<p style="margin-top:60px; margin-left:25px; margin-bottom: 0px; font-family:'Avenir Next LT Pro'; font-size:13pt;">Wpisz poniżej początek i cel swojej podróży, aby automatycznie znaleźć po drodze optymalne miejsce naładowania swojego samochodu elektrycznego.<br><br></p>
+
+<div class="accordion" id="accordionExample" style="margin-top:0px; margin-bottom:25px;">
+  <div class="card">
+	<div class="card-header" id="headingOne">
+	  <h5 class="mb-0">
+		<button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+		  Kliknij aby wyświetlić więcej informacji...
+		</button>
+	  </h5>
+	</div>
+
+	<div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
+	  <div class="card-body">
+		Aplikacja korzysta z Google API, bla bla bla....<br><br>
+	  </div>
+	</div>
+  </div>
+ </div>
+<div class="row" style="margin-left:20px; margin-right:20px; margin-bottom:20px;">
+	<div class="col-md-6" style="height:620px; width: 75%;">
+		<div id="map" style="height:600px; width: 100%;"></div>
+	</div>
+	<div class="col-md-6" style="width: 25%;">
+		<div class="col-md-6" style="width: 80%;">
+			<input type="image" id="currentLocationButton" src="/images/currentLocation.jpg" style="height:20px;width:20px;">
+			<form id = "fr">
+				<input type="text" id="origin" style="width:100%" placeholder = "Origin" style="margin-top:5px;" required> <br><br> 
+				<input type="text" id="destination" style="width:100%" placeholder = "Destination" required><br><br>
+				@Html.DropDownList("User", new SelectList(Model))<br><br>
+				<input type=number placeholder="Battery level (1-100)" min=0 max=100><br><br>
+			</form>
+			<button type="button" id="findRouteButton">Szukaj ładowarek</button>
+		</div>
+	</div>
+</div>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=@(key + "&callback=initMap")" async defer></script>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script type="text/javascript" src="@Url.Content("~/lib/jquery/dist/jquery.js")"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
+<script>
+
+	//Map function ----
+	var map;
+	var directionsService;
+	var directionsRenderer;
+
+	function initMap() { //zainicjowanie mapy
+		map = new google.maps.Map(document.getElementById('map'), {
+			center: {lat: 53.082100, lng: 18.228580},
+			zoom: 8,
+		});
+	}
+
+	async function calcRoute() { //wyznaczenie trasy
+		var startBox = document.getElementById("origin");
+		var destinationBox = document.getElementById("destination");
+		if(!startBox.value||!destinationBox.value) {
+			window.alert("Proszę wypełnić pola trasy.");
+		}
+		else {
+			directionsService = new google.maps.DirectionsService();
+			directionsRenderer = new google.maps.DirectionsRenderer();
+			directionsRenderer.setMap(map);
+			var myOrigin;
+			var myDestination;
+			if(startBox.value&&destinationBox.value) {
+				const temp1 = await fetchAddress(startBox.value);
+				const temp2 = await fetchAddress(destinationBox.value);
+				myOrigin = new google.maps.LatLng(parseFloat(temp1[0].replace(",",".")),parseFloat(temp1[1].replace(",",".")));
+				myDestination = new google.maps.LatLng(parseFloat(temp2[0].replace(",",".")),parseFloat(temp2[1].replace(",",".")));
+
+				var request = {
+					origin: myOrigin,
+					destination: myDestination,
+					travelMode: 'DRIVING'
+				};
+
+				var x = new google.maps.LatLng(53.030622, 18.197513); //testowy punkt
+				directionsService.route(request, function(response, status) {
+				if(status == google.maps.DirectionsStatus.OK) {
+					directionsRenderer.setDirections(response);
+					if(google.maps.geometry.poly.isLocationOnEdge(x, new google.maps.Polyline({ path: google.maps.geometry.encoding.decodePath(response.routes[0].overview_polyline) }), 0.01))
+						window.alert("OK");
+					else
+						window.alert("NOT OK");
+				}
+				else
+					alert("Błąd wyznaczania trasy. Status: " + status)
+				});
+			}
+		}
+	}
+
+	function checkIfIsOnRoute(polyline, point) { //funkcja sprawdza, czy punkt jest na trasie
+		var x = new google.maps.LatLng(53.030622, 18.197513); //testowy punkt
+		if(google.maps.geometry.poly.isLocationOnEdge(point, polyline, 0.01))
+			return "x";
+	}
+
+
+	async function fetchAddress(address) { //zamiana adresu na współrzędne poprzez API
+		try {
+			const response = await fetch(window.location.href + "geo/getCoordinates?key=" + "@geoKey" + "&address=" + address);
+			const coordinates = await response.json();
+			return coordinates;
+		} catch(error) {
+			console.error(error);
+		}
+	}
+
+	function init() {
+		document.getElementById("findRouteButton").addEventListener("click", function() {calcRoute();});
+	}
+	window.onload = init();
+
+</script>
+
+<script type="text/javascript">
+	var element = document.getElementById("origin");
+	document.getElementById("currentLocationButton").addEventListener("click", function(){ var coords = getCurrentLocation(); element.value = coords[0]; });
+
+
+	function getCurrentLocation() {
+		if(navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition(useLocation);
+		}
+	}
+
+	function useLocation(position) {
+		url = window.location.href + "geo/getAddress?key=" + "@geoKey" + "&longitude=" + position.coords.longitude + "&latitude=" + position.coords.latitude;
+		fetch(url)
+		.then(res => res.text())
+		.then(data => {
+			element.value = data;
+		});
+	}
+
+</script>
+
+
+</body>
+
