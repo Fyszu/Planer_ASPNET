@@ -4,12 +4,12 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace ASP_MVC_NoAuthentication.Views.Home
 {
-    [Authorize]
     public class InfoModel : PageModel
     {
+        public string Message { get; private set; } = "PageModel in C#";
         public void OnGet()
         {
-            Console.WriteLine("OK");
+            Message += $" Server time is { DateTime.Now }";
         }
     }
 }
