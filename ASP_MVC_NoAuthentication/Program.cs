@@ -1,17 +1,17 @@
 using ASP_MVC_NoAuthentication.Data;
 using ASP_MVC_NoAuthentication.Services;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddDbContext<MyDbContext>(options => options.UseMySQL(builder.Configuration.GetConnectionString("Default")));
-//builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = true).AddRoles<IdentityRole>().AddUserStore<MyDbContext>();
+builder.Services.AddIdentity<User, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = false).AddEntityFrameworkStores<MyDbContext>();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddTransient<IGeoService, GeoService>();
 builder.Services.AddControllersWithViews();
+builder.Services.AddRazorPages(); // nowe
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

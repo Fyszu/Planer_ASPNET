@@ -1,8 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 namespace ASP_MVC_NoAuthentication.Data
 {
-    public class MyDbContext : DbContext
+    public class MyDbContext : IdentityDbContext<User, IdentityRole, string>
     {
         public MyDbContext() { }
         public MyDbContext(DbContextOptions<MyDbContext> options) : base(options)

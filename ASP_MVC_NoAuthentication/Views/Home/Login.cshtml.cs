@@ -1,7 +1,6 @@
 using ASP_MVC_NoAuthentication.Data;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
@@ -16,14 +15,12 @@ namespace ASP_MVC_NoAuthentication.Views.Home
         private readonly SignInManager<User> _signInManager;
         private readonly UserManager<User> _userManager;
         private readonly ILogger<LoginModel> _logger;
-        private readonly IEmailSender _emailSender;
 
-        public LoginModel (UserManager<User> userManager, SignInManager<User> signInManager, ILogger<LoginModel> logger, IEmailSender emailSender)
+        public LoginModel (UserManager<User> userManager, SignInManager<User> signInManager, ILogger<LoginModel> logger)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
-            _emailSender = emailSender;
         }
 
         [BindProperty]
@@ -82,8 +79,6 @@ namespace ASP_MVC_NoAuthentication.Views.Home
                         values: new { area = "Identity", userId = user.Id, code = code },
                         protocol: Request.Scheme);
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
