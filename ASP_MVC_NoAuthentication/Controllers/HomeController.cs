@@ -26,7 +26,7 @@ namespace ASP_MVC_NoAuthentication.Controllers
             return View();
         }
 
-        public IActionResult Informations()
+        public IActionResult Info()
         {
             return View();
         }

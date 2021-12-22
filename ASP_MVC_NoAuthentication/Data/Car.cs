@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using Microsoft.AspNetCore.Authorization;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ASP_MVC_NoAuthentication.Data
 {
