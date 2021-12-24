@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<User> SignInManager
+@inject UserManager<User> UserManager
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -19,17 +23,24 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Map</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Planer</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" href="/Info">Informations</a>
+                            <a class="nav-link text-dark" href="/Info">O aplikacji</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" href="/Account/Login">Login</a>
-                        </li>
+                        @if(SignInManager.IsSignedIn(User)) {
                         <li class="nav-item">
                             <a class="nav-link text-dark" href="/UserPanel">Panel użytkownika</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" href="/Identity/Account/Logout">Wyloguj</a>
+                        </li>
+                        } else {
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" href="/Identity/Account/Login">Zaloguj</a>
+                        </li>
+                        }
+
                     </ul>
                 </div>
             </div>

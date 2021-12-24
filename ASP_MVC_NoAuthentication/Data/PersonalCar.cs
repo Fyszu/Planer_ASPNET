@@ -21,5 +21,10 @@ namespace ASP_MVC_NoAuthentication.Data
         {
             return $"{Brand} {Model} ({MaximumDistance}, {Connectors})";
         }
+
+        public Car toCar()
+		{
+            return new Car(this.Id, this.Brand, this.Model, this.MaximumDistance, this.Connectors);
+		}
     }
 }

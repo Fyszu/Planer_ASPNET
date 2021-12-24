@@ -9,6 +9,15 @@ namespace ASP_MVC_NoAuthentication.Data
         {
             this.Connectors = new HashSet<Connector>();
         }
+
+        public Car(int id, string brand, string model, int maximumDistance, ICollection<Connector> connectors)
+		{
+            this.Id = id;
+            this.Brand = brand;
+            this.Model = model;
+            this.MaximumDistance = maximumDistance;
+            this.Connectors = connectors;
+		}
         public int Id { set; get; }
         public String Brand { set; get; }
         public String Model { set; get; }

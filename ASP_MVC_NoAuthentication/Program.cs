@@ -9,7 +9,17 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddDbContext<MyDbContext>(options => options.UseMySQL(builder.Configuration.GetConnectionString("Default")));
 builder.Services.AddAuthentication(CertificateAuthenticationDefaults.AuthenticationScheme).AddCertificate();
-builder.Services.AddIdentity<User, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = false).AddEntityFrameworkStores<MyDbContext>();
+builder.Services.AddIdentity<User, IdentityRole>(
+    options => {
+        options.SignIn.RequireConfirmedAccount = false;
+        options.Password.RequireDigit = false;
+        options.Password.RequireLowercase = false;
+        options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequireUppercase = false;
+        options.Password.RequiredLength = 6;
+        options.Password.RequiredUniqueChars = 0;
+        }
+    ).AddEntityFrameworkStores<MyDbContext>();
 builder.Services.ConfigureApplicationCookie(options =>
 {
     // Ustawienia cookie dla przekierowañ np. niezalogowanych u¿ytkowników
@@ -17,7 +27,7 @@ builder.Services.ConfigureApplicationCookie(options =>
     //options.Cookie.Expiration 
 
     options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
-    options.LoginPath = "/Account/Login";
+    options.LoginPath = "/Identity/Account/Login";
     options.LogoutPath = "/Identity/Account/Logout";
     options.AccessDeniedPath = "/Identity/Account/AccessDenied";
     options.SlidingExpiration = true;
@@ -25,6 +35,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 });
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddTransient<IGeoService, GeoService>();
+builder.Services.AddTransient<IHomeService, HomeService>();
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 var app = builder.Build();
