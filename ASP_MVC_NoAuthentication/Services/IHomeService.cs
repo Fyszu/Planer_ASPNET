@@ -6,6 +6,5 @@ namespace ASP_MVC_NoAuthentication.Services
 	{
 		List<Car> getUserCars(string userName);
 		List<Car> getDefaultCars();
-
 	}
 }

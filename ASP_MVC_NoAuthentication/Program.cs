@@ -36,6 +36,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddTransient<IGeoService, GeoService>();
 builder.Services.AddTransient<IHomeService, HomeService>();
+builder.Services.AddTransient<IChargingStationService, ChargingStationService>();
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 var app = builder.Build();

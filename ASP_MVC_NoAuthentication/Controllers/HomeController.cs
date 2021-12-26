@@ -28,8 +28,9 @@ namespace ASP_MVC_NoAuthentication.Controllers
                 cars = _service.getUserCars(User.Identity.Name);
             else
                 cars = _service.getDefaultCars();
+
             return View(cars);
-        }
+         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
