@@ -21,9 +21,9 @@ namespace ASP_MVC_NoAuthentication.Controllers
         }
 
         [HttpGet("getChargingStations")]
-        public List<ChargingStation> getChargingStationsByConnectors([FromQuery] List<String> connectorNames)
+        public JsonResult getChargingStationsByConnectors([FromQuery] List<String> connectorNames)
         {
-            return _service.getChargingStationsByConnectors(connectorNames);
+            return Json(_service.getChargingStationsByConnectors(connectorNames));
         }
         
     }

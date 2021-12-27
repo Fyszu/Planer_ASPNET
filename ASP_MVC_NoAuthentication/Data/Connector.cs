@@ -11,6 +11,7 @@
         public string Name { get; set; }
 
         public ICollection<Car> Cars { get; set; }
+        public ICollection<PersonalCar> PersonalCars { get; set;}
         public ICollection<ChargingPoint> ChargingPoints { get; set; }
 
         public override string ToString()

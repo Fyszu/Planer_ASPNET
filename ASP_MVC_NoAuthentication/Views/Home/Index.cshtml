@@ -1,15 +1,26 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @using ASP_MVC_NoAuthentication.Data
+@using Microsoft.Extensions.Configuration
+@using System.Net
+@using System.Text;
 
 @{
 	ViewData["Title"] = "Planer ładowania";
 }
 @model List<Car>
-@using Microsoft.Extensions.Configuration
 @inject IConfiguration Configuration
 @{
 	string geoKey = Configuration.GetValue<string>("MyApiKey");
 	string key = Configuration.GetValue<string>("AuthKey");
+	List<ChargingStation> testLista = new List<ChargingStation>();
+	using (WebClient wc = new WebClient())
+	{
+		wc.Headers[HttpRequestHeader.ContentType] = "application/json";
+		wc.Encoding = Encoding.UTF8;
+		wc.Headers.Add("User-Agent: Other");
+		string result = wc.DownloadString("https://localhost:7288/chargingstation/getChargingStations?connectornames=test1");
+		testLista = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ChargingStation>>(result);
+	}
 }
 
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
@@ -27,7 +38,7 @@
 	<div class="card-header" id="headingOne">
 	  <h5 class="mb-0">
 		<button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-		  Kliknij aby wyświetlić więcej informacji...
+		  Kliknij aby wyświetlić więcej informacji... @testLista[0].Name
 		</button>
 	  </h5>
 	</div>
