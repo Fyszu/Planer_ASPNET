@@ -1,4 +1,6 @@
 ﻿using ASP_MVC_NoAuthentication.Data;
+using ASP_MVC_NoAuthentication.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace ASP_MVC_NoAuthentication.Services
 {
@@ -6,18 +8,22 @@ namespace ASP_MVC_NoAuthentication.Services
     {
         private readonly ILogger<HomeService> _logger;
         private readonly MyDbContext _context;
+        private readonly UserRepository _userRepository;
+        private readonly CarRepository _carRepository;
 
-        public HomeService(ILogger<HomeService> logger, MyDbContext context)
+		public HomeService(ILogger<HomeService> logger, MyDbContext context, UserRepository userRepository, CarRepository carRepository)
+		{
+			_logger = logger;
+			_context = context;
+			_userRepository = userRepository;
+			_carRepository = carRepository;
+		}
+		public List<Car> getUserCars(string userName)
         {
-            _logger = logger;
-            _context = context;
-        }
-        public List<Car> getUserCars(string userName)
-        {
-            var cars = _context.Cars.ToList();
+            var cars = _carRepository.getCars();
             var userQueryable = from u in _context.Users where u.UserName == userName select u; //pobranie użytkownika
             User user = userQueryable.FirstOrDefault<User>();
-            var personalCars = from u in _context.Users where u.Id == user.Id from c in u.PersonalCars select c; //pobranie aut użytkownika jako queryable
+            var personalCars = _userRepository.getPersonalCars(user.Id); //pobranie aut użytkownika jako queryable
             List<Car>? userCars = cars;
             foreach (PersonalCar car in personalCars)
                 userCars.Add(car.toCar());
@@ -26,7 +32,7 @@ namespace ASP_MVC_NoAuthentication.Services
 
         public List<Car> getDefaultCars()
 		{
-            return _context.Cars.ToList();
+            return _carRepository.getCars();
         }
 	}
 }

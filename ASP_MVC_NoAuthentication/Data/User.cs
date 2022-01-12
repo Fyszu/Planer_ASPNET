@@ -6,12 +6,13 @@ namespace ASP_MVC_NoAuthentication.Data
     {
         public User()
         {
+            PersonalCars = new HashSet<PersonalCar>();
         }
         public string DrivingStyle { set; get; }
         public double WinterFactor { set; get; }
         public double SummerFactor { set; get; }
         public string HighwaySpeed { set; get; }
-        public ICollection<PersonalCar> PersonalCars { get; set;}
+        public virtual ICollection<PersonalCar> PersonalCars { get; set;}
 
         public List<Car> getCars()
 		{

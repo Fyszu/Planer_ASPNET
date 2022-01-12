@@ -19,7 +19,7 @@ namespace ASP_MVC_NoAuthentication.Data
         public Boolean StationState { get; set; }
         public String OpenHours { get; set; }
         public String Owner { get; set; }
-        public ICollection<PaymentMethod> PaymentMethods { get; set; }
-        public ICollection<ChargingPoint> ChargingPoints { get; set; }
+        public virtual ICollection<PaymentMethod> PaymentMethods { get; set; }
+        public virtual ICollection<ChargingPoint> ChargingPoints { get; set; }
     }
 }

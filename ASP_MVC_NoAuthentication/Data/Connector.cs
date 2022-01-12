@@ -10,9 +10,9 @@
         public int Id { get; set; }
         public string Name { get; set; }
 
-        public ICollection<Car> Cars { get; set; }
-        public ICollection<PersonalCar> PersonalCars { get; set;}
-        public ICollection<ChargingPoint> ChargingPoints { get; set; }
+        public virtual ICollection<Car> Cars { get; set; }
+        public virtual ICollection<PersonalCar> PersonalCars { get; set;}
+        public virtual ICollection<ChargingPoint> ChargingPoints { get; set; }
 
         public override string ToString()
         {

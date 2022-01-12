@@ -8,6 +8,6 @@
         }
         public int Id { get; set; }
         public string Name { get; set; }
-        public ICollection<ChargingStation> ChargingStations { get; set; }
+        public virtual ICollection<ChargingStation> ChargingStations { get; set; }
     }
 }

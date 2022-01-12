@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.Certificate;
 using System.Text.Json.Serialization;
+using ASP_MVC_NoAuthentication.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,6 +38,9 @@ builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddTransient<IGeoService, GeoService>();
 builder.Services.AddTransient<IHomeService, HomeService>();
 builder.Services.AddTransient<IChargingStationService, ChargingStationService>();
+builder.Services.AddScoped<CarRepository, CarRepository>();
+builder.Services.AddScoped<ConnectorRepository, ConnectorRepository>();
+builder.Services.AddScoped<UserRepository, UserRepository>();
 builder.Services.AddControllersWithViews().AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 builder.Services.AddRazorPages();
 var app = builder.Build();

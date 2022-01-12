@@ -3,6 +3,7 @@
 @using Microsoft.Extensions.Configuration
 @using System.Net
 @using System.Text;
+@using System.Web;
 
 @{
 	ViewData["Title"] = "Planer ładowania";
@@ -60,7 +61,7 @@
 			<form id = "fr">
 				<input type="text" id="origin" style="width:100%" placeholder = "Punkt początkowy" style="margin-top:5px;" required> <br><br> 
 				<input type="text" id="destination" style="width:100%" placeholder = "Punkt docelowy" required><br><br>
-				<select name="drop1" id="Select1"><br><br>
+				<select id="selectCar"></select><br><br>
 				<input type=number style="width:55%" placeholder="Poziom baterii [%]" min=1 max=100><br><br>
 			</form>
 			<button type="button" id="findRouteButton">Szukaj ładowarek</button>
@@ -81,6 +82,7 @@
 	var map;
 	var directionsService;
 	var directionsRenderer;
+	var carList;
 
 	function initMap() { //zainicjowanie mapy
 		map = new google.maps.Map(document.getElementById('map'), {
@@ -89,7 +91,13 @@
 		});
 	}
 
-	async function calcRoute() { //wyznaczenie trasy
+	async function calcRoute() { //wyznaczenie trasy, wyzwalacz guzika znajdź trasę
+
+		//pobranie gniazd ładowania obecnie wybranego samochodu
+		var selectCarList = document.getElementById('selectCar');
+		var connectors = carList[selectCarList.selectedIndex].connectors;
+		window.alert(carList[INDEX].connectors);
+
 		var startBox = document.getElementById("origin");
 		var destinationBox = document.getElementById("destination");
 		if(!startBox.value||!destinationBox.value) {
@@ -148,16 +156,12 @@
 
 	function init() {
 		document.getElementById("findRouteButton").addEventListener("click", function() {calcRoute();});
-		/*var sel = document.createElement('select');
-		sel.name = 'drop1';
-		sel.id = 'Select1';
-		var cars = @Model;
-		var options_str = "";
-		cars.forEach( function(car) {
-		options_str += '<option value="' + car + '">' + car + '</option>';
-		});
-		sel.innerHTML = options_str;
-		document.body.appendChild(sel);*/
+		carList = @Html.Raw(Json.Serialize(Model));
+		//var carList = [{ ID: 1, Text: "One" }, { ID: 2, Text: "Two" }];
+		//var carList = [{ Brand: "@Model.ElementAt(0).Brand", Model: "@Model.ElementAt(0).Model" }];
+		for (var i = 0; i < carList.length; i++ ) {
+			$("#selectCar").append("<option value='" + carList[i].brand + "'>" + carList[i].model + "</option>");
+		}
 	}
 	window.onload = init();
 

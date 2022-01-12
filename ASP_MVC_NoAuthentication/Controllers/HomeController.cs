@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Identity;
 using ASP_MVC_NoAuthentication.Services;
+using ASP_MVC_NoAuthentication.Repositories;
 
 namespace ASP_MVC_NoAuthentication.Controllers
 {
@@ -13,12 +14,16 @@ namespace ASP_MVC_NoAuthentication.Controllers
         private readonly IHomeService _service;
         private readonly SignInManager<User> _signInManager;
         private readonly UserManager<User> _userManager;
-        public HomeController(IHomeService service, ILogger<HomeController> logger, UserManager<User> userManager, SignInManager<User> signInManager)
+        private readonly CarRepository _carRepository;
+        private readonly ConnectorRepository _connectorRepository;
+        public HomeController(IHomeService service, ILogger<HomeController> logger, UserManager<User> userManager, SignInManager<User> signInManager, CarRepository carRepository, ConnectorRepository connectorRepository)
         {
             _logger = logger;
             _userManager = userManager;
             _signInManager = signInManager;
             _service = service;
+            _carRepository = carRepository;
+            _connectorRepository = connectorRepository;
         }
 
         public IActionResult Index()
@@ -28,7 +33,6 @@ namespace ASP_MVC_NoAuthentication.Controllers
                 cars = _service.getUserCars(User.Identity.Name);
             else
                 cars = _service.getDefaultCars();
-
             return View(cars);
          }
 
