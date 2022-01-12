@@ -3,7 +3,7 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
-/appsettings.json
+ASP_MVC_NoAuthentication\appsettings.json
 # User-specific files
 *.rsuser
 *.suo
