@@ -13,14 +13,14 @@
 @{
 	string geoKey = Configuration.GetValue<string>("MyApiKey");
 	string key = Configuration.GetValue<string>("AuthKey");
-	List<ChargingStation> testLista = new List<ChargingStation>();
+	List<ChargingStation> chargingStationsList = new List<ChargingStation>();
 	using (WebClient wc = new WebClient())
 	{
 		wc.Headers[HttpRequestHeader.ContentType] = "application/json";
 		wc.Encoding = Encoding.UTF8;
 		wc.Headers.Add("User-Agent: Other");
-		string result = wc.DownloadString("https://localhost:7288/chargingstation/getChargingStations?connectornames=test1");
-		testLista = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ChargingStation>>(result);
+		string result = wc.DownloadString("https://localhost:7288/chargingstation/getAllChargingStations");
+		chargingStationsList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ChargingStation>>(result);
 	}
 }
 
@@ -39,7 +39,7 @@
 	<div class="card-header" id="headingOne">
 	  <h5 class="mb-0">
 		<button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-		  Kliknij aby wyświetlić więcej informacji... @testLista[0].Name
+		  Kliknij aby wyświetlić więcej informacji... @chargingStationsList[0].Name @chargingStationsList[1].Name
 		</button>
 	  </h5>
 	</div>
@@ -96,14 +96,26 @@
 		//pobranie gniazd ładowania obecnie wybranego samochodu
 		var selectCarList = document.getElementById('selectCar');
 		var connectors = carList[selectCarList.selectedIndex].connectors;
-		window.alert(carList[INDEX].connectors);
+		var chargingStations = @Html.Raw(Json.Serialize(chargingStationsList));
+		var chargingStationsByConnectors = new Array();
+		var chargingStationsNearRoute = new Array();
+
+		chargingStations.forEach(chargingStation => {
+			chargingStation.chargingPoints.forEach(chargingPoint => {
+				connectors.forEach(connector => {
+					if(chargingPoint.connector.name == connector.name) {
+						chargingStationsByConnectors.push(chargingStation); //dodanie do tablicy ładowarek, które odpowiadają gniazdom ładowania samochodu
+					}
+				});
+			});
+		});
+
 
 		var startBox = document.getElementById("origin");
 		var destinationBox = document.getElementById("destination");
 		if(!startBox.value||!destinationBox.value) {
 			window.alert("Proszę wypełnić pola trasy.");
-		}
-		else {
+		} else {
 			directionsService = new google.maps.DirectionsService();
 			directionsRenderer = new google.maps.DirectionsRenderer();
 			directionsRenderer.setMap(map);
@@ -120,18 +132,41 @@
 					destination: myDestination,
 					travelMode: 'DRIVING'
 				};
-
-				var x = new google.maps.LatLng(53.030622, 18.197513); //testowy punkt
-				directionsService.route(request, function(response, status) {
-				if(status == google.maps.DirectionsStatus.OK) {
-					directionsRenderer.setDirections(response);
-					if(google.maps.geometry.poly.isLocationOnEdge(x, new google.maps.Polyline({ path: google.maps.geometry.encoding.decodePath(response.routes[0].overview_polyline) }), 0.01))
-						window.alert("OK");
+				var searchEnded = false;
+				directionsService.route(request, function(response, status) { //sprawdź czy ładowarka jest w pobliżu trasy
+					if(status == google.maps.DirectionsStatus.OK) {
+						directionsRenderer.setDirections(response);
+						chargingStationsByConnectors.forEach(station => {
+							var stationLat = station.latitude;
+							var stationLong = station.longitude;
+							var stationCoordinates = new google.maps.LatLng(stationLat, stationLong);
+							if(google.maps.geometry.poly.isLocationOnEdge(stationCoordinates, new google.maps.Polyline({ path: google.maps.geometry.encoding.decodePath(response.routes[0].overview_polyline) }), 0.1))
+								chargingStationsNearRoute.push(station); //dodanie ładowarki, która jest w pobliżu trasy
+						});
+						if(chargingStationsNearRoute.length == 0) {
+							window.alert("Brak ładowarek elektrycznych w pobliżu wyznaczonej trasy!");
+						} else { //wyświetlenie przefiltrowanych ładowarek
+							chargingStationsNearRoute.forEach(station => {
+								window.alert("Stacja na trasie: " + station.name);
+								var stationState = "Aktywna";
+								if(station.stationState == 0) {
+									stationState = "Zamknięta";
+								}
+								var marker = new google.maps.Marker({
+									position: { lat: station.latitude, lng: station.longitude },
+									map: map,
+								});
+								var infoWindow = new google.maps.InfoWindow({
+									content: "<p>Stacja: " + station.name + "<br>Koordynaty: " + station.latitude + ", " + station.longitude + "<br>Adres: " + station.city + " " + station.postalAdress + ", " + station.street + "<br>Godziny otwarcia: " + station.openHours + "<br>Właściciel: " + station.owner + "<br>Stan stacji: " + stationState + "</p>",
+								});
+								google.maps.event.addListener(marker, "click", () => {
+									infoWindow.open(map,marker);
+								});
+							});
+						}
+					}
 					else
-						window.alert("NOT OK");
-				}
-				else
-					alert("Błąd wyznaczania trasy. Status: " + status)
+						alert("Błąd wyznaczania trasy. Status: " + status) //obsługa błędu
 				});
 			}
 		}
@@ -157,8 +192,6 @@
 	function init() {
 		document.getElementById("findRouteButton").addEventListener("click", function() {calcRoute();});
 		carList = @Html.Raw(Json.Serialize(Model));
-		//var carList = [{ ID: 1, Text: "One" }, { ID: 2, Text: "Two" }];
-		//var carList = [{ Brand: "@Model.ElementAt(0).Brand", Model: "@Model.ElementAt(0).Model" }];
 		for (var i = 0; i < carList.length; i++ ) {
 			$("#selectCar").append("<option value='" + carList[i].brand + "'>" + carList[i].model + "</option>");
 		}

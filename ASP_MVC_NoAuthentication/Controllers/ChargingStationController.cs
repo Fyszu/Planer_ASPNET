@@ -25,6 +25,11 @@ namespace ASP_MVC_NoAuthentication.Controllers
         {
             return Json(_service.getChargingStationsByConnectors(connectorNames));
         }
-        
+
+        [HttpGet("getAllChargingStations")]
+        public JsonResult getAllChargingStations()
+        {
+            return Json(_service.getAllChargingStations());
+        }
     }
 }

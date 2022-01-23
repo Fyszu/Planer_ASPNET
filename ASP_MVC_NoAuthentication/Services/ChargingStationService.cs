@@ -28,5 +28,26 @@ namespace ASP_MVC_NoAuthentication.Services
             }
             return chargingStations.Distinct().ToList();
         }
+
+        public List<ChargingStation> getAllChargingStations()
+        {
+            List<ChargingStation>? chargingStations = _context.ChargingStations.Include("ChargingPoints").ToList();
+            foreach(var chargingStation in chargingStations)
+            {
+                List<ChargingPoint>? chargingPoints = (from c in _context.ChargingPoints.Include("Connector").Include("Station") where c.Station.Id == chargingStation.Id select c).ToList();
+                foreach(var chargingPoint in chargingStation.ChargingPoints)
+                {
+                    foreach(ChargingPoint chargingPoint2 in chargingPoints)
+                    {
+                        if(chargingPoint2.Id == chargingPoint.Id)
+                        {
+                            chargingPoint.Connector = chargingPoint2.Connector;
+                        }
+                    }
+                }
+            }
+
+            return chargingStations;
+        }
     }
 }
