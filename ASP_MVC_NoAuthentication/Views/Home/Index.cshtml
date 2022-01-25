@@ -145,9 +145,9 @@
 						});
 						if(chargingStationsNearRoute.length == 0) {
 							window.alert("Brak ładowarek elektrycznych w pobliżu wyznaczonej trasy!");
-						} else { //wyświetlenie przefiltrowanych ładowarek
+						}
+						else { //wyświetlenie przefiltrowanych ładowarek
 							chargingStationsNearRoute.forEach(station => {
-								window.alert("Stacja na trasie: " + station.name);
 								var stationState = "Aktywna";
 								if(station.stationState == 0) {
 									stationState = "Zamknięta";
@@ -164,6 +164,9 @@
 								});
 							});
 						}
+						var length = response.routes[0].legs[0].distance.text;
+						window.alert("Length: " + length);
+
 					}
 					else
 						alert("Błąd wyznaczania trasy. Status: " + status) //obsługa błędu
