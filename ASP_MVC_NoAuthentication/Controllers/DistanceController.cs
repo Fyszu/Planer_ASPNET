@@ -2,6 +2,7 @@
 using ASP_MVC_NoAuthentication.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.RegularExpressions;
 
 namespace ASP_MVC_NoAuthentication.Controllers
 {
@@ -28,6 +29,17 @@ namespace ASP_MVC_NoAuthentication.Controllers
                 return _service.getRealMaximumDistance(batteryLevel, maximumDistance, User.Identity.Name);
             else
                 return _service.getRealMaximumDistance(batteryLevel, maximumDistance, null);
+        }
+
+        [HttpGet("getNumberOfRecharges")]
+        public int getNumberOfRecharges([FromQuery] string routeDistance, int maxDistance, int batteryLevel)
+        { 
+            if(string.IsNullOrEmpty(routeDistance)) return -1;
+            else {
+                Regex regex = new Regex(@"[^\d]+");
+                string cleaned = regex.Replace(routeDistance, "");
+                return _service.getNumberOfRecharges(Double.Parse(cleaned), maxDistance, batteryLevel);
+            }
         }
     }
 }

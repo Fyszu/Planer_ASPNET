@@ -86,7 +86,7 @@ namespace ASP_MVC_NoAuthentication.Services
 
 
         
-        public double getNumberOfRecharges(double routeDistance, int maximumDistance)
+        public int getNumberOfRecharges(double routeDistance, int maximumDistance, int batteryLevel)
         {
            /* double distance = routeDistance / maximumDistance;
           //  if ((route.Distance / maximumDistance) < 0.8) //Da radę dojechać na obecnym naładowaniu
@@ -100,7 +100,7 @@ namespace ASP_MVC_NoAuthentication.Services
                 return 2;
             else if (distance >= 1.8 && distance < 2.8)
                 return 3;*/
-            return 4.0;
+            return 4;
         }
 
 

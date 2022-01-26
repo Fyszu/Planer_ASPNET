@@ -62,7 +62,7 @@
 				<input type="text" id="origin" style="width:100%" placeholder = "Punkt początkowy" style="margin-top:5px;" required> <br><br> 
 				<input type="text" id="destination" style="width:100%" placeholder = "Punkt docelowy" required><br><br>
 				<select id="selectCar"></select><br><br>
-				<input type=number style="width:55%" placeholder="Poziom baterii [%]" min=1 max=100><br><br>
+				<input type=number id="batteryLevelSelect" style="width:55%" placeholder="Poziom baterii [%]" min=1 max=100><br><br>
 			</form>
 			<button type="button" id="findRouteButton">Szukaj ładowarek</button>
 		</div>
@@ -96,9 +96,11 @@
 		//pobranie gniazd ładowania obecnie wybranego samochodu
 		var selectCarList = document.getElementById('selectCar');
 		var connectors = carList[selectCarList.selectedIndex].connectors;
+		var carMaximumDistance = carList[selectCarList.selectedIndex].maximumDistance;
 		var chargingStations = @Html.Raw(Json.Serialize(chargingStationsList));
 		var chargingStationsByConnectors = new Array();
 		var chargingStationsNearRoute = new Array();
+		var route;
 
 		chargingStations.forEach(chargingStation => {
 			chargingStation.chargingPoints.forEach(chargingPoint => {
@@ -132,15 +134,17 @@
 					destination: myDestination,
 					travelMode: 'DRIVING'
 				};
-				var searchEnded = false;
+
 				directionsService.route(request, function(response, status) { //sprawdź czy ładowarka jest w pobliżu trasy
 					if(status == google.maps.DirectionsStatus.OK) {
+						route = response.routes[0];
+						numberOfRechargesCallback(route.legs[0].distance.text, route, carMaximumDistance);
 						directionsRenderer.setDirections(response);
 						chargingStationsByConnectors.forEach(station => {
 							var stationLat = station.latitude;
 							var stationLong = station.longitude;
 							var stationCoordinates = new google.maps.LatLng(stationLat, stationLong);
-							if(google.maps.geometry.poly.isLocationOnEdge(stationCoordinates, new google.maps.Polyline({ path: google.maps.geometry.encoding.decodePath(response.routes[0].overview_polyline) }), 0.1))
+							if(google.maps.geometry.poly.isLocationOnEdge(stationCoordinates, new google.maps.Polyline({ path: google.maps.geometry.encoding.decodePath(route.overview_polyline) }), 0.1))
 								chargingStationsNearRoute.push(station); //dodanie ładowarki, która jest w pobliżu trasy
 						});
 						if(chargingStationsNearRoute.length == 0) {
@@ -164,9 +168,6 @@
 								});
 							});
 						}
-						var length = response.routes[0].legs[0].distance.text;
-						window.alert("Length: " + length);
-
 					}
 					else
 						alert("Błąd wyznaczania trasy. Status: " + status) //obsługa błędu
@@ -181,6 +182,11 @@
 			return "x";
 	}
 
+	async function numberOfRechargesCallback(distance, route, carMaximumDistance) {
+		var carBatteryLevel = document.getElementById("batteryLevelSelect").value;
+		numberOfRecharges = await fetchNumberOfRecharges(distance, carMaximumDistance, carBatteryLevel);
+		window.alert("NR " + numberOfRecharges);
+	}
 
 	async function fetchAddress(address) { //zamiana adresu na współrzędne poprzez API
 		try {
@@ -189,6 +195,24 @@
 			return coordinates;
 		} catch(error) {
 			console.error(error);
+		}
+	}
+
+	async function fetchNumberOfRecharges(distance, maxDistance, batteryLevel) {
+		try {
+			const response = await fetch(window.location.href + "distance/getNumberOfRecharges?routeDistance=" + distance + "&maxDistance=" + maxDistance + "&batteryLevel=" + batteryLevel);
+			const numberOfRecharges = await response.json();
+			return numberOfRecharges;
+		} catch(error) {
+			console.error(error);
+		}
+	}
+
+	function checkFlag(flag) {
+		if(flag == false) {
+			window.setTimeout(checkFlag, 100);
+		} else {
+			return true;
 		}
 	}
 
