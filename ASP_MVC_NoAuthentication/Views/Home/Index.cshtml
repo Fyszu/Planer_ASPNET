@@ -161,7 +161,10 @@
 									map: map,
 								});
 								var infoWindow = new google.maps.InfoWindow({
-									content: "<p>Stacja: " + station.name + "<br>Koordynaty: " + station.latitude + ", " + station.longitude + "<br>Adres: " + station.city + " " + station.postalAdress + ", " + station.street + "<br>Godziny otwarcia: " + station.openHours + "<br>Właściciel: " + station.owner + "<br>Stan stacji: " + stationState + "</p>",
+									content: "<p>Stacja: " + station.name + "<br>Koordynaty: " + station.latitude + ", " 
+									+ station.longitude + "<br>Adres: " + station.city + " " + station.postalAdress + ", "
+									+ station.street + "<br>Godziny otwarcia: " + station.openHours + "<br>Właściciel: "
+									+ station.owner + "<br>Stan stacji: " + stationState + "<br><a href='https://www.google.pl/maps?q=" + station.latitude + ",+" + station.longitude + "'>Otwórz w google maps</a></p>",
 								});
 								google.maps.event.addListener(marker, "click", () => {
 									infoWindow.open(map,marker);
