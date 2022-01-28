@@ -21,8 +21,7 @@ namespace ASP_MVC_NoAuthentication.Services
 		public List<Car> getUserCars(string userName)
         {
             var cars = _carRepository.getCars();
-            var userQueryable = from u in _context.Users where u.UserName == userName select u; //pobranie użytkownika
-            User user = userQueryable.FirstOrDefault<User>();
+            User user = getUser(userName);
             var personalCars = _userRepository.getPersonalCars(user.Id); //pobranie aut użytkownika jako queryable
             List<Car>? userCars = cars;
             foreach (PersonalCar car in personalCars)
@@ -30,9 +29,37 @@ namespace ASP_MVC_NoAuthentication.Services
             return userCars;
         }
 
+        public List<Car> getPersonalisableCars(string userName)
+        {
+            User user = getUser(userName);
+            var personalCars = _userRepository.getPersonalCars(user.Id);
+            List<Car>? userCars = new List<Car>();
+            foreach (PersonalCar car in personalCars)
+                userCars.Add(car.toCar());
+            return userCars;
+        }
         public List<Car> getDefaultCars()
 		{
             return _carRepository.getCars();
+        }
+
+        public User getUser(string userName)
+        {
+            var userQueryable = from u in _context.Users where u.UserName == userName select u;
+            return userQueryable.FirstOrDefault<User>();
+        }
+
+        public void saveSettings(double summerFactor, double winterFactor, string drivingStyle, string id)
+        {
+            var dbUser = _context.Users.Find(id);
+            if (dbUser != null)
+            {
+                dbUser.SummerFactor = summerFactor;
+                dbUser.WinterFactor = winterFactor;
+                dbUser.DrivingStyle = drivingStyle;
+                _context.SaveChanges();
+            }
+            
         }
 	}
 }

@@ -29,12 +29,19 @@ namespace ASP_MVC_NoAuthentication.Data
             return $"{Brand} {Model} ({MaximumDistance}, {ConnectorsToString()})";
         }
 
-        private string ConnectorsToString()
+        public string ConnectorsToString()
         {
             string ret = "";
-            foreach(Connector connector in Connectors)
+            if (Connectors.Count > 0)
             {
-                ret += connector.ToString() + ";";
+                foreach (Connector connector in Connectors)
+                {
+                    ret += connector.ToString() + ", ";
+                }
+            }
+            else
+            {
+                ret = "Brak gniazd ładowania.";
             }
             return ret;
         }

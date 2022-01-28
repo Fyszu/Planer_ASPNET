@@ -64,7 +64,7 @@ namespace ASP_MVC_NoAuthentication.Views.Home
             [Compare("PasswordRegister", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPasswordRegister { get; set; }
 
-            public string DrivingStyle = "test1";
+            public string DrivingStyle = "Mieszany";
             public double WinterFactor = 0.2;
             public double SummerFactor = 0.2;
             public string HighwaySpeed = "test2";

@@ -39,7 +39,7 @@
 	<div class="card-header" id="headingOne">
 	  <h5 class="mb-0">
 		<button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-		  Kliknij aby wyświetlić więcej informacji... @chargingStationsList[0].Name @chargingStationsList[1].Name
+		  Kliknij aby wyświetlić więcej informacji...
 		</button>
 	  </h5>
 	</div>
@@ -188,7 +188,6 @@
 	async function numberOfRechargesCallback(distance, route, carMaximumDistance) {
 		var carBatteryLevel = document.getElementById("batteryLevelSelect").value;
 		numberOfRecharges = await fetchNumberOfRecharges(distance, carMaximumDistance, carBatteryLevel);
-		window.alert("NR " + numberOfRecharges);
 	}
 
 	async function fetchAddress(address) { //zamiana adresu na współrzędne poprzez API
