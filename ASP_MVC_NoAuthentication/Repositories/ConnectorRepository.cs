@@ -20,5 +20,10 @@ namespace ASP_MVC_NoAuthentication.Repositories
             }
             return null;
         }
+
+        public List<Connector> GetAllConnectors()
+        {
+            return _context.Connectors.ToList();
+        }
     }
 }

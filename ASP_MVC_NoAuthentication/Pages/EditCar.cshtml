@@ -1,0 +1,99 @@
+﻿@page
+@model ASP_MVC_NoAuthentication.Pages.EditCarModel
+@using System.Net
+@using System.Text;
+@using System.Web;
+@using Microsoft.Extensions.Configuration
+@{
+    ViewData["Title"] = "Panel użytkownika";
+    Layout = "_Layout";
+    string cb = "checkbox";
+}
+
+<!DOCTYPE html>
+<html lang="en" >
+
+<head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+</head>
+
+<body>
+    <h1>
+        Edycja samochodu @Model._editedCar.Brand @Model._editedCar.Model
+    </h1>
+    <br />
+    <form method="post" name="postForm" onsubmit="return checkBoxes()" asp-page-handler="AddCar">
+        <h3>
+            Marka:
+        </h3>
+        <input id="brand" name="brand" maxlength="30" value="@Model._editedCar.Brand"required/>
+        <br /><br />
+        <h3>
+            Model:
+        </h3>
+        <input id="carmodel" name="carmodel" maxlength="30" value="@Model._editedCar.Model" required/>
+        <br /><br />
+        <h3>
+            Zasięg maksymalny:
+        </h3>
+        <input type="range" name="maximumdistance" value="400" min="30" max="1000" value="@Model._editedCar.MaximumDistance" oninput="this.nextElementSibling.value = this.value"/>
+        <output>@Model._editedCar.MaximumDistance</output> km
+        <br /><br />
+        <h3>
+            Gniazda ładowania:
+        </h3>
+        @foreach(var connector in Model._connectors)
+        {
+            if (Model._editedCar.Connectors.Contains(connector))
+            {
+                <input type="checkbox" id="@(cb + connector.Id)" name="@(cb + connector.Id)" checked>
+            }
+            else
+            {
+                <input type="checkbox" id="@(cb + connector.Id)" name="@(cb + connector.Id)">
+            }
+            <label for="@(cb + connector.Id)">@connector.Name</label>
+            <br />
+        }
+        <!------------------------- Bootstrap alert ----------------------------->
+        <div class="alert alert-warning alert-dismissible fade show" role="alert" id="alertDiv">
+            <label id="alertText"><strong>Uwaga!</strong> Należy zaznaczyć przynajmniej jedno gniazdo ładowania.</label>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <br /><br />
+
+        <button type = "submit" onclick="return checkBoxes()">Zapisz</button>
+    </form>
+
+    <!----- Bootstrap  ------>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    <script>
+        $('.alert').alert()
+        $(".alert").hide()
+        $(".alert").on("close.bs.alert", function () {
+              $(".alert").hide();
+              return false;
+        });
+        function checkBoxes() {
+            var check = false;
+            var connectorsArray = @Html.Raw(Json.Serialize(Model._connectors));
+            var checkboxName = "";
+            var cb;
+            connectorsArray.forEach(connector => {
+                checkboxName = "#checkbox" + connector.id;
+                cb = document.querySelector(checkboxName);
+                if(cb.checked) {
+                    check = true;
+                }
+            });
+            if(!check) {
+                $(".alert").show()
+            } 
+            return check;
+        }
+    </script>
+</body>}

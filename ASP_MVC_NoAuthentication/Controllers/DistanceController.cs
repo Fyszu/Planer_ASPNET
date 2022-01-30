@@ -28,7 +28,7 @@ namespace ASP_MVC_NoAuthentication.Controllers
             if (_signInManager.IsSignedIn(User))
                 return _service.getRealMaximumDistance(batteryLevel, maximumDistance, User.Identity.Name);
             else
-                return _service.getRealMaximumDistance(batteryLevel, maximumDistance, null);
+                return _service.getRealMaximumDistance(batteryLevel, maximumDistance, "default");
         }
 
         [HttpGet("getNumberOfRecharges")]

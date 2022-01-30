@@ -17,6 +17,24 @@ namespace ASP_MVC_NoAuthentication.Data
         [Required]
         public User User { set; get; }
 
+        public PersonalCar(int id, string brand, string model, int maximumDistance, ICollection<Connector> connectors, User user)
+        {
+            this.Id = id;
+            this.Brand = brand;
+            this.Model = model;
+            this.MaximumDistance = maximumDistance;
+            this.Connectors = new HashSet<Connector>(connectors);
+            this.User = user;
+        }
+        public PersonalCar(string brand, string model, int maximumDistance, ICollection<Connector> connectors, User user)
+        {
+            this.Brand = brand;
+            this.Model = model;
+            this.MaximumDistance = maximumDistance;
+            this.Connectors = new HashSet<Connector>(connectors);
+            this.User = user;
+        }
+
         public override string ToString()
         {
             return $"{Brand} {Model} ({MaximumDistance}, {Connectors})";

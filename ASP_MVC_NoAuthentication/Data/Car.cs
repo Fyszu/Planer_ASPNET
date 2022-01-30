@@ -24,6 +24,14 @@ namespace ASP_MVC_NoAuthentication.Data
             this.Connectors = connectors;
 		}
 
+        public Car(string brand, string model, int maximumDistance, ICollection<Connector> connectors)
+        {
+            this.Brand = brand;
+            this.Model = model;
+            this.MaximumDistance = maximumDistance;
+            this.Connectors = connectors;
+        }
+
         public override string ToString()
         {
             return $"{Brand} {Model} ({MaximumDistance}, {ConnectorsToString()})";
@@ -38,6 +46,8 @@ namespace ASP_MVC_NoAuthentication.Data
                 {
                     ret += connector.ToString() + ", ";
                 }
+                ret = ret.Remove(ret.Length - 2);
+
             }
             else
             {

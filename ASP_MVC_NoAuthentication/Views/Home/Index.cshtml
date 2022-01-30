@@ -69,7 +69,7 @@
 	</div>
 </div>
 
-<script src="https://maps.googleapis.com/maps/api/js?key=@(key + "&callback=initMap")" async defer></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=@(key + "&callback=initMap")" defer></script>
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script type="text/javascript" src="@Url.Content("~/lib/jquery/dist/jquery.js")"></script>
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
@@ -82,12 +82,23 @@
 	var map;
 	var directionsService;
 	var directionsRenderer;
+	var chargingRadius;
 	var carList;
+	var markersArray = [];
 
 	function initMap() { //zainicjowanie mapy
 		map = new google.maps.Map(document.getElementById('map'), {
 			center: {lat: 53.082100, lng: 18.228580},
 			zoom: 8,
+		});
+		directionsService = new google.maps.DirectionsService();
+		directionsRenderer = new google.maps.DirectionsRenderer();
+		chargingRadius = new google.maps.Circle({
+			strokeColor: "#FF0000",
+			strokeOpacity: 0.8,
+			strokeWeight: 2,
+			fillColor: "#FF0000",
+			fillOpacity: 0.35,
 		});
 	}
 
@@ -117,9 +128,13 @@
 		var destinationBox = document.getElementById("destination");
 		if(!startBox.value||!destinationBox.value) {
 			window.alert("Proszę wypełnić pola trasy.");
-		} else {
-			directionsService = new google.maps.DirectionsService();
-			directionsRenderer = new google.maps.DirectionsRenderer();
+		}
+		else if(!(document.getElementById("batteryLevelSelect").value)) {
+			window.alert("Proszę podać stan baterii.");
+		}
+		else {
+			directionsRenderer.setMap(null); //czyszczenie mapy z poprzednich tras
+			clearMarkers(); //czyszczenie pinezek
 			directionsRenderer.setMap(map);
 			var myOrigin;
 			var myDestination;
@@ -128,6 +143,12 @@
 				const temp2 = await fetchAddress(destinationBox.value);
 				myOrigin = new google.maps.LatLng(parseFloat(temp1[0].replace(",",".")),parseFloat(temp1[1].replace(",",".")));
 				myDestination = new google.maps.LatLng(parseFloat(temp2[0].replace(",",".")),parseFloat(temp2[1].replace(",",".")));
+
+				chargingRadius.setMap(null);
+				chargingRadius.setMap(map);
+				chargingRadius.setCenter(myOrigin);
+				const radius = await fetchRealDistance(carList[selectCarList.selectedIndex].maximumDistance, document.getElementById("batteryLevelSelect").value);
+				chargingRadius.setRadius(radius);
 
 				var request = {
 					origin: myOrigin,
@@ -160,6 +181,7 @@
 									position: { lat: station.latitude, lng: station.longitude },
 									map: map,
 								});
+								markersArray.push(marker);
 								var infoWindow = new google.maps.InfoWindow({
 									content: "<p>Stacja: " + station.name + "<br>Koordynaty: " + station.latitude + ", " 
 									+ station.longitude + "<br>Adres: " + station.city + " " + station.postalAdress + ", "
@@ -210,6 +232,16 @@
 		}
 	}
 
+	async function fetchRealDistance(maxDistance, batteryLevel) {
+		try {
+			const response = await fetch(window.location.href + "distance/getRealDistance?maximumDistance=" + maxDistance + "&batteryLevel=" + batteryLevel);
+			const realDistance = await response.json();
+			return realDistance;
+		} catch(error) {
+			console.error(error);
+		}
+	}
+
 	function checkFlag(flag) {
 		if(flag == false) {
 			window.setTimeout(checkFlag, 100);
@@ -218,11 +250,24 @@
 		}
 	}
 
+	function clearMarkers() {
+		markersArray.forEach(marker => {
+			marker.setMap(null);
+		});
+		markersArray.length = 0;
+	}
+
 	function init() {
 		document.getElementById("findRouteButton").addEventListener("click", function() {calcRoute();});
 		carList = @Html.Raw(Json.Serialize(Model));
 		for (var i = 0; i < carList.length; i++ ) {
-			$("#selectCar").append("<option value='" + carList[i].brand + "'>" + carList[i].model + "</option>");
+			var connectorsString = "";
+			carList[i].connectors.forEach(connector => {
+				connectorsString += connector.name;
+				connectorsString += ", ";
+			});
+			connectorsString = connectorsString.substring(0, connectorsString.length - 2);
+			$("#selectCar").append("<option value='" + i + "'>" + carList[i].brand + " " + carList[i].model + " Zasięg: " + carList[i].maximumDistance + "km (" + connectorsString + ")" + "</option>");
 		}
 	}
 	window.onload = init();

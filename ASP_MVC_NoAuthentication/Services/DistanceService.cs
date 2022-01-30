@@ -16,44 +16,23 @@ namespace ASP_MVC_NoAuthentication.Services
         public int getRealMaximumDistance(int currentBatteryLevel, int maximumDistance, String? userName) // string 
         {
             //wyparsować usera z nazwy
-            double currentDistance = maximumDistance * (currentBatteryLevel * 0.01);
-            if (userName == null)
+            double currentDistance = (maximumDistance * 1000) * (currentBatteryLevel * 0.01);
+            if (userName == "default")
             {
-                userName = "default";
+                userName = "default@default.pl";
             }
             var userQueryable = from u in _context.Users where u.UserName == userName select u; //pobranie użytkownika
             User user = userQueryable.FirstOrDefault<User>();
-            switch (user.HighwaySpeed)
-            {
-                case "do 90 km/h":
-                    currentDistance = currentDistance * 1.15;
-                    break;
-
-                case "do 120 km/h":
-                    break;
-
-                case "do 140 km/h":
-                    currentDistance = currentDistance * 0.65;
-                    break;
-
-                case "do 200 km/h":
-                    currentDistance = currentDistance * 0.45;
-                    break;
-
-                default:
-                    return 0;
-            }
-
             switch (user.DrivingStyle)
             {
-                case "Ekonomiczny":
+                case "ekonomiczny":
                     break;
 
-                case "Mieszany":
+                case "mieszany":
                     currentDistance = currentDistance * 0.9;
                     break;
 
-                case "Nieekonomiczny":
+                case "nieekonomiczny":
                     currentDistance = currentDistance * 0.8;
                     break;
 
@@ -73,12 +52,12 @@ namespace ASP_MVC_NoAuthentication.Services
 
             if (aktualnaData > summerDateStart && aktualnaData < summerDateEnd)
             {
-                currentDistance = currentDistance * user.SummerFactor;
+                currentDistance = currentDistance * (1 - user.SummerFactor);
             }
 
             else if (aktualnaData > winterDateStart && aktualnaData < winterDateEnd)
             {
-                currentDistance = currentDistance * user.WinterFactor;
+                currentDistance = currentDistance * (1 - user.WinterFactor);
             }
 
             return (int)Math.Round(currentDistance);

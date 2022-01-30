@@ -30,5 +30,23 @@ namespace ASP_MVC_NoAuthentication.Repositories
 		{
             return _context.Cars.Include(c => c.Connectors).ToList();
         }
+
+        public PersonalCar getPersonalCarById(string userId, int carId)
+        {
+            return _context.PersonalCars.Where(p => p.User.Id.Equals(userId)).Where(i => i.Id.Equals(carId)).Include(c => c.Connectors).FirstOrDefault();
+        }
+
+        public void UpdatePersonalCar(User user, PersonalCar car)
+        {
+            var dbCar = _context.PersonalCars.Where(c => c.User.Id.Equals(user.Id)).Where(pc => pc.Id.Equals(car.Id)).FirstOrDefault();
+            if (dbCar != null)
+            {
+                dbCar.Brand = car.Brand;
+                dbCar.Model = car.Model;
+                dbCar.MaximumDistance = car.MaximumDistance;
+                dbCar.Connectors = car.Connectors;
+                _context.SaveChanges();
+            }
+        }
     }
 }
