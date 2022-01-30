@@ -2,18 +2,12 @@
 
 namespace ASP_MVC_NoAuthentication.Data
 {
-    public class PersonalCar
+    public class PersonalCar : Car
     {
         public PersonalCar()
         {
             this.Connectors = new HashSet<Connector>();
         }
-        public int Id { set; get; }
-        public String Brand { set; get; }
-        public String Model { set; get; }
-        public int MaximumDistance { set; get; }
-        public ICollection<Connector> Connectors { get; set; }
-
         [Required]
         public User User { set; get; }
 
@@ -40,7 +34,7 @@ namespace ASP_MVC_NoAuthentication.Data
             return $"{Brand} {Model} ({MaximumDistance}, {Connectors})";
         }
 
-        public Car toCar()
+        public Car ToCar()
 		{
             return new Car(this.Id, this.Brand, this.Model, this.MaximumDistance, this.Connectors);
 		}

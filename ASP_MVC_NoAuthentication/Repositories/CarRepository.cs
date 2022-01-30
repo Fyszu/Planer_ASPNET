@@ -28,7 +28,9 @@ namespace ASP_MVC_NoAuthentication.Repositories
 
         public List<Car> getCars()
 		{
-            return _context.Cars.Include(c => c.Connectors).ToList();
+            List<PersonalCar> personalCars = _context.Cars.OfType<PersonalCar>().ToList();
+            List<Car> cars = _context.Cars.Include(c => c.Connectors).ToList();
+            return cars.Except(personalCars).ToList();
         }
 
         public PersonalCar getPersonalCarById(string userId, int carId)

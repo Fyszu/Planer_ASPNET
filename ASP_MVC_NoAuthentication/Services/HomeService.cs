@@ -25,7 +25,7 @@ namespace ASP_MVC_NoAuthentication.Services
             var personalCars = _userRepository.getPersonalCars(user.Id); //pobranie aut użytkownika jako queryable
             List<Car>? userCars = cars;
             foreach (PersonalCar car in personalCars)
-                userCars.Add(car.toCar());
+                userCars.Add(car.ToCar());
             return userCars;
         }
 
@@ -35,7 +35,7 @@ namespace ASP_MVC_NoAuthentication.Services
             var personalCars = _userRepository.getPersonalCars(user.Id);
             List<Car>? userCars = new List<Car>();
             foreach (PersonalCar car in personalCars)
-                userCars.Add(car.toCar());
+                userCars.Add(car.ToCar());
             return userCars;
         }
         public List<Car> getDefaultCars()
