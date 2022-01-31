@@ -1,6 +1,12 @@
 ﻿@page
 @using ASP_MVC_NoAuthentication.Views;
 @model ASP_MVC_NoAuthentication.Views.Home.InfoModel
+@{
+    ViewData["Title"] = "O aplikacji";
+    Layout = "_Layout";
+    string cb = "checkbox";
+}
 
-<p>@Model.Message</p>
+<h1>O aplikacji</h1><br />
+<p>Aplikacja opracowywana w ramach projektu uczelnianego (Politechnika Bydgoska) przez Patryka Fysz, Kaję Marczak i Martę Ostrowską. Korzysta z google API w celu uzyskiwania tras oraz parsowania adresów i koordynatów.</p>
 

@@ -32,7 +32,7 @@
 
 <body>
 
-<p style="margin-top:60px; margin-left:25px; margin-bottom: 0px; font-family:'Avenir Next LT Pro'; font-size:13pt;">Wpisz poniżej początek i cel swojej podróży, aby automatycznie znaleźć po drodze optymalne miejsce naładowania swojego samochodu elektrycznego.<br><br></p>
+<p style="margin-top:60px; margin-left:25px; margin-bottom: 0px; font-family:'Avenir Next LT Pro'; font-size:13pt;">Aplikacja automatyzująca planowanie podróży samochodem elektrycznym. Aby wyszukać optymalne ładowarki na trasie, wpisz początek i cel swojej podróży oraz wybierz samochód i stan baterii. Aby dodać własny samochód, zaloguj się.<br><br></p>
 
 <div class="accordion" id="accordionExample" style="margin-top:0px; margin-bottom:25px;">
   <div class="card">
@@ -46,7 +46,7 @@
 
 	<div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
 	  <div class="card-body">
-		Aplikacja korzysta z Google API, bla bla bla....<br><br>
+		Aplikacja wyszukuje ładowarki na trasie Twojej podróży, jednocześnie wskazując realny zasięg Twojego samochodu (zielony okrąg na mapie).<br>Realny zasięg jest automatycznie obliczany biorąc pod uwagę początkowy stan baterii, styl jazdy (zarejestrowani użytkownicy) oraz aktualny sezon (w zimę i w lato występują spadki wydajności z powodu korzystania z ogrzewania lub klimatyzacji). Parametry te można dostosować w panelu użytkownika po zalogowaniu się. Można tam również dodać własny samochód, jeśli nie możesz znaleźć go na liście.<br>Aby wyznaczyć trasę podróży, wpisz początek, cel podróży, wybierz samochód z listy oraz stan baterii. Następnie wybierz najbardziej oddaloną ładowarkę na trasie która mieści się w okręgu. Po wciśnięciu pinezki kliknij "Otwórz w google maps" - zostanie otwarta lokalizacja ładowarki w google maps. Teraz możesz wyznaczyć trasę oraz dodać kolejny przystanek w trasie (miejsce docelowe) i możesz być spokojny o dojechanie do celu swoim samochodem elektrycznym.<br />Aby uzyskać więcej informacji o aplikacji, kliknij w zakładkę "O aplikacji" na górnym pasku nawigacji.<br /><br />
 	  </div>
 	</div>
   </div>
@@ -57,11 +57,17 @@
 	</div>
 	<div class="col-md-6" style="width: 25%;">
 		<div class="col-md-6" style="width: 80%;">
-			<input type="image" id="currentLocationButton" src="/images/currentLocation.jpg" style="height:20px;width:20px;">
+			<label for="currentLocationButton">Aktualna lokacja</label>
+			<input type="image" id="currentLocationButton" name="currentLocationButton" src="/images/currentLocation.jpg" style="height:20px;width:20px;">
 			<form id = "fr">
-				<input type="text" id="origin" style="width:100%" placeholder = "Punkt początkowy" style="margin-top:5px;" required> <br><br> 
-				<input type="text" id="destination" style="width:100%" placeholder = "Punkt docelowy" required><br><br>
+				Początek podróży:<br />
+				<input type="text" id="origin" style="width:100%" placeholder = "Wpisz punkt początkowy" style="margin-top:5px;" required> <br><br> 
+				Koniec podróży:<br />
+				<input type="text" id="destination" style="width:100%" placeholder = "Wpisz punkt docelowy" required><br><br>
+				Samochód:<br />
 				<select id="selectCar"></select><br><br>
+				<em>Nie możesz znaleźć swojego samochodu na liście? Zaloguj się i dodaj własny!</em><br />
+				<br />Stan baterii:<br />
 				<input type=number id="batteryLevelSelect" style="width:55%" placeholder="Poziom baterii [%]" min=1 max=100><br><br>
 			</form>
 			<button type="button" id="findRouteButton">Szukaj ładowarek</button>
@@ -94,10 +100,10 @@
 		directionsService = new google.maps.DirectionsService();
 		directionsRenderer = new google.maps.DirectionsRenderer();
 		chargingRadius = new google.maps.Circle({
-			strokeColor: "#FF0000",
+			strokeColor: "#14f562",
 			strokeOpacity: 0.8,
 			strokeWeight: 2,
-			fillColor: "#FF0000",
+			fillColor: "#14f562",
 			fillOpacity: 0.35,
 		});
 	}

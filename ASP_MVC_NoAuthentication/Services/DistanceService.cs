@@ -32,7 +32,7 @@ namespace ASP_MVC_NoAuthentication.Services
                     currentDistance = currentDistance * 0.9;
                     break;
 
-                case "nieekonomiczny":
+                case "dynamiczny":
                     currentDistance = currentDistance * 0.8;
                     break;
 
