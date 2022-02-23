@@ -26,8 +26,10 @@ namespace ASP_MVC_NoAuthentication.Controllers
             _connectorRepository = connectorRepository;
         }
 
+
         public IActionResult Index()
         {
+            //Returns view with List of cars as a model (No user signed - default cars, user signed in - default + user cars)
             List<Car> cars = new List<Car>();
             if (_signInManager.IsSignedIn(User))
                 cars = _service.getUserCars(User.Identity.Name);
@@ -35,6 +37,7 @@ namespace ASP_MVC_NoAuthentication.Controllers
                 cars = _service.getDefaultCars();
             return View(cars);
          }
+
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

@@ -9,7 +9,6 @@ namespace ASP_MVC_NoAuthentication.Controllers
     public class ChargingStationController : Controller
     {
         private readonly IChargingStationService _service;
-
         public ChargingStationController(IChargingStationService service)
         {
             _service = service;

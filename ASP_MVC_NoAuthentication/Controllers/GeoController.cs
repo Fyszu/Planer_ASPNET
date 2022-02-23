@@ -22,6 +22,8 @@ namespace ASP_MVC_NoAuthentication.Controllers
             return null;
         }
 
+
+
         [HttpGet("getAddress")]
         public string GetAddress([FromQuery] string key, [FromQuery] string longitude, [FromQuery] string latitude)
         {
@@ -33,5 +35,6 @@ namespace ASP_MVC_NoAuthentication.Controllers
         {
             return _service.GetCoordinates(key, address);
         }
+
     }
 }

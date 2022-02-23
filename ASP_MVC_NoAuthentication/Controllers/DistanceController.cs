@@ -22,6 +22,8 @@ namespace ASP_MVC_NoAuthentication.Controllers
             _userManager = userManager;
         }
 
+
+
         [HttpGet("getRealDistance")]
         public int getRealDistance([FromQuery] int maximumDistance, int batteryLevel)
         {
@@ -31,15 +33,19 @@ namespace ASP_MVC_NoAuthentication.Controllers
                 return _service.getRealMaximumDistance(batteryLevel, maximumDistance, "default");
         }
 
+
         [HttpGet("getNumberOfRecharges")]
         public int getNumberOfRecharges([FromQuery] string routeDistance, int maxDistance, int batteryLevel)
         { 
             if(string.IsNullOrEmpty(routeDistance)) return -1;
+
             else {
+                //Regex cleaning string leaving only number
                 Regex regex = new Regex(@"[^\d]+");
                 string cleaned = regex.Replace(routeDistance, "");
                 return _service.getNumberOfRecharges(Double.Parse(cleaned), maxDistance, batteryLevel);
             }
         }
+
     }
 }
