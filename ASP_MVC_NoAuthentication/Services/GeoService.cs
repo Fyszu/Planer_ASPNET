@@ -7,66 +7,91 @@ namespace ASP_MVC_NoAuthentication.Services
     public class GeoService : IGeoService
     {
         private readonly IConfiguration _configuration;
+        private readonly string googleApiKey;
+        private readonly string geoControllerKey;
+        private string GoogleApiKey { get { return googleApiKey; } }
+        private string GeoControllerKey { get { return geoControllerKey; } }
+
         public GeoService(IConfiguration configuration)
         {
             _configuration = configuration;
+            googleApiKey = _configuration.GetValue<string>("AuthKey");
+            geoControllerKey = _configuration.GetValue<string>("MyApiKey");
         }
 
+
+
+        //Parse result from google api to address name (passing coordinates)
         public string GetAddress(string key, string longitude, string latitude)
         {
-            string properKey = _configuration.GetValue<string>("MyApiKey");
-            string data = GetResultFromCoordinates(latitude, longitude);
+            string googleApiResult = GetResultFromGoogleApi("latlng=" + latitude + "," + longitude);
             string result = string.Empty;
-            if (data.Contains("error_message"))
-            {
 
-            }
-            else if (key != _configuration.GetValue<string>("MyApiKey"))
+            if (googleApiResult.Contains("error_message"))
             {
-
+                Console.WriteLine("Error while parsing coordinates to address - google api returned error message as result.");
+                return "error_googleapi";
             }
+            else if (key != GeoControllerKey)
+            {
+                Console.WriteLine("Error while parsing coordinates to address - wrong Geo Key.");
+                return "error_bad_geokey";
+            }
+
             else
             {
                 try
                 {
-                    if (data.Length > 1)
+                    if (googleApiResult.Length > 1)
                     {
-                        JToken token = JToken.Parse(data);
+                        //Find formatted_address in result JSON matrix
+                        JToken token = JToken.Parse(googleApiResult);
                         JArray array = JArray.Parse(token["results"].ToString());
-
-
-
                         result = array.First["formatted_address"].ToString();
-
-
                     }
-
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex);
-                    Console.Read();
                 }
             }
+
+            if(String.IsNullOrEmpty(result))
+            {
+                Console.WriteLine("Something went wrong while parsing address to coordinates - result is empty.");
+                return "error_unknown";
+            }
+
             return result;
         }
 
+        //Parse result from google api to coordinates (passing address name)
         public string[] GetCoordinates(string key, string address)
         {
-            string data = GetResultFromAddress(address);
+            string googleApiResult = GetResultFromGoogleApi("address=" + address);
             string resultLat = string.Empty;
             string resultLong = string.Empty;
-            string properKey = _configuration.GetValue<string>("MyApiKey");
-            if (key == _configuration.GetValue<string>("MyApiKey"))
+
+            if (googleApiResult.Contains("error_message"))
+            {
+                Console.WriteLine("Error while parsing address to coordinates - google api returned error message as result.");
+                return new string[] { "error_googleapi" };
+            }
+            else if (key != GeoControllerKey)
+            {
+                Console.WriteLine("Error while parsing address to coordinates - wrong Geo Key.");
+                return new string[] { "error_bad_geokey" };
+            }
+
+            else
             {
                 try
                 {
-                    if (data.Length > 1)
+                    //Find lat & lng in JSON result matrix
+                    if (googleApiResult.Length > 1)
                     {
-                        JToken token = JToken.Parse(data);
+                        JToken token = JToken.Parse(googleApiResult);
                         JArray array = JArray.Parse(token["results"].ToString());
-
-
 
                         JToken arraySecond = array.First["geometry"];
                         arraySecond = arraySecond.First;
@@ -98,26 +123,30 @@ namespace ASP_MVC_NoAuthentication.Services
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex);
-                    Console.Read();
                 }
             }
-            else
-                return new string[] { "Wrong key bruh" };
+
             string[] result = new string[] { resultLat, resultLong };
+
+            if (String.IsNullOrEmpty(resultLat) || String.IsNullOrEmpty(resultLong))
+            {
+                Console.WriteLine("Something went wrong while parsing address to coordinates - lat or lng are empty.");
+                return new string[] { "error_unknown" };
+            }
+
             return result;
         }
 
-        private string GetResultFromCoordinates(string lat, string lang)
+        
+        //Gets result from google api in JSON passing location parameter (coordinates or address)
+        private string GetResultFromGoogleApi(string location)
         {
-
-            string method = "GET";
-            string URL = "https://maps.googleapis.com/maps/api/geocode/json?";
-            string Key = "key=" + _configuration.GetValue<string>("AuthKey");
-            string Sensor = "&sensor=false&";
-            string latlng = "latlng=" + lat + "," + lang;
             string result = string.Empty;
+            string URL = "https://maps.googleapis.com/maps/api/geocode/json?";
+            string Key = "key=" + GoogleApiKey;
+            string Sensor = "&sensor=false&";
 
-            URL = URL + Key + Sensor + latlng;
+            URL = URL + Key + Sensor + location;
 
             try
             {
@@ -126,56 +155,12 @@ namespace ASP_MVC_NoAuthentication.Services
                     wc.Headers[HttpRequestHeader.ContentType] = "application/json";
                     wc.Encoding = Encoding.UTF8;
                     wc.Headers.Add("User-Agent: Other");
-
-                    switch (method.ToUpper())
-                    {
-                        case "GET":
-                            result = wc.DownloadString(URL);
-                            break;
-                    }
+                    result = wc.DownloadString(URL); //Download result from Google API
                 }
             }
             catch (Exception ex)
             {
                 Console.Write(ex);
-                Console.Read();
-            }
-
-            return result;
-        }
-
-        private string GetResultFromAddress(string address)
-        {
-
-            string method = "GET";
-            string URL = "https://maps.googleapis.com/maps/api/geocode/json?";
-            string Key = "key=" + _configuration.GetValue<string>("AuthKey");
-            string Sensor = "&sensor=false&";
-            string addressURL = "address=" + address;
-            string result = string.Empty;
-
-            URL = URL + Key + Sensor + addressURL;
-
-            try
-            {
-                using (WebClient wc = new WebClient())
-                {
-                    wc.Headers[HttpRequestHeader.ContentType] = "application/json";
-                    wc.Encoding = Encoding.UTF8;
-                    wc.Headers.Add("User-Agent: Other");
-
-                    switch (method.ToUpper())
-                    {
-                        case "GET":
-                            result = wc.DownloadString(URL);
-                            break;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.Write(ex);
-                Console.Read();
             }
 
             return result;

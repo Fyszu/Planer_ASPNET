@@ -29,7 +29,7 @@ namespace ASP_MVC_NoAuthentication.Services
             return chargingStations.Distinct().ToList();
         }
 
-        public List<ChargingStation> getAllChargingStations()
+        public List<ChargingStation> getAllChargingStations() //przejrzeć
         {
             List<ChargingStation>? chargingStations = _context.ChargingStations.Include("ChargingPoints").ToList();
             foreach(var chargingStation in chargingStations)
