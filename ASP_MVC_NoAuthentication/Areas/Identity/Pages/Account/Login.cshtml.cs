@@ -68,7 +68,6 @@ namespace ASP_MVC_NoAuthentication.Views.Home
             public double WinterFactor = 0.35;
             public double SummerFactor = 0.15;
             public string HighwaySpeed = "test";
-            public ICollection<PersonalCar> PersonalCars = null;
         }
 
         public class InputLoginModel
@@ -98,7 +97,7 @@ namespace ASP_MVC_NoAuthentication.Views.Home
             ModelState.MarkAllFieldsAsSkipped();
             if (TryValidateModel(InputRegister, nameof(InputRegister)))
             {
-                var user = new User { UserName = InputRegister.EmailRegister, Email = InputRegister.EmailRegister, DrivingStyle = "mieszany", WinterFactor = 0.35, SummerFactor = 0.15, HighwaySpeed = "test", PersonalCars = null};
+                var user = new User { UserName = InputRegister.EmailRegister, Email = InputRegister.EmailRegister, DrivingStyle = "mieszany", WinterFactor = 0.35, SummerFactor = 0.15, HighwaySpeed = "test"};
                 var result = await _userManager.CreateAsync(user, InputRegister.PasswordRegister);
                 if (result.Succeeded)
                 {

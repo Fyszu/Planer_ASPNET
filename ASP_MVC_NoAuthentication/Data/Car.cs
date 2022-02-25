@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ASP_MVC_NoAuthentication.Data
@@ -9,19 +10,21 @@ namespace ASP_MVC_NoAuthentication.Data
         {
             this.Connectors = new HashSet<Connector>();
         }   
-        public int Id { set; get; }
+        public int Id { get; set; }
         public String Brand { set; get; }
         public String Model { set; get; }
         public int MaximumDistance { set; get; }
         public virtual ICollection<Connector> Connectors { get; set; }
+        public User? User { get; set; }
 
-        public Car(int id, string brand, string model, int maximumDistance, ICollection<Connector> connectors)
+        public Car(int id, string brand, string model, int maximumDistance, ICollection<Connector> connectors, User user)
 		{
             this.Id = id;
             this.Brand = brand;
             this.Model = model;
             this.MaximumDistance = maximumDistance;
             this.Connectors = connectors;
+            this.User = user;
 		}
 
         public Car(string brand, string model, int maximumDistance, ICollection<Connector> connectors)
@@ -30,6 +33,15 @@ namespace ASP_MVC_NoAuthentication.Data
             this.Model = model;
             this.MaximumDistance = maximumDistance;
             this.Connectors = connectors;
+        }
+
+        public Car(string brand, string model, int maximumDistance, ICollection<Connector> connectors, User user)
+        {
+            this.Brand= brand;
+            this.Model = model;
+            this.MaximumDistance = maximumDistance;
+            this.Connectors = connectors;
+            this.User = user;
         }
 
         public override string ToString()

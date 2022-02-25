@@ -6,20 +6,20 @@ namespace ASP_MVC_NoAuthentication.Data
     {
         public User()
         {
-            PersonalCars = new HashSet<PersonalCar>();
+            Cars = new HashSet<Car>();
         }
         public string DrivingStyle { set; get; }
         public double WinterFactor { set; get; }
         public double SummerFactor { set; get; }
         public string HighwaySpeed { set; get; }
-        public virtual ICollection<PersonalCar> PersonalCars { get; set;}
-
-        public List<Car> getCars()
-		{
-            List<Car> cars = new List<Car>();
-            foreach(PersonalCar personalCar in this.PersonalCars)
-                cars.Add(new Car(personalCar.Id, personalCar.Brand, personalCar.Brand, personalCar.MaximumDistance, personalCar.Connectors));
-            return cars;
-		}
+        public ICollection<Car> Cars { set; get; }
+        public User(string id, string drivingStyle, double winterFactor, double summerFactor, string highwaySpeed)
+        {
+            this.Id = id;
+            this.DrivingStyle = drivingStyle;
+            this.WinterFactor = winterFactor;
+            this.SummerFactor = summerFactor;
+            this.HighwaySpeed = highwaySpeed;
+        }
     }
 }
