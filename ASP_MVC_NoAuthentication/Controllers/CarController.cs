@@ -12,14 +12,14 @@ namespace ASP_MVC_NoAuthentication.Controllers
     public class CarController : Controller
     {
         private readonly UserManager<User> _userManager;
-        private readonly IHomeService _homeService;
         private readonly ICarService _carService;
+        private readonly IUserService _userService;
 
-        public CarController(UserManager<User> userManager, IHomeService homeService, ICarService carService)
+        public CarController(UserManager<User> userManager, ICarService carService, IUserService userService)
         {
             _userManager = userManager;
-            _homeService = homeService;
             _carService = carService;
+            _userService = userService;
         }
 
 
@@ -29,16 +29,17 @@ namespace ASP_MVC_NoAuthentication.Controllers
         }
 
         [HttpGet("RemoveUserCar")]
-        public async Task<IActionResult> RemoveUserCar([FromQuery] int carid)
+        public async Task<IActionResult> RemoveUserCar([FromQuery] int carId)
         {
-            _carService.RemoveUserCar(_homeService.getUser(User.Identity.Name), carid);
+            if (_carService.CheckIfCarBelongsToUser(_userService.GetUserByName(User.Identity.Name), _carService.GetCarById(carId)))
+                _carService.RemoveCarByUser(User.Identity.Name, carId);
             return Redirect(Url.Content("~/UserPanel"));
         }
 
         [HttpGet("AddUserCar")]
         public async Task<IActionResult> AddUserCar(Car car)
         {
-            _carService.AddUserCar(_homeService.getUser(User.Identity.Name), car);
+            _carService.AddNewCar(car);
             return Redirect(Url.Content("~/UserPanel"));
         }
     }

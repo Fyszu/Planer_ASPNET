@@ -19,16 +19,11 @@ namespace ASP_MVC_NoAuthentication.Controllers
             return null;
         }
 
-        [HttpGet("getChargingStations")]
-        public JsonResult getChargingStationsByConnectors([FromQuery] List<String> connectorNames)
-        {
-            return Json(_service.getChargingStationsByConnectors(connectorNames));
-        }
 
         [HttpGet("getAllChargingStations")]
         public JsonResult getAllChargingStations()
         {
-            return Json(_service.getAllChargingStations());
+            return Json(_service.GetAllChargingStations());
         }
     }
 }

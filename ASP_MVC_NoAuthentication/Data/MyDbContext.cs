@@ -17,7 +17,6 @@ namespace ASP_MVC_NoAuthentication.Data
         public DbSet<Car> Cars { get; set; }
         public DbSet<Connector> Connectors { get; set; }
         public DbSet<PaymentMethod> PaymentMethods { get; set; }
-        public DbSet<PersonalCar> PersonalCars { get; set; }
 
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

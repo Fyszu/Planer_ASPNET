@@ -5,46 +5,37 @@ namespace ASP_MVC_NoAuthentication.Services
 {
     public class CarService : ICarService
     {
-        private readonly ILogger<HomeService> _logger;
-        private readonly MyDbContext _context;
+        private readonly ILogger<CarService> _logger;
         private readonly UserRepository _userRepository;
         private readonly CarRepository _carRepository;
 
-        public CarService(ILogger<HomeService> logger, MyDbContext context, UserRepository userRepository, CarRepository carRepository)
+        public CarService(ILogger<CarService> logger, UserRepository userRepository, CarRepository carRepository)
         {
             _logger = logger;
-            _context = context;
             _userRepository = userRepository;
             _carRepository = carRepository;
         }
 
 
-        public void RemoveUserCar(User user, int carId)
-        {
-            PersonalCar car = _carRepository.getPersonalCarById(user.Id, carId);
-            if (car != null)
-            {
-                _context.PersonalCars.Remove(car);
-                _context.SaveChanges();
-            }
-        }
-        public int AddUserCar(User user, Car car)
-        {
-            PersonalCar userCar = new PersonalCar(car.Brand, car.Model, car.MaximumDistance, car.Connectors, user);
-            _context.PersonalCars.Add(userCar);
-            _context.SaveChanges();
-            return 1;
-        }
 
-        public PersonalCar getPersonalCarById(string userId, int carId)
-        {
-            return _carRepository.getPersonalCarById(userId, carId);
-        }
+        public List<Car> GetDefaultCars() { return _carRepository.GetDefaultCars(); }
 
-        public void UpdateCar(User user, Car car)
+        public List<Car> GetCarsByUser(String userName) { return _carRepository.GetCarsByUser(_userRepository.GetUserByName(userName)); }
+
+        public Car GetCarById(int id) { return _carRepository.GetCarById(id); }
+
+        public void RemoveCarByUser(string userName, int carId) { _carRepository.RemoveCarById(carId); }
+
+        public void AddNewCar(Car car) { _carRepository.AddNewCar(car); }
+
+        public void UpdateCar(Car car) { _carRepository.UpdateCar(car); }
+
+        public Boolean CheckIfCarBelongsToUser(User user, Car car)
         {
-            PersonalCar userCar = new PersonalCar(car.Id, car.Brand, car.Model, car.MaximumDistance, car.Connectors, user);
-            _carRepository.UpdatePersonalCar(user, userCar);
+            if (_carRepository.GetCarById(car.Id).User.Equals(_userRepository.GetUserByName(user.UserName)))
+                return true;
+            else
+                return false;
         }
     }
 }

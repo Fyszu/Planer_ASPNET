@@ -1,16 +1,17 @@
 ﻿using ASP_MVC_NoAuthentication.Data;
+using ASP_MVC_NoAuthentication.Repositories;
 
 namespace ASP_MVC_NoAuthentication.Services
 {
     public class DistanceService : IDistanceService
     {
         private readonly ILogger<DistanceService> _logger;
-        private readonly MyDbContext _context;
+        private readonly UserRepository _userRepository;
 
-        public DistanceService(ILogger<DistanceService> logger, MyDbContext context)
+        public DistanceService(ILogger<DistanceService> logger, UserRepository userRepository)
         {
             _logger = logger;
-            _context = context;
+            _userRepository = userRepository;
         }
 
         public int getRealMaximumDistance(int currentBatteryLevel, int maximumDistance, String? userName) // string 
@@ -21,8 +22,7 @@ namespace ASP_MVC_NoAuthentication.Services
             {
                 userName = "default@default.pl";
             }
-            var userQueryable = from u in _context.Users where u.UserName == userName select u; //pobranie użytkownika
-            User user = userQueryable.FirstOrDefault<User>();
+            User user = _userRepository.GetUserByName(userName);
             switch (user.DrivingStyle)
             {
                 case "ekonomiczny":

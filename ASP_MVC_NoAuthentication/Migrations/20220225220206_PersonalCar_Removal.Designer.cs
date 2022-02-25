@@ -3,14 +3,16 @@ using System;
 using ASP_MVC_NoAuthentication.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ASP_MVC_NoAuthentication.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    partial class MyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220225220206_PersonalCar_Removal")]
+    partial class PersonalCar_Removal
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,12 +36,7 @@ namespace ASP_MVC_NoAuthentication.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("UserId")
-                        .HasColumnType("varchar(767)");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Cars");
                 });
@@ -382,13 +379,6 @@ namespace ASP_MVC_NoAuthentication.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("ASP_MVC_NoAuthentication.Data.Car", b =>
-                {
-                    b.HasOne("ASP_MVC_NoAuthentication.Data.User", null)
-                        .WithMany("Cars")
-                        .HasForeignKey("UserId");
-                });
-
             modelBuilder.Entity("ASP_MVC_NoAuthentication.Data.ChargingPoint", b =>
                 {
                     b.HasOne("ASP_MVC_NoAuthentication.Data.Connector", "Connector")
@@ -497,11 +487,6 @@ namespace ASP_MVC_NoAuthentication.Migrations
             modelBuilder.Entity("ASP_MVC_NoAuthentication.Data.Connector", b =>
                 {
                     b.Navigation("ChargingPoints");
-                });
-
-            modelBuilder.Entity("ASP_MVC_NoAuthentication.Data.User", b =>
-                {
-                    b.Navigation("Cars");
                 });
 #pragma warning restore 612, 618
         }

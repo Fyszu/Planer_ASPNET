@@ -11,19 +11,15 @@ namespace ASP_MVC_NoAuthentication.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly IHomeService _service;
+        private readonly ICarService _carService;
         private readonly SignInManager<User> _signInManager;
         private readonly UserManager<User> _userManager;
-        private readonly CarRepository _carRepository;
-        private readonly ConnectorRepository _connectorRepository;
-        public HomeController(IHomeService service, ILogger<HomeController> logger, UserManager<User> userManager, SignInManager<User> signInManager, CarRepository carRepository, ConnectorRepository connectorRepository)
+        public HomeController(ILogger<HomeController> logger, UserManager<User> userManager, SignInManager<User> signInManager, ICarService carService)
         {
             _logger = logger;
             _userManager = userManager;
             _signInManager = signInManager;
-            _service = service;
-            _carRepository = carRepository;
-            _connectorRepository = connectorRepository;
+            _carService = carService;
         }
 
 
@@ -31,10 +27,9 @@ namespace ASP_MVC_NoAuthentication.Controllers
         {
             //Returns view with List of cars as a model (No user signed - default cars, user signed in - default + user cars)
             List<Car> cars = new List<Car>();
+            cars = _carService.GetDefaultCars();
             if (_signInManager.IsSignedIn(User))
-                cars = _service.getUserCars(User.Identity.Name);
-            else
-                cars = _service.getDefaultCars();
+                cars = (_carService.GetCarsByUser(User.Identity.Name)).Concat(cars).OrderBy(car => car.Brand).ToList();
             return View(cars);
          }
 

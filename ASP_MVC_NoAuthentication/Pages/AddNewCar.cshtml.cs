@@ -13,19 +13,19 @@ namespace ASP_MVC_NoAuthentication.Pages
     {
         private readonly SignInManager<User> _signInManager;
         private readonly UserManager<User> _userManager;
-        private readonly ConnectorRepository _repository;
-        private readonly IHomeService _homeService;
+        private readonly IUserService _userService;
         private readonly ICarService _carService;
+        private readonly IConnectorService _connectorService;
         public List<Connector> _connectors = null;
         public User _currentUser;
 
-        public AddNewCarModel(UserManager<User> userManager, SignInManager<User> signInManager, ConnectorRepository repository, IHomeService homeService, ICarService carService)
+        public AddNewCarModel(UserManager<User> userManager, SignInManager<User> signInManager, IUserService userService, ICarService carService, IConnectorService connectorService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
-            _repository = repository;
-            _homeService = homeService;
+            _userService = userService;
             _carService = carService;
+            _connectorService = connectorService;
         }
 
         public async Task OnGetAsync()
@@ -34,13 +34,13 @@ namespace ASP_MVC_NoAuthentication.Pages
         }
         public async Task GetPage()
         {
-            _connectors = _repository.GetAllConnectors();
-            _currentUser = _homeService.getUser(User.Identity.Name);
+            _connectors = _connectorService.GetAllConnectors();
+            _currentUser = _userService.GetUserByName(User.Identity.Name);
         }
         public async Task<IActionResult> OnPostAddCarAsync(string? returnUrl = null)
         {
-            _currentUser = _homeService.getUser(User.Identity.Name);
-            _connectors = _repository.GetAllConnectors();
+            _currentUser = _userService.GetUserByName(User.Identity.Name);
+            _connectors = _connectorService.GetAllConnectors();
             string brand = Request.Form["brand"];
             string model = Request.Form["carmodel"];
             int maximumDistance = (int.Parse(Request.Form["maximumdistance"]));
@@ -53,7 +53,8 @@ namespace ASP_MVC_NoAuthentication.Pages
                 if(check != null)
                     carConnectors.Add(connector);
             }
-            int x = _carService.AddUserCar(_currentUser, new Car(brand, model, maximumDistance, carConnectors));
+
+            _carService.AddNewCar(new Car(brand, model, maximumDistance, carConnectors, _currentUser));
             return Redirect(Url.Content("~/UserPanel"));
         }
     }

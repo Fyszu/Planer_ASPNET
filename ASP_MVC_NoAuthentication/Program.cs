@@ -36,13 +36,15 @@ builder.Services.ConfigureApplicationCookie(options =>
 });
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddTransient<IGeoService, GeoService>();
-builder.Services.AddTransient<IHomeService, HomeService>();
 builder.Services.AddTransient<IChargingStationService, ChargingStationService>();
 builder.Services.AddTransient<IDistanceService, DistanceService>();
+builder.Services.AddTransient<IUserService, UserService>();
+builder.Services.AddTransient<IConnectorService, ConnectorService>();
 builder.Services.AddScoped<ICarService, CarService>();
 builder.Services.AddScoped<CarRepository, CarRepository>();
 builder.Services.AddScoped<ConnectorRepository, ConnectorRepository>();
 builder.Services.AddScoped<UserRepository, UserRepository>();
+builder.Services.AddScoped<ChargingStationsRepository, ChargingStationsRepository>();
 builder.Services.AddControllersWithViews().AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 builder.Services.AddRazorPages();
 var app = builder.Build();

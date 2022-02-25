@@ -11,9 +11,28 @@ namespace ASP_MVC_NoAuthentication.Repositories
             _context = context;
         }
 
-        public List<PersonalCar> getPersonalCars(string id)
-		{
-            return _context.PersonalCars.Where(p => p.User.Id.Equals(id)).Include(c => c.Connectors).ToList();
-		}
+
+        public User GetUserByName(string name)
+        {
+            return _context.Users.Where(u => u.UserName == name).FirstOrDefault();
+        }
+
+        public User GetUserById(string id)
+        {
+            return _context.Users.Find(id);
+        }
+
+        public void UpdateUser(User user)
+        {
+            User dbUser = _context.Users.Find(user.Id);
+            if (dbUser != null)
+            {
+                dbUser.SummerFactor = user.SummerFactor;
+                dbUser.WinterFactor = user.WinterFactor;
+                dbUser.DrivingStyle = user.DrivingStyle;
+                _context.SaveChanges();
+            }
+
+        }
     }
 }

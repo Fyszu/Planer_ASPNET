@@ -13,13 +13,16 @@ namespace ASP_MVC_NoAuthentication.Pages
     {
         private readonly SignInManager<User> _signInManager;
         private readonly UserManager<User> _userManager;
-        private readonly IHomeService _service;
+        private readonly IUserService _userService;
+        private readonly ICarService _carService;
         public List<Car> cars = null;
         public User currentUser;
+        public string testMessage;
         public string ReturnUrl { get; set; }
-        public UserPanelModel(IHomeService service, UserManager<User> userManager, SignInManager<User> signInManager)
+        public UserPanelModel(IUserService userService, UserManager<User> userManager, SignInManager<User> signInManager, ICarService carService)
         {
-            _service = service;
+            _userService = userService;
+            _carService = carService;
             _userManager = userManager;
             _signInManager = signInManager;
         }
@@ -31,20 +34,32 @@ namespace ASP_MVC_NoAuthentication.Pages
 
         public async Task GetPage()
         {
-            cars = _service.getPersonalisableCars(User.Identity.Name);
-            currentUser = _service.getUser(User.Identity.Name);
+            cars = _carService.GetCarsByUser(User.Identity.Name);
+            currentUser = _userService.GetUserByName(User.Identity.Name);
+            testMessage = "brak";
         }
 
+        [HttpGet("success")]
+        public void OnGetSucces()
+        {
+            testMessage = "sukces";
+        }
+
+        [HttpGet("error")]
+        public void OnGetError()
+        {
+            testMessage = "error";
+        }
         public async Task<IActionResult> OnPostSaveSettingsAsync(string? returnUrl = null)
         {
-            currentUser = _service.getUser(User.Identity.Name);
+            currentUser = _userService.GetUserByName(User.Identity.Name);
             var summer = Request.Form["summerFactorRange"];
             var summer2 = int.Parse(summer);
             double summer3 = (double)summer2 / 100;
             double summerFactor = ((double)(int.Parse(Request.Form["summerFactorRange"])) / 100);
             double winterFactor = ((double)(int.Parse(Request.Form["winterFactorRange"])) / 100);
             string drivingStyle = Request.Form["drivingStyleSelect"];
-            _service.saveSettings(summerFactor, winterFactor, drivingStyle, currentUser.Id);
+            _userService.SaveSettings(summerFactor, winterFactor, drivingStyle, currentUser.Id);
             return Redirect(Url.Content("~/UserPanel"));
         }
     }

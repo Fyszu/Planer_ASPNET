@@ -7,13 +7,15 @@ namespace ASP_MVC_NoAuthentication.Services
     public class GeoService : IGeoService
     {
         private readonly IConfiguration _configuration;
+        private readonly ILogger<GeoService> _logger;
         private readonly string googleApiKey;
         private readonly string geoControllerKey;
         private string GoogleApiKey { get { return googleApiKey; } }
         private string GeoControllerKey { get { return geoControllerKey; } }
 
-        public GeoService(IConfiguration configuration)
+        public GeoService(ILogger<GeoService> logger, IConfiguration configuration)
         {
+            _logger = logger;
             _configuration = configuration;
             googleApiKey = _configuration.GetValue<string>("AuthKey");
             geoControllerKey = _configuration.GetValue<string>("MyApiKey");
