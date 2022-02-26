@@ -28,41 +28,32 @@ namespace ASP_MVC_NoAuthentication.Services
         {
             string googleApiResult = GetResultFromGoogleApi("latlng=" + latitude + "," + longitude);
             string result = string.Empty;
+            JToken token = JToken.Parse(googleApiResult); //Parse JSON array
 
-            if (googleApiResult.Contains("error_message"))
+            switch (token["status"].ToString())
             {
-                Console.WriteLine("Error while parsing coordinates to address - google api returned error message as result.");
-                return "error_googleapi";
-            }
-            else if (key != GeoControllerKey)
-            {
-                Console.WriteLine("Error while parsing coordinates to address - wrong Geo Key.");
-                return "error_bad_geokey";
+                case "INVALID_REQUEST":
+                    return token["error_message"].ToString();
+                case "ZERO_RESULTS":
+                    return "ZERO_RESULTS";
+                case "OK":
+                    break;
+                default:
+                    return "UNKNOWN";
             }
 
-            else
+            try
             {
-                try
-                {
-                    if (googleApiResult.Length > 1)
-                    {
-                        //Find formatted_address in result JSON matrix
-                        JToken token = JToken.Parse(googleApiResult);
-                        JArray array = JArray.Parse(token["results"].ToString());
-                        result = array.First["formatted_address"].ToString();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex);
-                }
+                //Find formatted_address in result JSON array
+                result = token["results"][0]["formatted_address"].ToString();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
             }
 
             if(String.IsNullOrEmpty(result))
-            {
-                Console.WriteLine("Something went wrong while parsing address to coordinates - result is empty.");
-                return "error_unknown";
-            }
+                return "UNKNOWN";
 
             return result;
         }
@@ -73,59 +64,29 @@ namespace ASP_MVC_NoAuthentication.Services
             string googleApiResult = GetResultFromGoogleApi("address=" + address);
             string resultLat = string.Empty;
             string resultLong = string.Empty;
+            JToken token = JToken.Parse(googleApiResult); //Parse JSON array
 
-            if (googleApiResult.Contains("error_message"))
+            switch(token["status"].ToString())
             {
-                Console.WriteLine("Error while parsing address to coordinates - google api returned error message as result.");
-                return new string[] { "error_googleapi" };
+                case "INVALID_REQUEST":
+                    return new string[] { token["error_message"].ToString() };
+                case "ZERO_RESULTS":
+                    return new string[] { "ZERO_RESULTS" };
+                case "OK":
+                    break;
+                default:
+                    return new string[] { "UNKNOWN" };
             }
-            else if (key != GeoControllerKey)
+
+            try
             {
-                Console.WriteLine("Error while parsing address to coordinates - wrong Geo Key.");
-                return new string[] { "error_bad_geokey" };
+                //find coordinates in JSON array
+                resultLat = token["results"][0]["geometry"]["location"]["lat"].ToString();
+                resultLong = token["results"][0]["geometry"]["location"]["lng"].ToString();
             }
-
-            else
+            catch (Exception ex)
             {
-                try
-                {
-                    //Find lat & lng in JSON result matrix
-                    if (googleApiResult.Length > 1)
-                    {
-                        JToken token = JToken.Parse(googleApiResult);
-                        JArray array = JArray.Parse(token["results"].ToString());
-
-                        JToken arraySecond = array.First["geometry"];
-                        arraySecond = arraySecond.First;
-                        if (JToken.ReferenceEquals(arraySecond.First["northeast"], null))
-                        {
-                            resultLat = arraySecond.First["lat"].ToString();
-                            resultLong = arraySecond.First["lng"].ToString();
-                        }
-                        else
-                        {
-                            if (JToken.ReferenceEquals(arraySecond.First["bounds"], null))
-                            {
-                                arraySecond = arraySecond.First;
-                                arraySecond = arraySecond.First;
-                                resultLat = arraySecond.First["lat"].ToString();
-                                resultLong = arraySecond.First["lng"].ToString();
-                            }
-                            else
-                            {
-                                arraySecond = arraySecond.First["bounds"];
-                                arraySecond = arraySecond.First["northeast"];
-                                resultLat = arraySecond.First["lat"].ToString();
-                                resultLong = arraySecond.First["lng"].ToString();
-                            }
-                        }
-                    }
-
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex);
-                }
+                Console.WriteLine(ex);
             }
 
             string[] result = new string[] { resultLat, resultLong };

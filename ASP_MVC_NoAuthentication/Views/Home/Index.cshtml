@@ -145,64 +145,82 @@
 			var myOrigin;
 			var myDestination;
 			if(startBox.value&&destinationBox.value) {
-				const temp1 = await fetchAddress(startBox.value);
-				const temp2 = await fetchAddress(destinationBox.value);
-				myOrigin = new google.maps.LatLng(parseFloat(temp1[0].replace(",",".")),parseFloat(temp1[1].replace(",",".")));
-				myDestination = new google.maps.LatLng(parseFloat(temp2[0].replace(",",".")),parseFloat(temp2[1].replace(",",".")));
+				const address1 = await fetchAddress(startBox.value);
+				const address2 = await fetchAddress(destinationBox.value);
+				
+				var errorMessage = "";
+				if(address1[0] == "ZERO_RESULTS")
+					errorMessage = "Can't find any results for origin address.";
+				if(address1[0] == "INVALID_REQUEST")
+					errorMessage = "Invalid request (origin).";
+				if(address2[0] == "ZERO_RESULTS")
+					errorMessage = "Can't find any results for destination address.";
+				if(address2[0] == "INVALID_REQUEST")
+					errorMessage = "Invalid request (destination).";
+				if(address1[0] == "UNKNOWN")
+					errorMessage = "Unknown error (origin).";
+				if(address2[0] == "UNKNOWN")
+					errorMessage = "Unknown error (destination).";
+				if(!errorMessage.length) {
+					myOrigin = new google.maps.LatLng(parseFloat(address1[0].replace(",",".")),parseFloat(address1[1].replace(",",".")));
+					myDestination = new google.maps.LatLng(parseFloat(address2[0].replace(",",".")),parseFloat(address2[1].replace(",",".")));
 
-				chargingRadius.setMap(null);
-				chargingRadius.setMap(map);
-				chargingRadius.setCenter(myOrigin);
-				const radius = await fetchRealDistance(carList[selectCarList.selectedIndex].maximumDistance, document.getElementById("batteryLevelSelect").value);
-				chargingRadius.setRadius(radius);
+					chargingRadius.setMap(null);
+					chargingRadius.setMap(map);
+					chargingRadius.setCenter(myOrigin);
+					const radius = await fetchRealDistance(carList[selectCarList.selectedIndex].maximumDistance, document.getElementById("batteryLevelSelect").value);
+					chargingRadius.setRadius(radius);
 
-				var request = {
-					origin: myOrigin,
-					destination: myDestination,
-					travelMode: 'DRIVING'
-				};
+					var request = {
+						origin: myOrigin,
+						destination: myDestination,
+						travelMode: 'DRIVING'
+					};
 
-				directionsService.route(request, function(response, status) { //sprawdź czy ładowarka jest w pobliżu trasy
-					if(status == google.maps.DirectionsStatus.OK) {
-						route = response.routes[0];
-						numberOfRechargesCallback(route.legs[0].distance.text, route, carMaximumDistance);
-						directionsRenderer.setDirections(response);
-						chargingStationsByConnectors.forEach(station => {
-							var stationLat = station.latitude;
-							var stationLong = station.longitude;
-							var stationCoordinates = new google.maps.LatLng(stationLat, stationLong);
-							if(google.maps.geometry.poly.isLocationOnEdge(stationCoordinates, new google.maps.Polyline({ path: google.maps.geometry.encoding.decodePath(route.overview_polyline) }), 0.1))
-								chargingStationsNearRoute.push(station); //dodanie ładowarki, która jest w pobliżu trasy
-						});
-						if(chargingStationsNearRoute.length == 0) {
-							window.alert("Brak ładowarek elektrycznych w pobliżu wyznaczonej trasy!");
-						}
-						else { //wyświetlenie przefiltrowanych ładowarek
-							chargingStationsNearRoute.forEach(station => {
-								var stationState = "Aktywna";
-								if(station.stationState == 0) {
-									stationState = "Zamknięta";
-								}
-								var marker = new google.maps.Marker({
-									position: { lat: station.latitude, lng: station.longitude },
-									map: map,
-								});
-								markersArray.push(marker);
-								var infoWindow = new google.maps.InfoWindow({
-									content: "<p>Stacja: " + station.name + "<br>Koordynaty: " + station.latitude + ", " 
-									+ station.longitude + "<br>Adres: " + station.city + " " + station.postalAdress + ", "
-									+ station.street + "<br>Godziny otwarcia: " + station.openHours + "<br>Właściciel: "
-									+ station.owner + "<br>Stan stacji: " + stationState + "<br><a href='https://www.google.pl/maps?q=" + station.latitude + ",+" + station.longitude + "'>Otwórz w google maps</a></p>",
-								});
-								google.maps.event.addListener(marker, "click", () => {
-									infoWindow.open(map,marker);
-								});
+					directionsService.route(request, function(response, status) { //sprawdź czy ładowarka jest w pobliżu trasy
+						if(status == google.maps.DirectionsStatus.OK) {
+							route = response.routes[0];
+							numberOfRechargesCallback(route.legs[0].distance.text, route, carMaximumDistance);
+							directionsRenderer.setDirections(response);
+							chargingStationsByConnectors.forEach(station => {
+								var stationLat = station.latitude;
+								var stationLong = station.longitude;
+								var stationCoordinates = new google.maps.LatLng(stationLat, stationLong);
+								if(google.maps.geometry.poly.isLocationOnEdge(stationCoordinates, new google.maps.Polyline({ path: google.maps.geometry.encoding.decodePath(route.overview_polyline) }), 0.1))
+									chargingStationsNearRoute.push(station); //dodanie ładowarki, która jest w pobliżu trasy
 							});
+							if(chargingStationsNearRoute.length == 0) {
+								window.alert("Brak ładowarek elektrycznych w pobliżu wyznaczonej trasy!");
+							}
+							else { //wyświetlenie przefiltrowanych ładowarek
+								chargingStationsNearRoute.forEach(station => {
+									var stationState = "Aktywna";
+									if(station.stationState == 0) {
+										stationState = "Zamknięta";
+									}
+									var marker = new google.maps.Marker({
+										position: { lat: station.latitude, lng: station.longitude },
+										map: map,
+									});
+									markersArray.push(marker);
+									var infoWindow = new google.maps.InfoWindow({
+										content: "<p>Stacja: " + station.name + "<br>Koordynaty: " + station.latitude + ", " 
+										+ station.longitude + "<br>Adres: " + station.city + " " + station.postalAdress + ", "
+										+ station.street + "<br>Godziny otwarcia: " + station.openHours + "<br>Właściciel: "
+										+ station.owner + "<br>Stan stacji: " + stationState + "<br><a href='https://www.google.pl/maps?q=" + station.latitude + ",+" + station.longitude + "'>Otwórz w google maps</a></p>",
+									});
+									google.maps.event.addListener(marker, "click", () => {
+										infoWindow.open(map,marker);
+									});
+								});
+							}
 						}
-					}
-					else
-						alert("Błąd wyznaczania trasy. Status: " + status) //obsługa błędu
-				});
+						else if(status == "ZERO_RESULTS")
+							alert("Nie znaleziono żadnej trasy dla podanych adresów.");
+						else
+							alert("Błąd wyznaczania trasy. Status: " + status) //obsługa błędu
+					});
+				} else alert(errorMessage);
 			}
 		}
 	}

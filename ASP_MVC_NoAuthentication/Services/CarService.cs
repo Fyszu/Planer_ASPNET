@@ -32,7 +32,9 @@ namespace ASP_MVC_NoAuthentication.Services
 
         public Boolean CheckIfCarBelongsToUser(User user, Car car)
         {
-            if (_carRepository.GetCarById(car.Id).User.Equals(_userRepository.GetUserByName(user.UserName)))
+            if (car.User is null)
+                return false;
+            else if (_carRepository.GetCarById(car.Id).User.Equals(_userRepository.GetUserByName(user.UserName)))
                 return true;
             else
                 return false;
