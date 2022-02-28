@@ -7,6 +7,7 @@ using System.Text;
 
 namespace ASP_MVC_NoAuthentication.Controllers
 {
+    //GeoController - provider of responses from google api (parsing coordinates and addresses)
     [ApiController]
     [Route("[controller]")]
     public class GeoController : Controller
@@ -23,7 +24,6 @@ namespace ASP_MVC_NoAuthentication.Controllers
         }
 
 
-
         [HttpGet("getAddress")]
         public string GetAddress([FromQuery] string key, [FromQuery] string longitude, [FromQuery] string latitude)
         {
@@ -31,7 +31,7 @@ namespace ASP_MVC_NoAuthentication.Controllers
         }
 
         [HttpGet("getCoordinates")]
-        public string[] GetCoordinates([FromQuery] string key, [FromQuery] string address)
+        public string GetCoordinates([FromQuery] string key, [FromQuery] string address)
         {
             return _service.GetCoordinates(key, address);
         }

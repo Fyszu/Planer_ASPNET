@@ -148,22 +148,8 @@
 				const address1 = await fetchAddress(startBox.value);
 				const address2 = await fetchAddress(destinationBox.value);
 				
-				var errorMessage = "";
-				if(address1[0] == "ZERO_RESULTS")
-					errorMessage = "Can't find any results for origin address.";
-				if(address1[0] == "INVALID_REQUEST")
-					errorMessage = "Invalid request (origin).";
-				if(address2[0] == "ZERO_RESULTS")
-					errorMessage = "Can't find any results for destination address.";
-				if(address2[0] == "INVALID_REQUEST")
-					errorMessage = "Invalid request (destination).";
-				if(address1[0] == "UNKNOWN")
-					errorMessage = "Unknown error (origin).";
-				if(address2[0] == "UNKNOWN")
-					errorMessage = "Unknown error (destination).";
-				if(!errorMessage.length) {
-					myOrigin = new google.maps.LatLng(parseFloat(address1[0].replace(",",".")),parseFloat(address1[1].replace(",",".")));
-					myDestination = new google.maps.LatLng(parseFloat(address2[0].replace(",",".")),parseFloat(address2[1].replace(",",".")));
+					myOrigin = new google.maps.LatLng(parseFloat(address1[0]),parseFloat(address1[1]));
+					myDestination = new google.maps.LatLng(parseFloat(address2[0]),parseFloat(address2[1]));
 
 					chargingRadius.setMap(null);
 					chargingRadius.setMap(map);
@@ -220,15 +206,28 @@
 						else
 							alert("Błąd wyznaczania trasy. Status: " + status) //obsługa błędu
 					});
-				} else alert(errorMessage);
 			}
 		}
 	}
 
-	function checkIfIsOnRoute(polyline, point) { //funkcja sprawdza, czy punkt jest na trasie
-		var x = new google.maps.LatLng(53.030622, 18.197513); //testowy punkt
-		if(google.maps.geometry.poly.isLocationOnEdge(point, polyline, 0.01))
-			return "x";
+	//Handling google api responses
+	function statusErrorHandler(status, address) {
+		switch(status) {
+			case("ZERO_RESULTS"):
+				alert("Can't find any results for address \"" + address + "\"");
+				break;
+			case("INVALID_REQUEST"):
+				alert("Invalid request - probably query is missing for address \"" + address + "\"");
+				break;
+			case("GOOGLEAPI_ERROR"):
+				alert("Problem while parsing result from google api has occured for address \"" + address + "\"");
+				break;
+			case("WRONG_KEY"):
+				alert("Wrong geocode api key.");
+			default:
+				alert("Unknown error has occured for \"" + address + "\" ");
+				break;
+		}
 	}
 
 	async function numberOfRechargesCallback(distance, route, carMaximumDistance) {
@@ -239,8 +238,11 @@
 	async function fetchAddress(address) { //zamiana adresu na współrzędne poprzez API
 		try {
 			const response = await fetch(window.location.href + "geo/getCoordinates?key=" + "@geoKey" + "&address=" + address);
-			const coordinates = await response.json();
-			return coordinates;
+			const geoArray = await response.json();
+			if(geoArray["Status"] == "OK")
+				return [geoArray["Coordinates"]["Lat"],geoArray["Coordinates"]["Lng"]];
+			else
+				statusErrorHandler(geoArray["Status"], address);
 		} catch(error) {
 			console.error(error);
 		}
@@ -312,9 +314,12 @@
 	function useLocation(position) {
 		url = window.location.href + "geo/getAddress?key=" + "@geoKey" + "&longitude=" + position.coords.longitude + "&latitude=" + position.coords.latitude;
 		fetch(url)
-		.then(res => res.text())
+		.then(res => res.json())
 		.then(data => {
-			element.value = data;
+			if(data["Status"] == "OK")
+				element.value = data["Address"];
+			else
+				alert("Problem with getting current localization has occured. Please type address manually.");
 		});
 	}
 
