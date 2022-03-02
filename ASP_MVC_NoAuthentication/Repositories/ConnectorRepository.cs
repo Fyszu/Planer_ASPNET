@@ -2,7 +2,7 @@
 
 namespace ASP_MVC_NoAuthentication.Repositories
 {
-    public class ConnectorRepository
+    public class ConnectorRepository : IConnectorRepository
     {
         private readonly MyDbContext _context;
         public ConnectorRepository(MyDbContext context)
@@ -10,18 +10,40 @@ namespace ASP_MVC_NoAuthentication.Repositories
             _context = context;
         }
 
-        public Connector getConnectorById(int id)
+
+
+        public Connector GetById(int id)
         {
-            List<Connector> connectors = _context.Connectors.ToList();
-            foreach (Connector connector in connectors)
-            {
-                if (connector.Id == id)
-                    return connector;
-            }
-            return null;
+            return _context.Connectors.Find(id);
         }
 
-        public List<Connector> GetAllConnectors()
+        public void Add(Connector connector)
+        {
+            if(connector != null)
+                _context.Add(connector);
+            _context.SaveChanges();
+        }
+
+        public void Update(Connector connector)
+        {
+            if (connector != null)
+            {
+                Connector dbConnector = GetById(connector.Id);
+                dbConnector.ChargingPoints = connector.ChargingPoints;
+                dbConnector.Name = connector.Name;
+            }
+                
+            _context.SaveChanges();
+        }
+
+        public void Remove(Connector connector)
+        {
+            if(connector != null)
+                _context.Remove(connector);
+            _context.SaveChanges();
+        }
+
+        public List<Connector> GetAll()
         {
             return _context.Connectors.ToList();
         }

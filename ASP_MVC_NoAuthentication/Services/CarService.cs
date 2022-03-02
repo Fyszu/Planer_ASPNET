@@ -20,21 +20,21 @@ namespace ASP_MVC_NoAuthentication.Services
 
         public List<Car> GetDefaultCars() { return _carRepository.GetDefaultCars(); }
 
-        public List<Car> GetCarsByUser(String userName) { return _carRepository.GetCarsByUser(_userRepository.GetUserByName(userName)); }
+        public List<Car> GetCarsByUser(String userName) { return _carRepository.GetCarsByUser(_userRepository.GetByName(userName)); }
 
-        public Car GetCarById(int id) { return _carRepository.GetCarById(id); }
+        public Car GetCarById(int id) { return _carRepository.GetById(id); }
 
-        public void RemoveCarByUser(string userName, int carId) { _carRepository.RemoveCarById(carId); }
+        public void RemoveCarByUser(string userName, int carId) { _carRepository.RemoveById(carId); }
 
-        public void AddNewCar(Car car) { _carRepository.AddNewCar(car); }
+        public void AddNewCar(Car car) { _carRepository.Add(car); }
 
-        public void UpdateCar(Car car) { _carRepository.UpdateCar(car); }
+        public void UpdateCar(Car car) { _carRepository.Update(car); }
 
         public Boolean CheckIfCarBelongsToUser(User user, Car car)
         {
             if (car.User is null)
                 return false;
-            else if (_carRepository.GetCarById(car.Id).User.Equals(_userRepository.GetUserByName(user.UserName)))
+            else if (_carRepository.GetById(car.Id).User.Equals(_userRepository.GetByName(user.UserName)))
                 return true;
             else
                 return false;

@@ -17,7 +17,7 @@ namespace ASP_MVC_NoAuthentication.Services
 
         public List<Connector> GetAllConnectors()
         {
-            return _connectorRepository.GetAllConnectors();
+            return _connectorRepository.GetAll();
         }
     }
 }

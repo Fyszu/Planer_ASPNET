@@ -22,7 +22,7 @@ namespace ASP_MVC_NoAuthentication.Services
             {
                 userName = "default@default.pl";
             }
-            User user = _userRepository.GetUserByName(userName);
+            User user = _userRepository.GetByName(userName);
             switch (user.DrivingStyle)
             {
                 case "ekonomiczny":

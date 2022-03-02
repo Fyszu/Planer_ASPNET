@@ -3,10 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ASP_MVC_NoAuthentication.Repositories
 {
-    public class CarRepository
+    public class CarRepository : ICarRepository
     {
         private readonly MyDbContext _context;
-
         public CarRepository(MyDbContext context)
         {
             _context = context;
@@ -14,24 +13,45 @@ namespace ASP_MVC_NoAuthentication.Repositories
 
 
 
-        public void AddNewCar(Car car)
+        public Car GetById(int id)
         {
-            _context.Cars.Add(car);
+            return _context.Cars.Include(car => car.Connectors).Where(car => car.Id == id).SingleOrDefault();
+        }
+
+        public void Add(Car car)
+        {
+            if(car != null)
+                _context.Cars.Add(car);
             _context.SaveChanges();
         }
 
-        public void UpdateCar(Car car)
+        public void Update(Car car)
         {
-            var dbCar = _context.Cars.Where(dbc => dbc.Id.Equals(car.Id)).FirstOrDefault();
-            if (dbCar != null)
+            if (car != null)
             {
+                Car dbCar = GetById(car.Id);
                 dbCar.Brand = car.Brand;
                 dbCar.Model = car.Model;
                 dbCar.MaximumDistance = car.MaximumDistance;
                 dbCar.Connectors = car.Connectors;
+            }
+            _context.SaveChanges();
+        }
+
+        public void Remove(Car car)
+        {
+            if(car != null)
+            {
+                _context.Cars.Remove(car);
                 _context.SaveChanges();
             }
         }
+
+        public List<Car> GetAll()
+        {
+            return _context.Cars.ToList();
+        }
+
         public List<Car> GetDefaultCars()
         {
             return _context.Cars.Include(car => car.User).Include(car => car.Connectors).Where(car => car.User.Equals(null)).ToList();
@@ -42,19 +62,12 @@ namespace ASP_MVC_NoAuthentication.Repositories
             return _context.Cars.Include(car => car.User).Include(car => car.Connectors).Where(car => car.User.Equals(user)).ToList();
         }
 
-        public Car GetCarById(int id)
+        public void RemoveById(int id)
         {
-            return _context.Cars.Include(car => car.Connectors).Where(car => car.Id == id).FirstOrDefault();
-        }
-
-        public void RemoveCarById(int id)
-        {
-            Car car = _context.Cars.Where(car => car.Id == id).FirstOrDefault();
-            if (car != null)
-            {
-                _context.Cars.Remove(car);
-                _context.SaveChanges();
-            }
+            Car car = GetById(id);
+            if(car != null)
+                Remove(car);
+            _context.SaveChanges();
         }
     }
 }

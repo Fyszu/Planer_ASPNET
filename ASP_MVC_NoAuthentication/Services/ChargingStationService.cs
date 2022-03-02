@@ -18,7 +18,7 @@ namespace ASP_MVC_NoAuthentication.Services
 
         public List<ChargingStation> GetAllChargingStations() //przejrzeć
         {
-            return _chargingStationsRepository.GetAllChargingStations();
+            return _chargingStationsRepository.GetAll();
         }
     }
 }

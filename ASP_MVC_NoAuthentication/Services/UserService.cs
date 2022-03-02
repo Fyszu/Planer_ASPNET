@@ -16,12 +16,12 @@ namespace ASP_MVC_NoAuthentication.Services
 
         public User GetUserByName(string name)
         {
-            return _repository.GetUserByName(name);
+            return _repository.GetByName(name);
         }
 
         public void SaveSettings(double summerFactor, double winterFactor, string drivingStyle, string userId)
         {
-            _repository.UpdateUser(new User(userId, drivingStyle, winterFactor, summerFactor, "default"));
+            _repository.Update(new User(userId, drivingStyle, winterFactor, summerFactor, "default"));
         }
     }
 }
