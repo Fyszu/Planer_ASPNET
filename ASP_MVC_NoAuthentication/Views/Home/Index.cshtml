@@ -8,7 +8,7 @@
 @{
 	ViewData["Title"] = "Planer ładowania";
 }
-@model List<Car>
+@model List<Car> //List of default cars + potential user's cars if logged in, returned by controlller
 @inject IConfiguration Configuration
 @{
 	string geoKey = Configuration.GetValue<string>("MyApiKey");
@@ -24,75 +24,94 @@
 	}
 }
 
+<!-- Bootstrap -->
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 
 <head>
+	<!-- Main top image -->
 	<img src="/images/top_image_wide.jpg" class="img-fluid" alt="Responsive image" style="position:relative; width:100%">
 </head>
 
+
 <body>
 
-<p style="margin-top:60px; margin-left:25px; margin-bottom: 0px; font-family:'Avenir Next LT Pro'; font-size:13pt;">Aplikacja automatyzująca planowanie podróży samochodem elektrycznym. Aby wyszukać optymalne ładowarki na trasie, wpisz początek i cel swojej podróży oraz wybierz samochód i stan baterii. Aby dodać własny samochód, zaloguj się.<br><br></p>
+	<!-- Short description -->
+	<p style="margin-top:60px; margin-left:25px; margin-bottom: 0px; font-family:'Avenir Next LT Pro'; font-size:13pt;">Aplikacja automatyzująca planowanie podróży samochodem elektrycznym. Aby wyszukać optymalne ładowarki na trasie, wpisz początek i cel swojej podróży oraz wybierz samochód i stan baterii. Aby dodać własny samochód, zaloguj się.<br><br></p>
 
-<div class="accordion" id="accordionExample" style="margin-top:0px; margin-bottom:25px;">
-  <div class="card">
-	<div class="card-header" id="headingOne">
-	  <h5 class="mb-0">
-		<button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-		  Kliknij aby wyświetlić więcej informacji...
-		</button>
-	  </h5>
-	</div>
-
-	<div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
-	  <div class="card-body">
-		Aplikacja wyszukuje ładowarki na trasie Twojej podróży, jednocześnie wskazując realny zasięg Twojego samochodu (zielony okrąg na mapie).<br>Realny zasięg jest automatycznie obliczany biorąc pod uwagę początkowy stan baterii, styl jazdy (zarejestrowani użytkownicy) oraz aktualny sezon (w zimę i w lato występują spadki wydajności z powodu korzystania z ogrzewania lub klimatyzacji). Parametry te można dostosować w panelu użytkownika po zalogowaniu się. Można tam również dodać własny samochód, jeśli nie możesz znaleźć go na liście.<br>Aby wyznaczyć trasę podróży, wpisz początek, cel podróży, wybierz samochód z listy oraz stan baterii. Następnie wybierz najbardziej oddaloną ładowarkę na trasie która mieści się w okręgu. Po wciśnięciu pinezki kliknij "Otwórz w google maps" - zostanie otwarta lokalizacja ładowarki w google maps. Teraz możesz wyznaczyć trasę oraz dodać kolejny przystanek w trasie (miejsce docelowe) i możesz być spokojny o dojechanie do celu swoim samochodem elektrycznym.<br />Aby uzyskać więcej informacji o aplikacji, kliknij w zakładkę "O aplikacji" na górnym pasku nawigacji.<br /><br />
+	<!-- Accordion description -->
+	<div class="accordion" id="accordionExample" style="margin-top:0px; margin-bottom:25px;">
+	  <div class="card">
+		<div class="card-header" id="headingOne">
+		  <h5 class="mb-0">
+			<button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+			  Kliknij aby wyświetlić więcej informacji...
+			</button>
+		  </h5>
+		</div>
+		<div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
+		  <div class="card-body">
+			Aplikacja wyszukuje ładowarki na trasie Twojej podróży, jednocześnie wskazując realny zasięg Twojego samochodu (zielony okrąg na mapie).<br>Realny zasięg jest automatycznie obliczany biorąc pod uwagę początkowy stan baterii, styl jazdy (zarejestrowani użytkownicy) oraz aktualny sezon (w zimę i w lato występują spadki wydajności z powodu korzystania z ogrzewania lub klimatyzacji). Parametry te można dostosować w panelu użytkownika po zalogowaniu się. Można tam również dodać własny samochód, jeśli nie możesz znaleźć go na liście.<br>Aby wyznaczyć trasę podróży, wpisz początek, cel podróży, wybierz samochód z listy oraz stan baterii. Następnie wybierz najbardziej oddaloną ładowarkę na trasie która mieści się w okręgu. Po wciśnięciu pinezki kliknij "Otwórz w google maps" - zostanie otwarta lokalizacja ładowarki w google maps. Teraz możesz wyznaczyć trasę oraz dodać kolejny przystanek w trasie (miejsce docelowe) i możesz być spokojny o dojechanie do celu swoim samochodem elektrycznym.<br />Aby uzyskać więcej informacji o aplikacji, kliknij w zakładkę "O aplikacji" na górnym pasku nawigacji.<br /><br />
+		  </div>
+		</div>
 	  </div>
-	</div>
-  </div>
- </div>
-<div class="row" style="margin-left:20px; margin-right:20px; margin-bottom:20px;">
-	<div class="col-md-6" style="height:620px; width: 75%;">
-		<div id="map" style="height:600px; width: 100%;"></div>
-	</div>
-	<div class="col-md-6" style="width: 25%;">
-		<div class="col-md-6" style="width: 80%;">
-			<label for="currentLocationButton">Aktualna lokacja</label>
-			<input type="image" id="currentLocationButton" name="currentLocationButton" src="/images/currentLocation.jpg" style="height:20px;width:20px;">
-			<form id = "fr">
-				Początek podróży:<br />
-				<input type="text" id="origin" style="width:100%" placeholder = "Wpisz punkt początkowy" style="margin-top:5px;" required> <br><br> 
-				Koniec podróży:<br />
-				<input type="text" id="destination" style="width:100%" placeholder = "Wpisz punkt docelowy" required><br><br>
-				Samochód:<br />
-				<select id="selectCar"></select><br><br>
-				<em>Nie możesz znaleźć swojego samochodu na liście? Zaloguj się i dodaj własny!</em><br />
-				<br />Stan baterii:<br />
-				<input type=number id="batteryLevelSelect" style="width:55%" placeholder="Poziom baterii [%]" min=1 max=100><br><br>
-			</form>
-			<button type="button" id="findRouteButton">Szukaj ładowarek</button>
+	 </div>
+
+	<!-- Map and choice fields grid -->
+	<div class="row" style="margin-left:20px; margin-right:20px; margin-bottom:20px;">
+		<!-- First collumn - map field anchor -->
+		<div class="col-md-6" style="height:620px; width: 75%;">
+			<div id="map" style="height:600px; width: 100%;"></div>
+		</div>
+		<!-- Second collumn - choice fields-->
+		<div class="col-md-6" style="width: 25%;">
+			<div class="col-md-6" style="width: 80%;">
+				<label for="currentLocationButton">Aktualna lokacja</label>
+				<input type="image" id="currentLocationButton" name="currentLocationButton" src="/images/currentLocation.jpg" style="height:20px;width:20px;">
+				<form id = "fr">
+					Początek podróży:<br />
+					<input type="text" id="origin" style="width:100%" placeholder = "Wpisz punkt początkowy" style="margin-top:5px;" required> <br><br> 
+					Koniec podróży:<br />
+					<input type="text" id="destination" style="width:100%" placeholder = "Wpisz punkt docelowy" required><br><br>
+					Samochód:<br />
+					<select id="selectCar"></select><br><br>
+					<em>Nie możesz znaleźć swojego samochodu na liście? Zaloguj się i dodaj własny!</em><br />
+					<br />Stan baterii:<br />
+					<input type=number id="batteryLevelSelect" style="width:55%" placeholder="Poziom baterii [%]" min=1 max=100><br><br>
+				</form>
+				<button type="button" id="findRouteButton">Szukaj ładowarek</button>
+			</div>
 		</div>
 	</div>
-</div>
 
+</body>
+
+
+<!---------------- JavaScript ---------------->
+<!-- Google map initialization using personal api key and creating map -->
 <script src="https://maps.googleapis.com/maps/api/js?key=@(key + "&callback=initMap")" defer></script>
+
+<!-- Libraries -->
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script type="text/javascript" src="@Url.Content("~/lib/jquery/dist/jquery.js")"></script>
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
+
+<!----------- JavaScript functions ----------->
 <script>
 
-	//Map function ----
-	var map;
-	var directionsService;
+	var map; //Google map object
+	var directionsService; //Google map routes services for javascript
 	var directionsRenderer;
-	var chargingRadius;
-	var carList;
+	var chargingRadius; //Real distance which car can travel on current battery level
+	var carList; 
 	var markersArray = [];
 
-	function initMap() { //zainicjowanie mapy
+	window.onload = init(); //Call init function on page load
+
+	//Google map initialization
+	function initMap() {
 		map = new google.maps.Map(document.getElementById('map'), {
 			center: {lat: 53.082100, lng: 18.228580},
 			zoom: 8,
@@ -108,9 +127,25 @@
 		});
 	}
 
-	async function calcRoute() { //wyznaczenie trasy, wyzwalacz guzika znajdź trasę
+	//Function called on page load - parsing list of cars array to JavaScript, adding list to choice box
+	function init() {
+		document.getElementById("findRouteButton").addEventListener("click", function() {calcRoute();});
+		carList = @Html.Raw(Json.Serialize(Model));
+		for (var i = 0; i < carList.length; i++ ) {
+			var connectorsString = "";
+			carList[i].connectors.forEach(connector => {
+				connectorsString += connector.name;
+				connectorsString += ", ";
+			});
+			connectorsString = connectorsString.substring(0, connectorsString.length - 2);
+			$("#selectCar").append("<option value='" + i + "'>" + carList[i].brand + " " + carList[i].model + " Zasięg: " + carList[i].maximumDistance + "km (" + connectorsString + ")" + "</option>");
+		}
+	}
 
-		//pobranie gniazd ładowania obecnie wybranego samochodu
+	//Set route, find charging stations near route and set markers 
+	async function calcRoute() {
+
+		//Get charging connectors from current car
 		var selectCarList = document.getElementById('selectCar');
 		var connectors = carList[selectCarList.selectedIndex].connectors;
 		var carMaximumDistance = carList[selectCarList.selectedIndex].maximumDistance;
@@ -210,7 +245,7 @@
 		}
 	}
 
-	//Handling google api responses
+	//Handling google api responses other than 'OK', while getting coordinates from address
 	function statusErrorHandler(status, address) {
 		switch(status) {
 			case("ZERO_RESULTS"):
@@ -235,7 +270,8 @@
 		numberOfRecharges = await fetchNumberOfRecharges(distance, carMaximumDistance, carBatteryLevel);
 	}
 
-	async function fetchAddress(address) { //zamiana adresu na współrzędne poprzez API
+	//Converting address to coordinates, using GeoController (getCoordinates), ultimately using google api
+	async function fetchAddress(address) {
 		try {
 			const response = await fetch(window.location.href + "geo/getCoordinates?key=" + "@geoKey" + "&address=" + address);
 			const geoArray = await response.json();
@@ -248,6 +284,7 @@
 		}
 	}
 
+	//Get number of car recharges for currrent route from api controller (DistanceController | getNumberOfRecharges)
 	async function fetchNumberOfRecharges(distance, maxDistance, batteryLevel) {
 		try {
 			const response = await fetch(window.location.href + "distance/getNumberOfRecharges?routeDistance=" + distance + "&maxDistance=" + maxDistance + "&batteryLevel=" + batteryLevel);
@@ -258,6 +295,7 @@
 		}
 	}
 
+	//Get real distance from api controller (DistanceController | getRealDistance)
 	async function fetchRealDistance(maxDistance, batteryLevel) {
 		try {
 			const response = await fetch(window.location.href + "distance/getRealDistance?maximumDistance=" + maxDistance + "&batteryLevel=" + batteryLevel);
@@ -268,35 +306,13 @@
 		}
 	}
 
-	function checkFlag(flag) {
-		if(flag == false) {
-			window.setTimeout(checkFlag, 100);
-		} else {
-			return true;
-		}
-	}
-
+	//Clear charging station markers from map
 	function clearMarkers() {
 		markersArray.forEach(marker => {
 			marker.setMap(null);
 		});
 		markersArray.length = 0;
 	}
-
-	function init() {
-		document.getElementById("findRouteButton").addEventListener("click", function() {calcRoute();});
-		carList = @Html.Raw(Json.Serialize(Model));
-		for (var i = 0; i < carList.length; i++ ) {
-			var connectorsString = "";
-			carList[i].connectors.forEach(connector => {
-				connectorsString += connector.name;
-				connectorsString += ", ";
-			});
-			connectorsString = connectorsString.substring(0, connectorsString.length - 2);
-			$("#selectCar").append("<option value='" + i + "'>" + carList[i].brand + " " + carList[i].model + " Zasięg: " + carList[i].maximumDistance + "km (" + connectorsString + ")" + "</option>");
-		}
-	}
-	window.onload = init();
 
 </script>
 
@@ -324,7 +340,4 @@
 	}
 
 </script>
-
-
-</body>
 
