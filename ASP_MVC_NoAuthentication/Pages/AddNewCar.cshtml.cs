@@ -34,16 +34,16 @@ namespace ASP_MVC_NoAuthentication.Pages
         }
         public async Task GetPage()
         {
-            _connectors = _connectorService.GetAllConnectors();
-            _currentUser = _userService.GetUserByName(User.Identity.Name);
+            _connectors = await _connectorService.GetAllConnectors();
+            _currentUser = await _userService.GetUserByName(User.Identity.Name);
         }
         public async Task<IActionResult> OnPostAddCarAsync(string? returnUrl = null)
         {
-            _currentUser = _userService.GetUserByName(User.Identity.Name);
-            _connectors = _connectorService.GetAllConnectors();
+            _currentUser = await _userService.GetUserByName(User.Identity.Name);
+            _connectors = await _connectorService.GetAllConnectors();
             string brand = Request.Form["brand"];
             string model = Request.Form["carmodel"];
-            int maximumDistance = (int.Parse(Request.Form["maximumdistance"]));
+            int maximumDistance = int.Parse(Request.Form["maximumdistance"]);
             string check;
             List<Connector> carConnectors = new List<Connector>();
             foreach(Connector connector in _connectors)
@@ -54,7 +54,7 @@ namespace ASP_MVC_NoAuthentication.Pages
                     carConnectors.Add(connector);
             }
 
-            _carService.AddNewCar(new Car(brand, model, maximumDistance, carConnectors, _currentUser));
+            await _carService.AddNewCar(new Car(brand, model, maximumDistance, carConnectors, _currentUser));
             return Redirect(Url.Content("~/UserPanel"));
         }
     }

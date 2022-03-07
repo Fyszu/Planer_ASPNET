@@ -4,7 +4,8 @@ namespace ASP_MVC_NoAuthentication.Services
 {
     public interface IUserService
     {
-        public User GetUserByName(string name);
-        public void SaveSettings(double summerFactor, double winterFactor, string drivingStyle, string userId);
+        public Task<User> GetUserByName(string name);
+
+        public Task SaveSettings(double summerFactor, double winterFactor, string drivingStyle, string userId);
     }
 }

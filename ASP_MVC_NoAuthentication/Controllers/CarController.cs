@@ -31,15 +31,15 @@ namespace ASP_MVC_NoAuthentication.Controllers
         [HttpGet("RemoveUserCar")]
         public async Task<IActionResult> RemoveUserCar([FromQuery] int carId)
         {
-            if (_carService.CheckIfCarBelongsToUser(_userService.GetUserByName(User.Identity.Name), _carService.GetCarById(carId)))
-                _carService.RemoveCarByUser(User.Identity.Name, carId);
+            if (await _carService.CheckIfCarBelongsToUser(await _userService.GetUserByName(User.Identity.Name), await _carService.GetCarById(carId)))
+                await _carService.RemoveCarByUser(User.Identity.Name, carId);
             return Redirect(Url.Content("~/UserPanel"));
         }
 
         [HttpGet("AddUserCar")]
         public async Task<IActionResult> AddUserCar(Car car)
         {
-            _carService.AddNewCar(car);
+            await _carService.AddNewCar(car);
             return Redirect(Url.Content("~/UserPanel"));
         }
     }

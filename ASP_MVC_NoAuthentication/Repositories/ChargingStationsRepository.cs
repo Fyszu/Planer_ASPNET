@@ -13,23 +13,23 @@ namespace ASP_MVC_NoAuthentication.Repositories
 
 
 
-        public ChargingStation GetById(int id)
+        public async Task<ChargingStation> GetById(int id)
         {
-            return _context.ChargingStations.Include(station => station.ChargingPoints).ThenInclude(point => point.Connector).Where(station => station.Id.Equals(id)).SingleOrDefault();
+            return await _context.ChargingStations.Include(station => station.ChargingPoints).ThenInclude(point => point.Connector).Where(station => station.Id.Equals(id)).SingleOrDefaultAsync();
         }
 
-        public void Add(ChargingStation chargingStation)
+        public async Task Add(ChargingStation chargingStation)
         {
             if(chargingStation != null)
-                _context.ChargingStations.Add(chargingStation);
-            _context.SaveChanges();
+                await _context.ChargingStations.AddAsync(chargingStation);
+            await _context.SaveChangesAsync();
         }
 
-        public void Update(ChargingStation chargingStation)
+        public async Task Update(ChargingStation chargingStation)
         {
             if (chargingStation != null)
             {
-                ChargingStation dbChargingStation = GetById(chargingStation.Id);
+                ChargingStation dbChargingStation = await GetById(chargingStation.Id);
                 dbChargingStation.Street = chargingStation.Street;
                 dbChargingStation.ChargingPoints = chargingStation.ChargingPoints;
                 dbChargingStation.PaymentMethods = chargingStation.PaymentMethods;
@@ -42,19 +42,19 @@ namespace ASP_MVC_NoAuthentication.Repositories
                 dbChargingStation.Name = chargingStation.Name;
                 dbChargingStation.PostalAdress = chargingStation.PostalAdress;
             }
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public void Remove(ChargingStation chargingStation)
+        public async Task Remove(ChargingStation chargingStation)
         {
             if (chargingStation != null)
                 _context.ChargingStations.Remove(chargingStation);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public List<ChargingStation> GetAll()
+        public async Task<List<ChargingStation>> GetAll()
         {
-            return _context.ChargingStations.Include(station => station.ChargingPoints).ThenInclude(point => point.Connector).ToList();
+            return await _context.ChargingStations.Include(station => station.ChargingPoints).ThenInclude(point => point.Connector).ToListAsync();
         }
     }
 }

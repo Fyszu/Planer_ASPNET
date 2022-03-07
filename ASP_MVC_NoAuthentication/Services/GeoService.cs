@@ -24,20 +24,20 @@ namespace ASP_MVC_NoAuthentication.Services
 
 
         //Parse result from google api to address name (passing coordinates)
-        public string GetAddress(string key, string longitude, string latitude)
+        public async Task<string> GetAddress(string key, string longitude, string latitude)
         {
-            return GetResultFromGoogleApi("latlng=" + latitude + "," + longitude, key);
+            return await GetResultFromGoogleApi("latlng=" + latitude + "," + longitude, key);
         }
 
         //Parse result from google api to coordinates (passing address name)
-        public string GetCoordinates(string key, string address)
+        public async Task<string> GetCoordinates(string key, string address)
         {
-            return GetResultFromGoogleApi("address=" + address, key);
+            return await GetResultFromGoogleApi("address=" + address, key);
         }
 
         
         //Gets result from google api in JSON and convert to response passing location parameter (coordinates or address)
-        private string GetResultFromGoogleApi(string location, string geoKey)
+        private async Task<string> GetResultFromGoogleApi(string location, string geoKey)
         {
             string URL = "https://maps.googleapis.com/maps/api/geocode/json?";
             string Key = "key=" + this.GoogleApiKey;
@@ -54,12 +54,12 @@ namespace ASP_MVC_NoAuthentication.Services
             {
                 try
                 {
-                    using (WebClient wc = new WebClient())
+                    using (WebClient webClient = new WebClient())
                     {
-                        wc.Headers[HttpRequestHeader.ContentType] = "application/json";
-                        wc.Encoding = Encoding.UTF8;
-                        wc.Headers.Add("User-Agent: Other");
-                        googleApiResult = wc.DownloadString(URL); //Download result from Google API
+                        webClient.Headers[HttpRequestHeader.ContentType] = "application/json";
+                        webClient.Encoding = Encoding.UTF8;
+                        webClient.Headers.Add("User-Agent: Other");
+                        googleApiResult = await webClient.DownloadStringTaskAsync(new Uri(URL)); //Download result from Google API
                         token = JToken.Parse(googleApiResult); //Parse JSON array
                         status = token["status"].ToString();
                     }

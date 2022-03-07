@@ -18,23 +18,25 @@ namespace ASP_MVC_NoAuthentication.Services
 
 
 
-        public List<Car> GetDefaultCars() { return _carRepository.GetDefaultCars(); }
+        public async Task<List<Car>> GetDefaultCars() { return await _carRepository.GetDefaultCars(); }
 
-        public List<Car> GetCarsByUser(String userName) { return _carRepository.GetCarsByUser(_userRepository.GetByName(userName)); }
+        public async Task<List<Car>> GetCarsByUser(String userName) { return await _carRepository.GetCarsByUser(await _userRepository.GetByName(userName)); }
 
-        public Car GetCarById(int id) { return _carRepository.GetById(id); }
+        public async Task<Car> GetCarById(int id) { return await _carRepository.GetById(id); }
 
-        public void RemoveCarByUser(string userName, int carId) { _carRepository.RemoveById(carId); }
+        public async Task RemoveCarByUser(string userName, int carId) { await _carRepository.RemoveById(carId); }
 
-        public void AddNewCar(Car car) { _carRepository.Add(car); }
+        public async Task AddNewCar(Car car) { await _carRepository.Add(car); }
 
-        public void UpdateCar(Car car) { _carRepository.Update(car); }
+        public async Task UpdateCar(Car car) { await _carRepository.Update(car); }
 
-        public Boolean CheckIfCarBelongsToUser(User user, Car car)
+        public async Task<Boolean> CheckIfCarBelongsToUser(User user, Car car)
         {
-            if (car.User is null)
+            if (car is null)
                 return false;
-            else if (_carRepository.GetById(car.Id).User.Equals(_userRepository.GetByName(user.UserName)))
+            else if (car.User is null)
+                return false;
+            else if ((await _carRepository.GetById(car.Id)).User.Equals(await _userRepository.GetByName(user.UserName)))
                 return true;
             else
                 return false;

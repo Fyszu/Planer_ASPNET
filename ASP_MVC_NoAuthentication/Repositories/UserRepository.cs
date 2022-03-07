@@ -13,19 +13,19 @@ namespace ASP_MVC_NoAuthentication.Repositories
 
 
 
-        public User GetById(string id)
+        public async Task<User> GetById(string id)
         {
-            return _context.Users.Find(id);
+            return await _context.Users.FindAsync(id);
         }
 
-        public void Add(User user)
+        public async Task Add(User user)
         {
             if (user != null)
-                _context.Users.Add(user);
-            _context.SaveChanges();
+                await _context.Users.AddAsync(user);
+            await _context.SaveChangesAsync();
         }
 
-        public void Update(User user)
+        public async Task Update(User user)
         {
             User dbUser = _context.Users.Find(user.Id);
             if (dbUser != null)
@@ -34,24 +34,24 @@ namespace ASP_MVC_NoAuthentication.Repositories
                 dbUser.WinterFactor = user.WinterFactor;
                 dbUser.DrivingStyle = user.DrivingStyle;
             }
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public void Remove(User user)
+        public async Task Remove(User user)
         {
             if (user != null)
                 _context.Users.Remove(user);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public List<User> GetAll()
+        public async Task<List<User>> GetAll()
         {
-            return _context.Users.ToList();
+            return await _context.Users.ToListAsync();
         }
 
-        public User GetByName(string name)
+        public async Task<User> GetByName(string name)
         {
-            return _context.Users.Where(u => u.UserName == name).SingleOrDefault();
+            return await _context.Users.Where(u => u.UserName == name).SingleOrDefaultAsync();
         }
     }
 }

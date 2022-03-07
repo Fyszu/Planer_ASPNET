@@ -25,12 +25,12 @@ namespace ASP_MVC_NoAuthentication.Controllers
 
 
         [HttpGet("getRealDistance")]
-        public int getRealDistance([FromQuery] int maximumDistance, int batteryLevel)
+        public async Task<int> getRealDistance([FromQuery] int maximumDistance, int batteryLevel)
         {
             if (_signInManager.IsSignedIn(User))
-                return _service.getRealMaximumDistance(batteryLevel, maximumDistance, User.Identity.Name);
+                return await _service.getRealMaximumDistance(batteryLevel, maximumDistance, User.Identity.Name);
             else
-                return _service.getRealMaximumDistance(batteryLevel, maximumDistance, "default");
+                return await _service.getRealMaximumDistance(batteryLevel, maximumDistance, "default");
         }
 
 

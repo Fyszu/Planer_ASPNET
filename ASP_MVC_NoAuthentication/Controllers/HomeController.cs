@@ -5,6 +5,7 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Identity;
 using ASP_MVC_NoAuthentication.Services;
 using ASP_MVC_NoAuthentication.Repositories;
+using Microsoft.AspNetCore;
 
 namespace ASP_MVC_NoAuthentication.Controllers
 {
@@ -23,13 +24,13 @@ namespace ASP_MVC_NoAuthentication.Controllers
         }
 
 
-        public IActionResult Index()
+        public async Task<ActionResult> Index()
         {
             //Returns view with List of cars as a model (No user signed - default cars, user signed in - default + user cars)
             List<Car> cars = new List<Car>();
-            cars = _carService.GetDefaultCars();
+            cars = await _carService.GetDefaultCars();
             if (_signInManager.IsSignedIn(User))
-                cars = (_carService.GetCarsByUser(User.Identity.Name)).Concat(cars).OrderBy(car => car.Brand).ToList();
+                cars = (await _carService.GetCarsByUser(User.Identity.Name)).Concat(cars).OrderBy(car => car.Brand).ToList();
             return View(cars);
          }
 

@@ -4,8 +4,8 @@ namespace ASP_MVC_NoAuthentication.Repositories
 {
     public interface ICarRepository : IRepository<Car, int>
     {
-        public List<Car> GetDefaultCars();
-        public List<Car> GetCarsByUser(User user);
-        void RemoveById(int id);
+        public Task<List<Car>> GetDefaultCars();
+        public Task<List<Car>> GetCarsByUser(User user);
+        Task RemoveById(int id);
     }
 }

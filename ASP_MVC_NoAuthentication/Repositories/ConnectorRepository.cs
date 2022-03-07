@@ -1,4 +1,5 @@
 ﻿using ASP_MVC_NoAuthentication.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace ASP_MVC_NoAuthentication.Repositories
 {
@@ -12,40 +13,39 @@ namespace ASP_MVC_NoAuthentication.Repositories
 
 
 
-        public Connector GetById(int id)
+        public async Task<Connector> GetById(int id)
         {
-            return _context.Connectors.Find(id);
+            return await _context.Connectors.FindAsync(id);
         }
 
-        public void Add(Connector connector)
+        public async Task Add(Connector connector)
         {
             if(connector != null)
-                _context.Add(connector);
-            _context.SaveChanges();
+                await _context.AddAsync(connector);
+            await _context.SaveChangesAsync();
         }
 
-        public void Update(Connector connector)
+        public async Task Update(Connector connector)
         {
             if (connector != null)
             {
-                Connector dbConnector = GetById(connector.Id);
+                Connector dbConnector = await GetById(connector.Id);
                 dbConnector.ChargingPoints = connector.ChargingPoints;
                 dbConnector.Name = connector.Name;
             }
-                
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public void Remove(Connector connector)
+        public async Task Remove(Connector connector)
         {
             if(connector != null)
                 _context.Remove(connector);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public List<Connector> GetAll()
+        public async Task<List<Connector>> GetAll()
         {
-            return _context.Connectors.ToList();
+            return await _context.Connectors.ToListAsync();
         }
     }
 }

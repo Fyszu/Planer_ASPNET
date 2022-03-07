@@ -36,20 +36,20 @@ namespace ASP_MVC_NoAuthentication.Pages
         }
         public async Task GetPage()
         {
-            _connectors = _connectorService.GetAllConnectors();
-            _currentUser = _userService.GetUserByName(User.Identity.Name);
+            _connectors = await _connectorService.GetAllConnectors();
+            _currentUser = await _userService.GetUserByName(User.Identity.Name);
             CarId = int.Parse(Request.Query["carid"]);
-            _editedCar = _carService.GetCarById(CarId);
+            _editedCar = await _carService.GetCarById(CarId);
             if (_editedCar != null)
-                _canEditCar = (_carService.CheckIfCarBelongsToUser(_currentUser, _editedCar));
+                _canEditCar = await _carService.CheckIfCarBelongsToUser(_currentUser, _editedCar);
         }
         public async Task<IActionResult> OnPostAddCarAsync(string? returnUrl = null)
         {
-            _currentUser = _userService.GetUserByName(User.Identity.Name);
-            _editedCar = _carService.GetCarById(CarId);
-            if (_carService.CheckIfCarBelongsToUser(_currentUser, _editedCar))
+            _currentUser = await _userService.GetUserByName(User.Identity.Name);
+            _editedCar = await _carService.GetCarById(CarId);
+            if (await _carService.CheckIfCarBelongsToUser(_currentUser, _editedCar))
             {
-                _connectors = _connectorService.GetAllConnectors();
+                _connectors = await _connectorService.GetAllConnectors();
                 string brand = Request.Form["brand"];
                 string model = Request.Form["carmodel"];
                 int maximumDistance = (int.Parse(Request.Form["maximumdistance"]));
@@ -62,7 +62,7 @@ namespace ASP_MVC_NoAuthentication.Pages
                     if (check != null)
                         carConnectors.Add(connector);
                 }
-                _carService.UpdateCar(new Car(_editedCar.Id, brand, model, maximumDistance, carConnectors, _currentUser));
+                await _carService.UpdateCar(new Car(_editedCar.Id, brand, model, maximumDistance, carConnectors, _currentUser));
             }
             return Redirect(Url.Content("~/UserPanel"));
         }

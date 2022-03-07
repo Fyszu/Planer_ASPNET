@@ -4,6 +4,6 @@ namespace ASP_MVC_NoAuthentication.Services
 {
     public interface IChargingStationService
     {
-        public List<ChargingStation> GetAllChargingStations();
+        public Task<List<ChargingStation>> GetAllChargingStations();
     }
 }

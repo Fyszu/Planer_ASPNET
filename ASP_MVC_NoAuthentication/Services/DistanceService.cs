@@ -14,7 +14,7 @@ namespace ASP_MVC_NoAuthentication.Services
             _userRepository = userRepository;
         }
 
-        public int getRealMaximumDistance(int currentBatteryLevel, int maximumDistance, String? userName) // string 
+        public async Task<int> getRealMaximumDistance(int currentBatteryLevel, int maximumDistance, String? userName) // string 
         {
             //wyparsować usera z nazwy
             double currentDistance = (maximumDistance * 1000) * (currentBatteryLevel * 0.01);
@@ -22,7 +22,7 @@ namespace ASP_MVC_NoAuthentication.Services
             {
                 userName = "default@default.pl";
             }
-            User user = _userRepository.GetByName(userName);
+            User user = await _userRepository.GetByName(userName);
             switch (user.DrivingStyle)
             {
                 case "ekonomiczny":

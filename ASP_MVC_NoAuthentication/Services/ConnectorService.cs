@@ -15,9 +15,9 @@ namespace ASP_MVC_NoAuthentication.Services
         }
 
 
-        public List<Connector> GetAllConnectors()
+        public async Task<List<Connector>> GetAllConnectors()
         {
-            return _connectorRepository.GetAll();
+            return await _connectorRepository.GetAll();
         }
     }
 }

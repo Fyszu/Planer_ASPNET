@@ -129,16 +129,11 @@
 
 	//Function called on page load - parsing list of cars array to JavaScript, adding list to choice box
 	function init() {
-		document.getElementById("findRouteButton").addEventListener("click", function() {calcRoute();});
+		document.getElementById("findRouteButton").addEventListener("click", function() { calcRoute(); });
 		carList = @Html.Raw(Json.Serialize(Model));
-		for (var i = 0; i < carList.length; i++ ) {
-			var connectorsString = "";
-			carList[i].connectors.forEach(connector => {
-				connectorsString += connector.name;
-				connectorsString += ", ";
-			});
-			connectorsString = connectorsString.substring(0, connectorsString.length - 2);
-			$("#selectCar").append("<option value='" + i + "'>" + carList[i].brand + " " + carList[i].model + " Zasięg: " + carList[i].maximumDistance + "km (" + connectorsString + ")" + "</option>");
+		@for(int i = 0; i < Model.Count; i++)
+		{
+			@:$("#selectCar").append("<option value='" + @i + "'>" + "@Model[i].Brand" + " " + "@Model[i].Model" + " Zasięg: " + "@Model[i].MaximumDistance" + "km (" + "@Model[i].ConnectorsToString()" + ")" + "</option>");
 		}
 	}
 

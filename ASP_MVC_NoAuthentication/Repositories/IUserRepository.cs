@@ -4,6 +4,6 @@ namespace ASP_MVC_NoAuthentication.Repositories
 {
     public interface IUserRepository : IRepository<User, string>
     {
-        public User GetByName(string name);
+        public Task<User> GetByName(string name);
     }
 }

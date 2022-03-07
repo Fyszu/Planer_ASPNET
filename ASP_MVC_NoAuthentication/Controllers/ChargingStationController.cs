@@ -21,9 +21,9 @@ namespace ASP_MVC_NoAuthentication.Controllers
 
 
         [HttpGet("getAllChargingStations")]
-        public JsonResult getAllChargingStations()
+        public async Task<JsonResult> getAllChargingStations()
         {
-            return Json(_service.GetAllChargingStations());
+            return Json(await _service.GetAllChargingStations());
         }
     }
 }

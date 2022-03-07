@@ -25,15 +25,15 @@ namespace ASP_MVC_NoAuthentication.Controllers
 
 
         [HttpGet("getAddress")]
-        public string GetAddress([FromQuery] string key, [FromQuery] string longitude, [FromQuery] string latitude)
+        public async Task<string> GetAddress([FromQuery] string key, [FromQuery] string longitude, [FromQuery] string latitude)
         {
-            return _service.GetAddress(key, longitude, latitude);
+            return await _service.GetAddress(key, longitude, latitude);
         }
 
         [HttpGet("getCoordinates")]
-        public string GetCoordinates([FromQuery] string key, [FromQuery] string address)
+        public async Task<string> GetCoordinates([FromQuery] string key, [FromQuery] string address)
         {
-            return _service.GetCoordinates(key, address);
+            return await _service.GetCoordinates(key, address);
         }
 
     }
