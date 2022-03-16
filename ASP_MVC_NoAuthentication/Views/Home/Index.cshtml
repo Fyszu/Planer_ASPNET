@@ -4,9 +4,11 @@
 @using System.Net
 @using System.Text;
 @using System.Web;
+@using Newtonsoft.Json;
+@using System.Globalization
 
 @{
-	ViewData["Title"] = "Planer ładowania";
+	ViewData["Title"] = "Planer tras";
 }
 @model List<Car> //List of default cars + potential user's cars if logged in, returned by controlller
 @inject IConfiguration Configuration
@@ -96,6 +98,7 @@
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+<script src="https://js.arcgis.com/4.4/"></script> <!--- ArcGIS geometry API --->
 
 
 <!----------- JavaScript functions ----------->
@@ -104,9 +107,11 @@
 	var map; //Google map object
 	var directionsService; //Google map routes services for javascript
 	var directionsRenderer;
+	var chargingStations = @Html.Raw(Json.Serialize(chargingStationsList)); //Charging stations from page model
 	var chargingRadius; //Real distance which car can travel on current battery level
-	var carList; 
-	var markersArray = [];
+	var carList; //List of cars to choose (from page model, default cars + user cars)
+	var carListComboBox = document.getElementById('selectCar'); //Html combo box for car selection
+	var markersArray = []; //Array of charging stations markers
 
 	window.onload = init(); //Call init function on page load
 
@@ -127,7 +132,7 @@
 		});
 	}
 
-	//Function called on page load - parsing list of cars array to JavaScript, adding list to choice box
+	//Function called on page load - parsing list of cars array to JavaScript, initializing and adding list to choice box
 	function init() {
 		document.getElementById("findRouteButton").addEventListener("click", function() { calcRoute(); });
 		carList = @Html.Raw(Json.Serialize(Model));
@@ -140,105 +145,106 @@
 	//Set route, find charging stations near route and set markers 
 	async function calcRoute() {
 
-		//Get charging connectors from current car
-		var selectCarList = document.getElementById('selectCar');
-		var connectors = carList[selectCarList.selectedIndex].connectors;
-		var carMaximumDistance = carList[selectCarList.selectedIndex].maximumDistance;
-		var chargingStations = @Html.Raw(Json.Serialize(chargingStationsList));
-		var chargingStationsByConnectors = new Array();
-		var chargingStationsNearRoute = new Array();
-		var route;
+		var originTextField = document.getElementById("origin");
+		var destinationTextField = document.getElementById("destination");
 
-		chargingStations.forEach(chargingStation => {
-			chargingStation.chargingPoints.forEach(chargingPoint => {
-				connectors.forEach(connector => {
-					if(chargingPoint.connector.name == connector.name) {
-						chargingStationsByConnectors.push(chargingStation); //dodanie do tablicy ładowarek, które odpowiadają gniazdom ładowania samochodu
-					}
-				});
-			});
-		});
-
-
-		var startBox = document.getElementById("origin");
-		var destinationBox = document.getElementById("destination");
-		if(!startBox.value||!destinationBox.value) {
+		if(!originTextField.value||!destinationTextField.value) {
 			window.alert("Proszę wypełnić pola trasy.");
 		}
 		else if(!(document.getElementById("batteryLevelSelect").value)) {
 			window.alert("Proszę podać stan baterii.");
 		}
-		else {
-			directionsRenderer.setMap(null); //czyszczenie mapy z poprzednich tras
-			clearMarkers(); //czyszczenie pinezek
+
+		else
+		{
+			var choosedCar = carList[carListComboBox.selectedIndex];
+			directionsRenderer.setMap(null); //Reset map (clear from previous routes)
+			clearMarkers();
 			directionsRenderer.setMap(map);
-			var myOrigin;
-			var myDestination;
-			if(startBox.value&&destinationBox.value) {
-				const address1 = await fetchAddress(startBox.value);
-				const address2 = await fetchAddress(destinationBox.value);
-				
-					myOrigin = new google.maps.LatLng(parseFloat(address1[0]),parseFloat(address1[1]));
-					myDestination = new google.maps.LatLng(parseFloat(address2[0]),parseFloat(address2[1]));
+			chargingRadius.setMap(null);
+			chargingRadius.setMap(map);
 
-					chargingRadius.setMap(null);
-					chargingRadius.setMap(map);
-					chargingRadius.setCenter(myOrigin);
-					const radius = await fetchRealDistance(carList[selectCarList.selectedIndex].maximumDistance, document.getElementById("batteryLevelSelect").value);
-					chargingRadius.setRadius(radius);
+			var originCoordinates = await fetchAddress(originTextField.value);
+			var destinationCoordinates = await fetchAddress(destinationTextField.value);
+			const radius = await fetchRealDistance(carList[carListComboBox.selectedIndex].maximumDistance, document.getElementById("batteryLevelSelect").value);
 
-					var request = {
-						origin: myOrigin,
-						destination: myDestination,
-						travelMode: 'DRIVING'
-					};
+			chargingRadius.setCenter(originCoordinates);
+			chargingRadius.setRadius(radius);
 
-					directionsService.route(request, function(response, status) { //sprawdź czy ładowarka jest w pobliżu trasy
-						if(status == google.maps.DirectionsStatus.OK) {
-							route = response.routes[0];
-							numberOfRechargesCallback(route.legs[0].distance.text, route, carMaximumDistance);
-							directionsRenderer.setDirections(response);
-							chargingStationsByConnectors.forEach(station => {
-								var stationLat = station.latitude;
-								var stationLong = station.longitude;
-								var stationCoordinates = new google.maps.LatLng(stationLat, stationLong);
-								if(google.maps.geometry.poly.isLocationOnEdge(stationCoordinates, new google.maps.Polyline({ path: google.maps.geometry.encoding.decodePath(route.overview_polyline) }), 0.1))
-									chargingStationsNearRoute.push(station); //dodanie ładowarki, która jest w pobliżu trasy
-							});
-							if(chargingStationsNearRoute.length == 0) {
-								window.alert("Brak ładowarek elektrycznych w pobliżu wyznaczonej trasy!");
-							}
-							else { //wyświetlenie przefiltrowanych ładowarek
-								chargingStationsNearRoute.forEach(station => {
-									var stationState = "Aktywna";
-									if(station.stationState == 0) {
-										stationState = "Zamknięta";
-									}
-									var marker = new google.maps.Marker({
-										position: { lat: station.latitude, lng: station.longitude },
-										map: map,
-									});
-									markersArray.push(marker);
-									var infoWindow = new google.maps.InfoWindow({
-										content: "<p>Stacja: " + station.name + "<br>Koordynaty: " + station.latitude + ", " 
-										+ station.longitude + "<br>Adres: " + station.city + " " + station.postalAdress + ", "
-										+ station.street + "<br>Godziny otwarcia: " + station.openHours + "<br>Właściciel: "
-										+ station.owner + "<br>Stan stacji: " + stationState + "<br><a href='https://www.google.pl/maps?q=" + station.latitude + ",+" + station.longitude + "'>Otwórz w google maps</a></p>",
-									});
-									google.maps.event.addListener(marker, "click", () => {
-										infoWindow.open(map,marker);
-									});
-								});
-							}
-						}
-						else if(status == "ZERO_RESULTS")
-							alert("Nie znaleziono żadnej trasy dla podanych adresów.");
-						else
-							alert("Błąd wyznaczania trasy. Status: " + status) //obsługa błędu
+			var routeGoogleApiRequest = {
+				origin: originCoordinates,
+				destination: destinationCoordinates,
+				travelMode: 'DRIVING'
+			};
+
+			directionsService.route(routeGoogleApiRequest, function(response, status)
+			{
+				if(status == "ZERO_RESULTS")
+					alert("Nie znaleziono żadnej trasy dla podanych adresów.");
+				else if(status != google.maps.DirectionsStatus.OK)
+					alert("Błąd wyznaczania trasy. Status: " + status) //obsługa błędu
+				else //Status is OK
+				{
+					var route = response.routes[0];
+					var routePolyline = new google.maps.Polyline({ path: google.maps.geometry.encoding.decodePath(route.overview_polyline) });
+					directionsRenderer.setDirections(response);
+					//numberOfRechargesCallback(route.legs[0].distance.text, route, choosedCar.maximumDistance);
+
+					//Filter stations to near-route stations
+					var chargingStationsNearRoute = new Array();
+					chargingStations.forEach(station => {
+						var stationCoordinates = new google.maps.LatLng(station.latitude, station.longitude);
+						if(google.maps.geometry.poly.isLocationOnEdge(stationCoordinates, routePolyline, 0.1))
+							chargingStationsNearRoute.push(station);
 					});
-			}
+
+					if(chargingStationsNearRoute.length == 0)
+						window.alert("Brak ładowarek elektrycznych w pobliżu wyznaczonej trasy!");
+					else
+					{
+						//Set charging stations as markers with info
+						chargingStationsNearRoute.forEach(station => {
+							var stationState = "Aktywna";
+							if(station.stationState == 0) {
+								stationState = "Zamknięta";
+							}
+
+							//Check if station has same connector as car - then, if yes show marker as green, otherwise show as yellow
+							var stationHasCorrectConnector = false;
+							station.chargingPoints.forEach(chargingPoint => {
+								choosedCar.connectors.forEach(carConnector => {
+									if(chargingPoint.connector.name == carConnector.name) {
+										stationHasCorrectConnector = true;
+									}
+								});
+							});
+							
+							var marker = new google.maps.Marker({
+								position: { lat: station.latitude, lng: station.longitude },
+								map: map,
+							});
+							if(stationHasCorrectConnector)
+								marker.setIcon('http://maps.google.com/mapfiles/ms/icons/green-dot.png');
+							else
+								marker.setIcon('http://maps.google.com/mapfiles/ms/icons/yellow-dot.png');
+							markersArray.push(marker);
+
+							//Create of marker's information window and attach click listener
+							var markerDetails = new google.maps.markerDetails({
+								content: "<p>Stacja: " + station.name + "<br>Koordynaty: " + station.latitude + ", " 
+								+ station.longitude + "<br>Adres: " + station.city + " " + station.postalAdress + ", "
+								+ station.street + "<br>Godziny otwarcia: " + station.openHours + "<br>Właściciel: "
+								+ station.owner + "<br>Stan stacji: " + stationState + "<br><a href='https://www.google.pl/maps?q=" + station.latitude + ",+" + station.longitude + "'>Otwórz w google maps</a></p>",
+							});
+							google.maps.event.addListener(marker, "click", () => {
+								markerDetails.open(map,marker);
+							});
+						});
+					}
+				}
+			});
 		}
-	}
+	} //End of calcRoute function
 
 	//Handling google api responses other than 'OK', while getting coordinates from address
 	function statusErrorHandler(status, address) {
@@ -271,7 +277,7 @@
 			const response = await fetch(window.location.href + "geo/getCoordinates?key=" + "@geoKey" + "&address=" + address);
 			const geoArray = await response.json();
 			if(geoArray["Status"] == "OK")
-				return [geoArray["Coordinates"]["Lat"],geoArray["Coordinates"]["Lng"]];
+				return new google.maps.LatLng(parseFloat(geoArray["Coordinates"]["Lat"]),parseFloat(geoArray["Coordinates"]["Lng"]));
 			else
 				statusErrorHandler(geoArray["Status"], address);
 		} catch(error) {
