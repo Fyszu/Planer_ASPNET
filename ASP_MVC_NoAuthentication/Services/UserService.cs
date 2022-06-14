@@ -8,7 +8,7 @@ namespace ASP_MVC_NoAuthentication.Services
         private readonly ILogger<UserService> _logger;
         private readonly UserRepository _repository;
 
-        public UserService(ILogger<UserService> logger, UserRepository userRepository, CarRepository carRepository)
+        public UserService(ILogger<UserService> logger, UserRepository userRepository)
         {
             _logger = logger;
             _repository = userRepository;

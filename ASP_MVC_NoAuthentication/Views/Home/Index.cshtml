@@ -26,10 +26,11 @@
 	}
 }
 
-<!-- Bootstrap -->
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 
 <head>
+	<!-- Bootstrap -->
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+	<link rel="stylesheet" href="~/css/Home.css">
 	<!-- Main top image -->
 	<img src="/images/top_image_wide.jpg" class="img-fluid" alt="Responsive image" style="position:relative; width:100%">
 </head>
@@ -58,32 +59,48 @@
 	  </div>
 	 </div>
 
+
 	<!-- Map and choice fields grid -->
-	<div class="row" style="margin-left:20px; margin-right:20px; margin-bottom:20px;">
-		<!-- First collumn - map field anchor -->
-		<div class="col-md-6" style="height:620px; width: 75%;">
-			<div id="map" style="height:600px; width: 100%;"></div>
+
+	<div class="row" style="margin-left:3.5%; margin-right:3.5%; width:100%; vertical-align:bottom;">
+		<div class="column" style="width:16%;">
+			<p class="formDescription"><input type="image" id="currentLocationButton" name="currentLocationButton" src="/images/currentLocation.jpg" style="height:20px;width:20px;"> Początek podróży:</p>
 		</div>
-		<!-- Second collumn - choice fields-->
-		<div class="col-md-6" style="width: 25%;">
-			<div class="col-md-6" style="width: 80%;">
-				<label for="currentLocationButton">Aktualna lokacja</label>
-				<input type="image" id="currentLocationButton" name="currentLocationButton" src="/images/currentLocation.jpg" style="height:20px;width:20px;">
-				<form id = "fr">
-					Początek podróży:<br />
-					<input type="text" id="origin" style="width:100%" placeholder = "Wpisz punkt początkowy" style="margin-top:5px;" required> <br><br> 
-					Koniec podróży:<br />
-					<input type="text" id="destination" style="width:100%" placeholder = "Wpisz punkt docelowy" required><br><br>
-					Samochód:<br />
-					<select id="selectCar"></select><br><br>
-					<em>Nie możesz znaleźć swojego samochodu na liście? Zaloguj się i dodaj własny!</em><br />
-					<br />Stan baterii:<br />
-					<input type=number id="batteryLevelSelect" style="width:55%" placeholder="Poziom baterii [%]" min=1 max=100><br><br>
-				</form>
-				<button type="button" id="findRouteButton">Szukaj ładowarek</button>
-			</div>
+		<div class="column" style="width:16%;">
+			<p class="formDescription">Koniec podróży:</p>
+		</div>
+		<div class="column" style="width:16%;" data-toggle="tooltip" data-placement="bottom" title="Nie możesz znaleźć swojego samochodu na liście? Zaloguj się i dodaj własny!">
+			<p class="formDescription"><img src="@Url.Content("~/images/question_mark.png")" height="14" width = "14"/> Samochód:</p>
+		</div>
+		<div class="column" style="width:16%;">
+			<p class="formDescription">Stan baterii:</p>
+		</div>
+		<div class="column" style="width:16%;">
 		</div>
 	</div>
+
+
+	<div class="row" style="margin-left:3.5%; margin-right:3.5%; margin-bottom:4vh; width:100%">
+		<form id = "fr">
+			<div class="column" style="width:16%;">
+				<input class="inputForm" type="text" id="origin" style="width:100%" placeholder = "Wpisz punkt początkowy" required>
+			</div>
+			<div class="column" style="width:16%;">
+				<input class="inputForm" type="text" id="destination" style="width:100%" placeholder = "Wpisz punkt docelowy" required>
+			</div>
+			<div class="column" style="width:16%;">
+				<select class="inputForm" id="selectCar" style="width:100%"></select>
+			</div>
+			<div class="column" style="width:16%;">
+				<input class="inputForm" type=number id="batteryLevelSelect" style="width:100%" placeholder="Poziom baterii [%]" min=1 max=100>
+			</div>
+			<div class="column" style="width:16%;">
+				<button class="inputForm" type="button" id="findRouteButton" style="width:100%">Szukaj ładowarek</button>
+			</div>
+		</form>
+	</div>
+
+	<div class="map" id="map"></div>
 
 </body>
 
