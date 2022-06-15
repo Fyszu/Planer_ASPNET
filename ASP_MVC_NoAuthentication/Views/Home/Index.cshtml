@@ -6,6 +6,8 @@
 @using System.Web;
 @using Newtonsoft.Json;
 @using System.Globalization
+@inject SignInManager<User> SignInManager
+@inject UserManager<User> UserManager
 
 @{
 	ViewData["Title"] = "Planer tras";
@@ -30,56 +32,49 @@
 <head>
 	<!-- Bootstrap -->
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+	<!-- My CSS -->
 	<link rel="stylesheet" href="~/css/Home.css">
-	<!-- Main top image -->
-	<img src="/images/top_image_wide.jpg" class="img-fluid" alt="Responsive image" style="position:relative; width:100%">
+	<link rel="stylesheet" href="~/css/site.css">
+	<!--- Header font import --->
+	<style>
+		@@import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@1,900&display=swap');
+	</style>
 </head>
 
 
 <body>
+	<!-- Main top image -->
+	<img src="/images/ecars_banner.jpg" class="img-fluid" id="headerImage" alt="Header image">
+	<!-- Header -->
+	<h1>Planer tras dla samochodów elektrycznych</h1>
 
 	<!-- Short description -->
-	<p style="margin-top:60px; margin-left:25px; margin-bottom: 0px; font-family:'Avenir Next LT Pro'; font-size:13pt;">Aplikacja automatyzująca planowanie podróży samochodem elektrycznym. Aby wyszukać optymalne ładowarki na trasie, wpisz początek i cel swojej podróży oraz wybierz samochód i stan baterii. Aby dodać własny samochód, zaloguj się.<br><br></p>
+	<p>Cześć! Znajdujesz się na stronie aplikacji automatyzującej planowanie podróży samochodem elektrycznym.</p>
+	<p>Wypełnij pola poniżej oraz klknij "<b>Szukaj ładowarek</b>", a zostaną znalezione dla Ciebie ładowarki w pobliżu trasy podróży.</p>
+	<p>Aplikacja korzysta z <b>Google API</b> do wyznaczania tras oraz bierze pod uwagę realny zasięg Twojego samochodu. <br /><em><a href="/Info">Kliknij po więcej informacji.</a></em></p>
+	@if(!SignInManager.IsSignedIn(User)) {
+	<p><b><a href="/Identity/Account/Login">Zaloguj się</a></b> w celu dodania swojego samochodu do listy oraz zmiany ustawień.</p>
+	}
 
-	<!-- Accordion description -->
-	<div class="accordion" id="accordionExample" style="margin-top:0px; margin-bottom:25px;">
-	  <div class="card">
-		<div class="card-header" id="headingOne">
-		  <h5 class="mb-0">
-			<button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-			  Kliknij aby wyświetlić więcej informacji...
-			</button>
-		  </h5>
-		</div>
-		<div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
-		  <div class="card-body">
-			Aplikacja wyszukuje ładowarki na trasie Twojej podróży, jednocześnie wskazując realny zasięg Twojego samochodu (zielony okrąg na mapie).<br>Realny zasięg jest automatycznie obliczany biorąc pod uwagę początkowy stan baterii, styl jazdy (zarejestrowani użytkownicy) oraz aktualny sezon (w zimę i w lato występują spadki wydajności z powodu korzystania z ogrzewania lub klimatyzacji). Parametry te można dostosować w panelu użytkownika po zalogowaniu się. Można tam również dodać własny samochód, jeśli nie możesz znaleźć go na liście.<br>Aby wyznaczyć trasę podróży, wpisz początek, cel podróży, wybierz samochód z listy oraz stan baterii. Następnie wybierz najbardziej oddaloną ładowarkę na trasie która mieści się w okręgu. Po wciśnięciu pinezki kliknij "Otwórz w google maps" - zostanie otwarta lokalizacja ładowarki w google maps. Teraz możesz wyznaczyć trasę oraz dodać kolejny przystanek w trasie (miejsce docelowe) i możesz być spokojny o dojechanie do celu swoim samochodem elektrycznym.<br />Aby uzyskać więcej informacji o aplikacji, kliknij w zakładkę "O aplikacji" na górnym pasku nawigacji.<br /><br />
-		  </div>
-		</div>
-	  </div>
-	 </div>
-
-
-	<!-- Map and choice fields grid -->
-
-	<div class="row" style="margin-left:3.5%; margin-right:3.5%; width:100%; vertical-align:bottom;">
+	<!-- Route form labels --->
+	<div class="row" style="margin-left:3.5%; margin-right:3.5%; margin-top:8vh; width:100%; vertical-align:bottom;">
 		<div class="column" style="width:16%;">
-			<p class="formDescription"><input type="image" id="currentLocationButton" name="currentLocationButton" src="/images/currentLocation.jpg" style="height:20px;width:20px;"> Początek podróży:</p>
+			<h2><input type="image" id="currentLocationButton" name="currentLocationButton" src="/images/currentLocation.jpg" style="height:20px;width:20px;"> Początek podróży:</h2>
 		</div>
 		<div class="column" style="width:16%;">
-			<p class="formDescription">Koniec podróży:</p>
+			<h2>Koniec podróży:</h2>
 		</div>
 		<div class="column" style="width:16%;" data-toggle="tooltip" data-placement="bottom" title="Nie możesz znaleźć swojego samochodu na liście? Zaloguj się i dodaj własny!">
-			<p class="formDescription"><img src="@Url.Content("~/images/question_mark.png")" height="14" width = "14"/> Samochód:</p>
+			<h2><img src="@Url.Content("~/images/question_mark.png")" height="14" width = "14"/> Samochód:</h2>
 		</div>
 		<div class="column" style="width:16%;">
-			<p class="formDescription">Stan baterii:</p>
+			<h2>Stan baterii:</h2>
 		</div>
 		<div class="column" style="width:16%;">
 		</div>
 	</div>
 
-
+	<!--- Route form inputs --->
 	<div class="row" style="margin-left:3.5%; margin-right:3.5%; margin-bottom:4vh; width:100%">
 		<form id = "fr">
 			<div class="column" style="width:16%;">
@@ -100,6 +95,7 @@
 		</form>
 	</div>
 
+	<!-- Map -->
 	<div class="map" id="map"></div>
 
 </body>

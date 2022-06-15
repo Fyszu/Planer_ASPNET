@@ -1,36 +1,51 @@
 html {
-  font-size: 14px;
+    font-size: 14px;
+    position: relative;
+    min-height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
 }
 
-@media (min-width: 768px) {
+/* Tablets and PC */
+@media (min-width: 768px) { 
   html {
     font-size: 15px;
   }
 }
 
-html {
-  position: relative;
-  min-height: 100%;
-}
-
 body {
-    padding:0;
-    margin:0;
-}
-
-h1 {
+    width: 100%;
     padding: 0;
     margin: 0;
+    overflow-x: hidden;
+    background-color: #ebffff;
 }
 
-/* The sticky class is added to the navbar with JS when it reaches its scroll position */
-.sticky {
+/* Navigation bar */
+#navbarheader {
     position: fixed;
     top: 0;
     width: 100%;
+    z-index: 1000;
 }
 
-/* Add some top padding to the page content to prevent sudden quick movement (as the navigation bar gets a new position at the top of the page (position:fixed and top:0) */
-.sticky + .content {
-    padding-top: 60px;
+#navbar {
+    background-color: #bee4fc;
+    opacity: 0.8;
+    margin-left:auto !important;
 }
+
+.nav-link, nav-link:visited {
+    font-size: 1.3vw;
+    color: #0111a2 !important;
+    font-weight: 700;
+    transition: transform 0.5s;
+}
+
+.nav-link:hover {
+    color: #2e8508 !important;
+    transform:scale(1.15);
+}
+/* Navigation bar end */
