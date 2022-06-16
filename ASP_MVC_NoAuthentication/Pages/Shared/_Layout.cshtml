@@ -1,6 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @inject SignInManager<User> SignInManager
 @inject UserManager<User> UserManager
+@using ASP_MVC_NoAuthentication.Data;
 
 <!DOCTYPE html>
 <html lang="en">
@@ -9,48 +10,51 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Planer tras dla samochodów elektrycznych</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/Home.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3" style="text-align:center">
-            <div class="container-fluid" style="text-align:center">
+    <!--- Navigation bar --->
+    <header id="navbarheader">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light border-bottom box-shadow mb-3" id="navbar">
+            <div class="container-fluid">
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-end">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Planer</a>
+                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Planer</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" href="/Info">O aplikacji</a>
+                            <a class="nav-link" href="/Info">O aplikacji</a>
                         </li>
                         @if(SignInManager.IsSignedIn(User)) {
                         <li class="nav-item">
-                            <a class="nav-link text-dark" href="/UserPanel">Panel użytkownika</a>
+                            <a class="nav-link" href="/UserPanel">Panel użytkownika</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" href="/Identity/Account/Logout">Wyloguj</a>
+                            <a class="nav-link" href="/Identity/Account/Logout">Wyloguj</a>
                         </li>
                         } else {
                         <li class="nav-item">
-                            <a class="nav-link text-dark" href="/Identity/Account/Login">Zaloguj</a>
+                            <a class="nav-link" href="/Identity/Account/Login">Zaloguj</a>
                         </li>
                         }
-
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container-fluid body-content" style="margin:0px; padding:0px;">
-        <main role="main" class="pb-3" style="margin:0px; margin-right=0px; padding:0px;">
+
+    <!--- Page body render --->
+    <div class="container-fluid body-content">
+        <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
+    <!--- JS libraries --->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

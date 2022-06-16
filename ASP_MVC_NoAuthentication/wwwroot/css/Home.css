@@ -1,6 +1,5 @@
 ﻿h1 {
     font-family: 'Merriweather', serif;
-    font-size: 4.3vw;
     font-weight: 900;
     letter-spacing: 0.1vw;
     color: #0111a2;
@@ -11,14 +10,12 @@
 
 h2 {
     font-family: 'Avenir Next LT Pro';
-    font-size: 1.3vw;
     font-weight: 600;
     color: #0111a2;
 }
 
 p {
     font-family: 'Avenir Next LT Pro';
-    font-size: 1.5vw;
     font-weight: 400;
     text-align:center;
     margin-left:5vw;
@@ -34,11 +31,6 @@ p {
     opacity: 0.5;
 }
 
-/* Input form colums */
-.column {
-    vertical-align: central;
-    display: inline-block;
-}
 .column + .column {
     margin-left: 3%;
 }
@@ -48,6 +40,7 @@ p {
     border-color: #0111a2;
     border-radius: 10px;
     text-indent: 0.3vw;
+    font-family: 'Avenir Next LT Pro';
 }
 
 .map {
@@ -58,38 +51,74 @@ p {
     width: 94%;
     margin-left: 3%;
     margin-right: 3%;
+    margin-top: 5vh;
 }
 
-
+.top-buffer {
+    margin-top: 3vh;
+}
 /* PC Resolution */
-@media (min-width: 500px) {
+@media (min-width: 576px) {
 
     h1 {
+        font-size: 4.3vw;
         margin-top: 15vh;
         margin-bottom: 48vh;
     }
+
+    p {
+        font-size: 1.5vw;
+    }
+
     #headerImage {
         top:0;
     }
-    .formDescription {
+
+    h2 {
         font-size: 1.3vw;
     }
 
+    .inputForm {
+        font-size: 1.2vw;
+    }
+
+    #currentLocationButton {
+        height: 10%;
+        width: 10%;
+    }
 }
 /* PC resolution END */
 
 
 /* Mobile resolution */
-@media (max-width: 500px) {
+@media (max-width: 576px) {
 
     h1 {
+        font-size: 7vw;
         margin-top: 8vh;
-        margin-bottom: 13vh;
+        margin-bottom: 8vh;
+    }
+
+    p {
+        font-size: 4vw;
     }
 
     #headerImage {
         top: 5vh;
     }
 
+    h2 {
+        font-size: 4.3vw;
+        text-align:center;
+    }
+
+    .inputForm {
+        font-size: 4vw;
+    }
+
+    #currentLocationButton {
+        height: 1.5em;
+        width: 1.5em;
+    }
 }
 /* Mobile resolution END */
