@@ -1,4 +1,6 @@
 @import url(https://fonts.googleapis.com/css?family=Roboto:300);
+
+
 /* PC Resolution */
 @media (min-width: 576px) {
     .login-page {
@@ -33,17 +35,24 @@
         box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
     }
 
-        .form input {
-            font-family: "Roboto", sans-serif;
-            font-size: 1.2vw;
-            color: #0111a2;
-            outline: 0;
-            background: #f2f2f2;
-            width: 100%;
-            border: 0;
-            margin-bottom: 8%;
-            padding: 0.9vw;
-            box-sizing: border-box;
+    .input-field {
+        font-family: "Roboto", sans-serif;
+        font-size: 1.2vw;
+        color: #0111a2;
+        outline: 0;
+        background: #f2f2f2;
+        width: 100%;
+        border: 0;
+        border-color: #f2f2f2;
+        border-radius: 1em;
+        margin-bottom: 8%;
+        padding: 0.9vw;
+        box-sizing: border-box;
+        transition: all 0.5s;
+    }
+
+        .input-field:focus {
+            box-shadow: 0 0 0.7em #719ECE;
         }
 
         .form button {
@@ -56,7 +65,7 @@
             background: #0111a2;
             width: 100%;
             border: 0;
-            border-radius: 20px;
+            border-radius: 1em;
             padding: 15px;
             color: #FFFFFF;
             -webkit-transition: all 0.3s ease;
@@ -70,7 +79,7 @@
             }
 
         .form .message {
-            margin: 15px 0 0;
+            margin: 3vh 0 0;
             color: #b3b3b3;
             font-size: 1vw;
         }
@@ -83,6 +92,12 @@
         .form .register-form {
             display: none;
         }
+
+    .form-check {
+        margin-bottom: 3vh;
+        margin-left: auto;
+        margin-right: auto;
+    }
 }
 
 
@@ -120,17 +135,23 @@
         box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
     }
 
-        .form input {
-            font-family: "Roboto", sans-serif;
-            font-size: 5vw;
-            color: #0111a2;
-            outline: 0;
-            background: #f2f2f2;
-            width: 100%;
-            border: 0;
-            margin-bottom: 8%;
-            padding: 3vw;
-            box-sizing: border-box;
+    .input-field {
+        font-family: "Roboto", sans-serif;
+        font-size: 5vw;
+        color: #0111a2;
+        outline: 0;
+        background: #f2f2f2;
+        width: 100%;
+        border: 0;
+        border-radius: 1em;
+        margin-bottom: 8%;
+        padding: 3vw;
+        box-sizing: border-box;
+        transition: all 0.5s;
+    }
+
+        .input-field:focus {
+            box-shadow: 0 0 0.7em #719ECE;
         }
 
         .form button {
@@ -143,7 +164,7 @@
             background: #0111a2;
             width: 100%;
             border: 0;
-            border-radius: 20px;
+            border-radius: 1em;
             padding: 15px;
             color: #FFFFFF;
             -webkit-transition: all 0.3 ease;
@@ -157,7 +178,7 @@
             }
 
         .form .message {
-            margin: 15px 0 0;
+            margin: 3vh 0 0;
             color: #b3b3b3;
             font-size: 4.2vw;
         }
@@ -170,43 +191,10 @@
         .form .register-form {
             display: none;
         }
-}
 
-
-
-
-    .container {
-        position: relative;
-        z-index: 1;
+    .form-check {
+        margin-bottom: 3vh;
+        margin-left: auto;
+        margin-right: auto;
     }
-
-        .container:before, .container:after {
-            content: "";
-            display: block;
-            clear: both;
-        }
-
-        .container .info {
-            text-align: center;
-        }
-
-            .container .info h1 {
-                padding: 0;
-                font-size: 36px;
-                font-weight: 300;
-                color: #1a1a1a;
-            }
-
-            .container .info span {
-                color: #4d4d4d;
-                font-size: 12px;
-            }
-
-                .container .info span a {
-                    color: #000000;
-                    text-decoration: none;
-                }
-
-                .container .info span .fa {
-                    color: #EF3B3A;
-                }
+}
