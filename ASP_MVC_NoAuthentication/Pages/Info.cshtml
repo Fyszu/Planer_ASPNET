@@ -4,12 +4,29 @@
 @{
     ViewData["Title"] = "O aplikacji";
     Layout = "_Layout";
-    string cb = "checkbox";
 }
+<head>
+    <!-- My CSS -->
+	<link rel="stylesheet" href="~/css/InfoPage.css">
+</head>
 
 <h1>O aplikacji</h1><br />
-<p>Aplikacja wyszukuje ładowarki na trasie Twojej podróży, jednocześnie wskazując realny zasięg Twojego samochodu (zielony okrąg na mapie).
-Realny zasięg jest automatycznie obliczany biorąc pod uwagę początkowy stan baterii, styl jazdy (zarejestrowani użytkownicy) oraz aktualny sezon (w zimę i w lato występują spadki wydajności z powodu korzystania z ogrzewania lub klimatyzacji). Parametry te można dostosować w panelu użytkownika po zalogowaniu się. Można tam również dodać własny samochód, jeśli nie możesz znaleźć go na liście.
-Aby wyznaczyć trasę podróży, wpisz początek, cel podróży, wybierz samochód z listy oraz stan baterii. Następnie wybierz najbardziej oddaloną ładowarkę na trasie która mieści się w okręgu. Po wciśnięciu pinezki kliknij "Otwórz w google maps" - zostanie otwarta lokalizacja ładowarki w google maps. Teraz możesz wyznaczyć trasę oraz dodać kolejny przystanek w trasie (miejsce docelowe) i możesz być spokojny o dojechanie do celu swoim samochodem elektrycznym.
-Aby uzyskać więcej informacji o aplikacji, kliknij w zakładkę "O aplikacji" na górnym pasku nawigacji.</p>
-<br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+<h2>Ogólnie o aplikacji</h2>
+<p>Aplikacja automatycznie wyszukuje ładowarki na trasie pomiędzy podanymi punktami, jednocześnie wskazując zasięg jazdy wybranego samochodu.
+	Po zalogowaniu użytkownik otrzymuje możliwość dodania własnych samochodów, które zostaną zapisane na jego koncie.<br />
+	Aby wyznaczyć trasę, należy wpisać w pola "Początek podróży" punkt początkowy, oraz cel w "Koniec podróży". Następnie należy wybrać samochód, podać stan baterii i kliknąć "Szukaj ładowarek".
+</p>
+<h2>Wyznaczanie trasy</h2>
+<p>Trasa jest wyznaczana poprzez Google API - do API jest wysyłane żądanie z współrzędnymi początkowymi i końcowymi trasy, a zwracana jest trasa która jest następnie nasieniona na mapę poprzez Javascript.<br>
+Współrzędnie są wyznaczane z nazwy miejsca również z użyciem Google API (geolokalizacja).<br>
+Następnie z bazy danych pobierane są ładowarki, które znajdują się wzdłuż trasy.</p>
+<h2>Obliczanie zasięgu maksymalnego</h2>
+<p>Na zasięg maksymalny składa się kilka czynników: m. in. styl jazdy, początkowy stan baterii oraz warunki na drodze takie jak temperatura.<br />
+Zasięg jest obliczany w dużym przybliżeniu, ponieważ aplikacja nie przewiduje częstotliwości korzystania użytkownika z klimatyzacji czy ogrzewania, oraz zakłada że styl jazdy będzie taki sam przez całą drogę. Należy wziąć to pod uwagę przy planowaniu podróży.<br />
+Niektóre z ustawień można zmienić na swoim koncie w panelu użytkownika.</p>
+<h2>Wykorzystane technologie</h2>
+<p>Strona internetowa została wykonana w technologii ASP .NET, z wykorzystaniem:<br />
+- C#,<br />
+- Entity Framework, <br />
+- Javascript, <br />
+- HTML, CSHTML, CSS (również Bootstrap). </p>

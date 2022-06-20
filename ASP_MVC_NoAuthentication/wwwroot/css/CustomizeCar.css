@@ -1,0 +1,239 @@
+﻿.customize-page {
+    min-width: 320px;
+    width: 100%;
+    min-height: 100vh;
+    text-align: center;
+    position: relative;
+    margin: 0;
+}
+
+.vertical-center {
+    margin: 0;
+    position: relative;
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+}
+
+.form {
+    min-width: 320px;
+    z-index: 1;
+    color: #0111a2;
+    background: #FFFFFF;
+    border-radius: 3vw;
+    margin: 0 auto 0;
+    padding: 1vw;
+    text-align: center;
+    box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+}
+
+h2 {
+    font-family: 'Merriweather', serif;
+    font-weight: 900;
+    text-align: center;
+    width: 100%;
+    color: #0111a2;
+}
+
+.input-form {
+    border: 2px solid;
+    border-color: #0111a2;
+    border-radius: 1em;
+    padding-left: 0.6em;
+    padding-right: 0.6em;
+    color: #0111a2;
+    font-weight:600;
+    font-family: 'Avenir Next LT Pro';
+}
+
+.myButton {
+    color: #0111a2;
+    font-family: 'Avenir Next LT Pro';
+    font-weight: 600;
+    border-color: #0111a2;
+    background-color: #ebffff;
+    -webkit-transition: all 0.3s ease;
+    transition: all 0.3s ease;
+}
+
+    .myButton:hover, button-safe:active {
+        background: #22e0b1;
+        color: #0111a2;
+    }
+
+h3 {
+    color: #0111a2;
+    font-family: 'Avenir Next LT Pro';
+    font-weight: 700;
+}
+
+input[type="range"] {
+    -webkit-appearance: none;
+    width: 85%;
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 2.5vh;
+    background: #0111a219;
+    border: none;
+    border-radius: 3vw;
+}
+
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    border: none;
+    border-radius: 50%;
+    background: #0111a2;
+    height: 1.5em;
+    width: 1.5em;
+}
+
+.slider-label {
+    color: #0111a2;
+    font-family: 'Avenir Next LT Pro';
+    vertical-align: middle;
+    font-weight: 600;
+}
+
+.connector-label {
+    color: #0111a2;
+    font-family: 'Avenir Next LT Pro';
+}
+
+input[type="checkbox"] {
+    -webkit-appearance: none;
+    appearance: none;
+    border: 0.15em solid #0111a2;
+    border-radius: 0.5em;
+    width: 1.7em;
+    height: 1.7em;
+    margin-right: 0.3vw;
+    place-content: center;
+    transform: translateY(0.1em);
+    transition: all 0.5s ease;
+}
+
+    input[type="checkbox"]:checked {
+        background-color: #0111a2;
+    }
+
+.alert {
+    border-radius: 1em;
+    background-color: orange;
+}
+
+/* PC resolution */
+@media (min-width: 576px) {
+    h1 {
+        margin-top: 8vh;
+        margin-bottom: 3vh;
+    }
+
+    h3 {
+        font-size: 1.5vw;
+    }
+
+    .form {
+        width: 50%;
+    }
+
+    .myButton {
+        font-size: 1.1vw;
+        border-radius: 1em;
+        border-width: 0.1em;
+        padding-left: 1.2em;
+        padding-right: 1.2em;
+        margin-top:3vh;
+    }
+
+    .slider-label {
+        font-size: 1vw;
+    }
+
+    input[type="range"] {
+        font-size: 0.8vw;
+        margin-top: 1vh;
+        margin-bottom: 2.5vh;
+    }
+
+    .input-form {
+        font-size: 1vw;
+        margin-bottom: 3vh;
+        width:50%;
+    }
+
+    .connector-label {
+        font-size: 1.1vw;
+        margin-bottom: 0.2vh;
+    }
+
+    input[type="checkbox"] {
+        width: 1.7em;
+        height: 1.7em;
+        margin-right: 0.3vw;
+    }
+
+    .alert {
+        font-size: 0.9vw;
+    }
+}
+
+/* Mobile resolution */
+@media (max-width: 576px) {
+    h1 {
+        margin-top: 8vh;
+        margin-bottom: 4vh;
+        font-size: 8vw;
+    }
+
+    .myButton {
+        font-size: 6vw;
+        border-radius: 1.5em;
+        border-width: 0.2em;
+        padding-left: 1em;
+        padding-right: 1em;
+        padding-top: 0.3em;
+        padding-bottom: 0.3em;
+        margin-top: 4vh;
+    }
+
+    .slider-label {
+        font-size: 4.5vw;
+    }
+
+    input[type="range"] {
+        width: 75vw;
+    }
+
+    .form {
+        padding: 7vw;
+        width: 90%;
+    }
+
+    .input-form {
+        font-size: 4.5vw;
+        margin-bottom: 5vh;
+        width: 90%;
+    }
+
+    .slider-label {
+        font-size: 3.5vw;
+        margin-bottom: 4vh;
+    }
+
+    .connector-label {
+        font-size: 5vw;
+        margin-bottom: 1.5vh;
+    }
+
+    input[type="checkbox"] {
+        width: 1.3em;
+        height: 1.3em;
+        margin-right: 1vw;
+    }
+
+    .alert {
+        font-size: 4vw;
+    }
+}

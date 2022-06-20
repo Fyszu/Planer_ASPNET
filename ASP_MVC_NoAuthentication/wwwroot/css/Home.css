@@ -1,14 +1,4 @@
-﻿h1 {
-    font-family: 'Merriweather', serif;
-    font-weight: 900;
-    letter-spacing: 0.1vw;
-    color: #0111a2;
-    position: relative;
-    text-align: center;
-    z-index: 5;
-}
-
-h2 {
+﻿h2 {
     font-family: 'Avenir Next LT Pro';
     font-weight: 600;
     color: #0111a2;
@@ -31,14 +21,20 @@ p {
     opacity: 0.5;
 }
 
+.column {
+    vertical-align: middle;
+    justify-content:center;
+    text-align: center;
+}
+
 .column + .column {
-    margin-left: 3%;
+    margin-left: 4%;
 }
 
 .inputForm {
     border: 2px solid;
     border-color: #0111a2;
-    border-radius: 10px;
+    border-radius: 1em;
     text-indent: 0.3vw;
     font-family: 'Avenir Next LT Pro';
 }
@@ -46,26 +42,67 @@ p {
 .map {
     border: 3px solid;
     border-color: #0111a2;
-    border-radius: 25px;
+    border-radius: 3em;
     height: 92vh;
     width: 94%;
-    margin-left: 3%;
-    margin-right: 3%;
     margin-top: 5vh;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .top-buffer {
     margin-top: 3vh;
 }
+
+.questionMark {
+    height: 0.8em;
+    width: 0.8em;
+    margin-bottom: 0.2em;
+}
+
+.search-button {
+    color: #0111a2;
+    font-weight: 600;
+    -webkit-transition: all 0.3s ease;
+    transition: all 0.3s ease;
+}
+    .search-button:hover {
+        background: #22e0b1;
+    }
+
+#currentLocationButton {
+    height: 10%;
+    width: 10%;
+}
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+    /* Tooltip text */
+    .tooltip .tooltiptext {
+        visibility: hidden;
+        background-color: black;
+        font-family: 'Avenir Next LT Pro';
+        color: #fff;
+        text-align: center;
+        position: absolute;
+        z-index: 1;
+    }
+
+    /* Show the tooltip text when you mouse over the tooltip container */
+    .tooltip:hover .tooltiptext {
+        visibility: visible;
+    }
+
+
 /* PC Resolution */
 @media (min-width: 576px) {
-
     h1 {
-        font-size: 4.3vw;
         margin-top: 15vh;
         margin-bottom: 48vh;
     }
-
     p {
         font-size: 1.5vw;
     }
@@ -76,15 +113,17 @@ p {
 
     h2 {
         font-size: 1.3vw;
+        text-align: center;
     }
 
     .inputForm {
         font-size: 1.2vw;
     }
 
-    #currentLocationButton {
-        height: 10%;
-        width: 10%;
+    .tooltip-inner {
+        font-size: 1.2vw;
+        min-width: 25vw;
+        border-radius: 1em;
     }
 }
 /* PC resolution END */
@@ -92,9 +131,7 @@ p {
 
 /* Mobile resolution */
 @media (max-width: 576px) {
-
     h1 {
-        font-size: 7vw;
         margin-top: 8vh;
         margin-bottom: 8vh;
     }
@@ -116,9 +153,18 @@ p {
         font-size: 4vw;
     }
 
-    #currentLocationButton {
-        height: 1.5em;
-        width: 1.5em;
+    .origin-column {
+        margin-left: 6%;
+    }
+    
+    .search-button {
+        margin-top: 2vh;
+    }
+
+    .tooltip-inner {
+        font-size: 5vw;
+        min-width: 80vw;
+        border-radius: 1em;
     }
 }
 /* Mobile resolution END */

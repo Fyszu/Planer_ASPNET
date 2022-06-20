@@ -12,7 +12,8 @@
 <html lang="en" >
 
     <head>
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+        <!-- My CSS -->
+        <link rel="stylesheet" href="~/css/UserPanel.css">
     </head>
 
     <body>
@@ -23,120 +24,124 @@
         <h2>
             Twoje samochody:
         </h2>
-        <table class = "table">
-            <thead>
-                <tr>
-                    <th>
-                        Marka
-                    </th>
-                    <th>
-                        Model
-                    </th>
-                    <th>
-                        Zasięg maksymalny
-                    </th>
-                    <th>
-                        Gniazda ładowania
-                    </th>
-                    <th>
-
-                    </th>
-                    <th>
-
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                @if(Model.cars != null && Model.cars.Count > 0)
-                {
-                @foreach (var (car, index) in Model.cars.Select((v, i) => (v, i)))
-                {
+        <div class="table-responsive">
+            <table class = "table table-striped">
+                <thead>
                     <tr>
-                        <td>
-                            @Html.DisplayFor(modelItem => car.Brand)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => car.Model)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => car.MaximumDistance)
-                        </td>
-                        <td>
-                            @car.ConnectorsToString()
-                        </td>
-                        <td>
-                            <input type="button" onclick="location.href='@(editUrl + Model.cars[index].Id)';" value="Edytuj" />
-                        </td>
-                        <td>
-                            <input type="button" onclick="if(window.confirm('Jesteś pewien że chcesz usunąć ten samochód?')) { location.href='@(removeUrl + Model.cars[index].Id)'; }" value="Usuń" />
-                        </td>
+                        <th>
+                            Marka
+                        </th>
+                        <th>
+                            Model
+                        </th>
+                        <th>
+                            Zasięg maksymalny
+                        </th>
+                        <th>
+                            Gniazda ładowania
+                        </th>
+                        <th>
+
+                        </th>
+                        <th>
+
+                        </th>
                     </tr>
+                </thead>
+                <tbody>
+                    @if(Model.cars != null && Model.cars.Count > 0)
+                    {
+                    @foreach (var (car, index) in Model.cars.Select((v, i) => (v, i)))
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => car.Brand)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => car.Model)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => car.MaximumDistance)
+                            </td>
+                            <td>
+                                @car.ConnectorsToString()
+                            </td>
+                            <td>
+                                <input type="button" class="myButton button-safe" onclick="location.href='@(editUrl + Model.cars[index].Id)';" value="Edytuj" />
+                            </td>
+                            <td>
+                                <input type="button" class="myButton button-remove" onclick="if(window.confirm('Jesteś pewien że chcesz usunąć ten samochód?')) { location.href='@(removeUrl + Model.cars[index].Id)'; }" value="Usuń" />
+                            </td>
+                        </tr>
+                    }
                 }
-            }
-            <tr>
-                    <td>
-                       <input type="button" onclick="location.href='@addUrl';" value="Dodaj nowy samochód" />
-                    </td>
-                    <td></td><td></td><td></td><td></td><td></td>
-                </tr>
-            </tbody>
-        </table>
+                <tr>
+                        <td>
+                           <input type="button" class="myButton button-safe" onclick="location.href='@addUrl';" value="Dodaj" />
+                        </td>
+                        <td></td><td></td><td></td><td></td><td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
 
-        <!---- Ustawienia użytkownika ----->
-        <br>
+        <div class="spacing"></div>
+        <!---- User settings ----->
         <h2>
-            Ustawienia indywidualne:
+            Ustawienia:
         </h2>
-        <br />
-         <form asp-route-returnUrl="@Model.ReturnUrl" method="post" asp-page-handler="SaveSettings">
-             <div style="width: 24%;" data-toggle="tooltip" width="40px" data-placement="bottom" title="Współczynnik letni określa procent spadku wydajności baterii w lato. Zależy on głównie od Twojego samochodu i używanego wyposażenia, zwłaszcza klimatyzacji. Szacuje się, że spadek wydajności latem może być równy nawet do 20%.">
-                 Współczynnik letni&nbsp;&nbsp;
-                <img src="@Url.Content("~/images/question_mark.png")" height="17" width = "17"/>
-             </div>
-             <input type="range" name="summerFactorRange" id="summerFactorRange" value="@(Model.currentUser.SummerFactor*100)" min="0" max="20" oninput="this.nextElementSibling.value = this.value"/>
-             -<output>@((int)(Model.currentUser.SummerFactor*100))</output>%
-             <br /><br />
-             <div style="width: 24%;" data-toggle="tooltip" width="40px" data-placement="bottom" title="Współczynnik zimowy określa procent spadku wydajności baterii w zimę. Zależy on głównie od Twojego samochodu i używanego wyposażenia, zwłaszcza ogrzewania. Szacuje się, że spadek wydajności zimą może być równy nawet do 50%.">
-                 Współczynnik zimowy&nbsp;&nbsp;
-                <img src="@Url.Content("~/images/question_mark.png")" height="17" width = "17"/>
-             </div>
-             <input type="range" name="winterFactorRange" id="winterFactorRange" value="@(Model.currentUser.SummerFactor*100)" min="0" max="50" oninput="this.nextElementSibling.value = this.value"/>
-             -<output>@((int)(Model.currentUser.WinterFactor*100))</output>%
-             <br /><br />
-             <div style="width: 24%;" data-toggle="tooltip" width="40px" data-placement="bottom" title="Styl jazdy w dużej mierze wpływa na realny zasięg Twojego samochodu. Przy wolnej jeździe (np. do 120 km/h na autostradzie) zaoszczędzisz wiele energii w akumulatorze i dojedziesz dalej.">
-                 Styl jazdy&nbsp;&nbsp;
-                <img src="@Url.Content("~/images/question_mark.png")" height="17" width = "17"/>
-             </div>
-             <select name="drivingStyleSelect">
-                <!------ Zaznaczenie zależnie od ustawień użytkownika -------->
-                @if (Model.currentUser.DrivingStyle == "ekonomiczny")
-                {
-                    <option selected value = "ekonomiczny">Ekonomiczny</option>
-                    <option value = "mieszany">Mieszany</option>
-                    <option value = "dynamiczny">Dynamiczny</option>
-                }
-                @if (Model.currentUser.DrivingStyle == "mieszany")
-                {
-                    <option value = "ekonomiczny">Ekonomiczny</option>
-                    <option selected value = "mieszany">Mieszany</option>
-                    <option value = "dynamiczny">Dynamiczny</option>
-                }
-                @if (Model.currentUser.DrivingStyle == "dynamiczny")
-                {
-                    <option value = "ekonomiczny">Ekonomiczny</option>
-                    <option value = "mieszany">Mieszany</option>
-                    <option selected value = "dynamiczny">Dynamiczny</option>
-                }
-             </select>
-             <br /><br /><br />
-             <button type = "submit">Zapisz</button>
-         </form>
+        <div class="settings">
+             <form asp-route-returnUrl="@Model.ReturnUrl" method="post" asp-page-handler="SaveSettings">
+                 <div class="my-tooltip">
+                    <h3>Współczynnik letni&nbsp;&nbsp;
+                    <img src="@Url.Content("~/images/question_mark.png")" class="questionMark" data-toggle="tooltip" data-placement="bottom" title="Współczynnik letni określa procent spadku wydajności baterii w lato. Zależy on głównie od Twojego samochodu i używanego wyposażenia, zwłaszcza klimatyzacji. Szacuje się, że spadek wydajności latem może być równy nawet do 20%."/></h3>
+                 </div>
+                 <div class="slider-label"><input type="range" name="summerFactorRange" class="slider" id="summerFactorRange" value="@(Model.currentUser.SummerFactor*100)" min="0" max="20" oninput="this.nextElementSibling.value = this.value"/>
+                 -<output>@((int)(Model.currentUser.SummerFactor*100))</output>%</div>
+                 <br /><br />
+                 <div class="my-tooltip" >
+                     <h3>Współczynnik zimowy&nbsp;&nbsp;
+                    <img src="@Url.Content("~/images/question_mark.png")" class="questionMark" data-toggle="tooltip" data-placement="bottom" title="Współczynnik zimowy określa procent spadku wydajności baterii w zimę. Zależy on głównie od Twojego samochodu i używanego wyposażenia, zwłaszcza ogrzewania. Szacuje się, że spadek wydajności zimą może być równy nawet do 50%."/></h3>
+                 </div>
+                 <div class="slider-label"><input type="range" name="winterFactorRange" id="winterFactorRange" value="@(Model.currentUser.WinterFactor*100)" min="0" max="50" oninput="this.nextElementSibling.value = this.value"/>
+                 -<output>@((int)(Model.currentUser.WinterFactor*100))</output>%</div>
+                 <br /><br />
+                 <div class="my-tooltip">
+                     <h3>Styl jazdy&nbsp;&nbsp;
+                    <img src="@Url.Content("~/images/question_mark.png")" class="questionMark" data-toggle="tooltip" data-placement="bottom" title="Styl jazdy w dużej mierze wpływa na realny zasięg Twojego samochodu. Przy wolnej jeździe (np. do 120 km/h na autostradzie) zaoszczędzisz wiele energii w akumulatorze i dojedziesz dalej."/></h3>
+                 </div>
+                 <select name="drivingStyleSelect" id="drivingStyleSelect">
+                    <optgroup label="Styl jazdy">
+                    @if (Model.currentUser.DrivingStyle == "ekonomiczny")
+                    {
+                        <option selected value = "ekonomiczny">Ekonomiczny</option>
+                        <option value = "mieszany">Mieszany</option>
+                        <option value = "dynamiczny">Dynamiczny</option>
+                    }
+                    @if (Model.currentUser.DrivingStyle == "mieszany")
+                    {
+                        <option value = "ekonomiczny">Ekonomiczny</option>
+                        <option selected value = "mieszany">Mieszany</option>
+                        <option value = "dynamiczny">Dynamiczny</option>
+                    }
+                    @if (Model.currentUser.DrivingStyle == "dynamiczny")
+                    {
+                        <option value = "ekonomiczny">Ekonomiczny</option>
+                        <option value = "mieszany">Mieszany</option>
+                        <option selected value = "dynamiczny">Dynamiczny</option>
+                    }
+                    </optgroup>
+                 </select>
+                 <br /><br /><br /><br />
+                 <button type = "submit" class="myButton button-safe settings-button">Zapisz</button>
+             </form>
+         </div>
 
-        <!----- Bootstrap  ------>
-        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+        <!----- Libraries  ------>
+        <script src="~/lib/jquery/dist/jquery.min.js"></script>
+        
+        <!-- Tooltip appearance script -->
         <script>
             $(function () {
               $('[data-toggle="tooltip"]').tooltip()

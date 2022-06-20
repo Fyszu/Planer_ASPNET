@@ -1,3 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@1,900&display=swap');
+
+h1 {
+    font-family: 'Merriweather', serif;
+    font-weight: 900;
+    letter-spacing: 0.1vw;
+    color: #0111a2;
+    position: relative;
+    text-align: center;
+    z-index: 5;
+}
+
 html {
     font-size: 14px;
     position: relative;
@@ -6,13 +18,6 @@ html {
     margin: 0;
     padding: 0;
     overflow-x: hidden;
-}
-
-/* Tablets and PC */
-@media (min-width: 768px) { 
-  html {
-    font-size: 15px;
-  }
 }
 
 body {
@@ -38,14 +43,40 @@ body {
 }
 
 .nav-link, nav-link:visited {
-    font-size: 1.3vw;
     color: #0111a2 !important;
     font-weight: 700;
-    transition: transform 0.5s;
+    transition: all 0.5s;
 }
 
 .nav-link:hover {
     color: #2e8508 !important;
-    transform:scale(1.15);
+    transform: scale(1.15);
 }
 /* Navigation bar end */
+
+/* Responsive */
+
+/* PC resolution */
+@media (min-width: 576px) {
+    h1 {
+        font-size: 4.3vw;
+    }
+
+    .nav-item {
+        margin-left: 1%;
+        font-size: 1.3vw;
+    }
+}
+
+/* Mobile resolution */
+@media (max-width: 576px) {
+    h1 {
+        font-size: 7vw;
+    }
+
+    .nav-item {
+        margin-left: 1%;
+        margin-top:2%;
+        font-size: 5vw;
+    }
+}

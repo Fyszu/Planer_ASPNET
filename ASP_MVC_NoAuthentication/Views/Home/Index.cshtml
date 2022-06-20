@@ -56,28 +56,28 @@
 
 	<!-- Route form  --->
 	<form id = "fr">
-	<div class="row justify-content-center align-items-center" style="margin-left:3%; margin-right: 3%; margin-top:4%">
-		<div class="col-sm top-buffer">
-			<h2>Początek podróży:</h2>
-			<input class="inputForm" type="text" id="origin" style="width:85%; max-width:50vw;" placeholder = "Wpisz punkt początkowy" required>
-			<input type="image" id="currentLocationButton" name="currentLocationButton" src="/images/currentLocation.png">
+		<div class="row align-items-end" style="margin-left:3%; margin-right: 3%; margin-top:4%">
+			<div class="col-sm top-buffer text-center origin-column">
+				<h2 style="margin-right:12%;">Początek podróży</h2>
+				<input class="inputForm align-middle" type="text" id="origin" style="width:88%; max-width:70vw; min-height: 5vh;" placeholder = "Wpisz punkt początkowy" required>
+				<input class="align-middle" type="image" id="currentLocationButton" name="currentLocationButton" src="/images/currentLocation.png">
+			</div>
+			<div class="col-sm top-buffer text-center">
+				<h2>Koniec podróży</h2>
+				<input class="inputForm align-middle" type="text" style="width:100%; max-width:70vw; min-height: 5vh;" id="destination" placeholder = "Wpisz punkt docelowy" required>
+			</div>
+			<div class="col-sm top-buffer text-center">
+				<h2><img src="@Url.Content("~/images/question_mark.png")" class="questionMark" data-toggle="tooltip" data-placement="bottom" title="Nie możesz znaleźć swojego samochodu na liście? Zaloguj się i dodaj własny!"/> Samochód:</h2>
+				<select class="inputForm align-middle" id="selectCar" style="width:100%; max-width:70vw; min-height: 5vh;"></select>
+			</div>
+			<div class="col-sm top-buffer text-center">
+				<h2><img src="@Url.Content("~/images/question_mark.png")" class="questionMark" data-toggle="tooltip" data-placement="bottom" title="Podaj aktualny (lub planowany) stan baterii Twojego samochodu."/> Stan baterii</h2>
+				<input class="inputForm align-middle" type=number id="batteryLevelSelect" style="width:100%; max-width:70vw; min-height: 5vh;" placeholder="Poziom baterii [%]" min=1 max=100>
+			</div>
+			<div class="col-sm top-buffer text-center" style="min-height:100%">
+				<button class="inputForm search-button align-middle" type="button" style="width:100%; max-width:70vw; min-height: 5vh;" id="findRouteButton">Szukaj ładowarek</button>
+			</div>
 		</div>
-		<div class="col-sm top-buffer">
-			<h2>Koniec podróży:</h2>
-			<input class="inputForm" type="text" style="width:100%; max-width:50vw;" id="destination" placeholder = "Wpisz punkt docelowy" required>
-		</div>
-		<div class="col-sm top-buffer" data-toggle="tooltip" data-placement="bottom" title="Nie możesz znaleźć swojego samochodu na liście? Zaloguj się i dodaj własny!">
-			<h2><img src="@Url.Content("~/images/question_mark.png")" height="14" width = "14"/> Samochód:</h2>
-			<select class="inputForm" id="selectCar" style="width:100%; max-width:50vw;"></select>
-		</div>
-		<div class="col-sm top-buffer">
-			<h2>Stan baterii:</h2>
-			<input class="inputForm" type=number id="batteryLevelSelect" style="width:100%; max-width:50vw;" placeholder="Poziom baterii [%]" min=1 max=100>
-		</div>
-		<div class="col-sm top-buffer">
-			<button class="inputForm" type="button" style="width:100%; max-width:50vw;" id="findRouteButton">Szukaj ładowarek</button>
-		</div>
-	</div>
 	</form>
 
 	<!-- Map -->
@@ -145,6 +145,9 @@
 			}
 			else if(!(document.getElementById("batteryLevelSelect").value)) {
 				window.alert("Proszę podać stan baterii.");
+			}
+			else if((document.getElementById("batteryLevelSelect").value > 100) || document.getElementById("batteryLevelSelect").value < 1) {
+				window.alert("Proszę podać realny stan baterii.");
 			}
 
 			else
@@ -329,5 +332,9 @@
 			});
 		}
 
+		// Tooltip appearance script
+		$(function () {
+              $('[data-toggle="tooltip"]').tooltip()
+        })
 	</script>
 </body>
