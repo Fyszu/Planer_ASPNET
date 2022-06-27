@@ -24,11 +24,13 @@ builder.Services.AddIdentity<User, IdentityRole>(
     ).AddEntityFrameworkStores<MyDbContext>();
 builder.Services.ConfigureApplicationCookie(options =>
 {
-    // Ustawienia cookie dla przekierowañ np. niezalogowanych u¿ytkowników
     options.Cookie.HttpOnly = true;
-    //options.Cookie.Expiration 
 
-    options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+// Remember me expire time
+    options.ExpireTimeSpan = TimeSpan.FromDays(30);
+    options.Cookie.Name = "Planer.AuthCookieAspNetCore";
+
+    // Redirection settings
     options.LoginPath = "/Identity/Account/Login";
     options.LogoutPath = "/Identity/Account/Logout";
     options.AccessDeniedPath = "/Identity/Account/AccessDenied";
@@ -62,6 +64,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseCookiePolicy();
 app.UseAuthentication();
 app.UseAuthorization();
 

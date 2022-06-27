@@ -225,7 +225,7 @@
 								markersArray.push(marker);
 
 								//Create of marker's information window and attach click listener
-								var markerDetails = new google.maps.markerDetails({
+								var markerDetails = new google.maps.InfoWindow({
 									content: "<p>Stacja: " + station.name + "<br>Koordynaty: " + station.latitude + ", " 
 									+ station.longitude + "<br>Adres: " + station.city + " " + station.postalAdress + ", "
 									+ station.street + "<br>Godziny otwarcia: " + station.openHours + "<br>Właściciel: "
