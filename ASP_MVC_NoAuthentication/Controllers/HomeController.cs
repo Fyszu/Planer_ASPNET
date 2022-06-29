@@ -15,22 +15,32 @@ namespace ASP_MVC_NoAuthentication.Controllers
         private readonly ICarService _carService;
         private readonly SignInManager<User> _signInManager;
         private readonly UserManager<User> _userManager;
-        public HomeController(ILogger<HomeController> logger, UserManager<User> userManager, SignInManager<User> signInManager, ICarService carService)
+        private readonly IUserService _userService;
+        public HomeController(ILogger<HomeController> logger, UserManager<User> userManager, SignInManager<User> signInManager, ICarService carService, IUserService userService)
         {
             _logger = logger;
             _userManager = userManager;
             _signInManager = signInManager;
             _carService = carService;
+            _userService = userService;
         }
 
 
         public async Task<ActionResult> Index()
         {
-            //Returns view with List of cars as a model (No user signed - default cars, user signed in - default + user cars)
+            //Returns view with List of cars as a model (No user signed - default cars, user signed in - user cars)
             List<Car> cars = new List<Car>();
-            cars = await _carService.GetDefaultCars();
             if (_signInManager.IsSignedIn(User))
-                cars = (await _carService.GetCarsByUser(User.Identity.Name)).Concat(cars).OrderBy(car => car.Brand).ToList();
+            {
+                User loggedUser = await _userService.GetUserByName(User.Identity.Name);
+                cars = await _carService.GetCarsByUser(loggedUser.UserName);
+                if (loggedUser.ShowOnlyMyCars)
+                {
+                    if (cars.Count > 0) { return View(cars); }
+                }
+                else if (cars.Count > 0) { return View(cars.Concat(await _carService.GetDefaultCars()).OrderBy(car => car.Brand).ToList()); }
+            }
+            cars = await _carService.GetDefaultCars();
             return View(cars);
          }
 

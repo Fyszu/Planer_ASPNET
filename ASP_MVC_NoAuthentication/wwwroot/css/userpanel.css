@@ -137,7 +137,10 @@ input[type=range]::-webkit-slider-thumb {
         visibility: visible;
     }
 
-
+input[type="checkbox"] {
+    width: 1.7em;
+    height: 1.7em;
+}
 
 
 /* PC resolution */

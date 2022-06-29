@@ -42,7 +42,7 @@ builder.Services.AddTransient<IChargingStationService, ChargingStationService>()
 builder.Services.AddTransient<IDistanceService, DistanceService>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IConnectorService, ConnectorService>();
-builder.Services.AddScoped<ICarService, CarService>();
+builder.Services.AddTransient<ICarService, CarService>();
 builder.Services.AddScoped<CarRepository, CarRepository>();
 builder.Services.AddScoped<ConnectorRepository, ConnectorRepository>();
 builder.Services.AddScoped<UserRepository, UserRepository>();

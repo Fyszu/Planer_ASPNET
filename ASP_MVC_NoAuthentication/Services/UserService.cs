@@ -19,9 +19,9 @@ namespace ASP_MVC_NoAuthentication.Services
             return await _repository.GetByName(name);
         }
 
-        public async Task SaveSettings(double summerFactor, double winterFactor, string drivingStyle, string userId)
+        public async Task SaveSettings(double summerFactor, double winterFactor, string drivingStyle, string userId, Boolean showOnlyMyCars)
         {
-            await _repository.Update(new User(userId, drivingStyle, winterFactor, summerFactor, "default"));
+            await _repository.Update(new User(userId, drivingStyle, winterFactor, summerFactor, "default", showOnlyMyCars));
         }
     }
 }

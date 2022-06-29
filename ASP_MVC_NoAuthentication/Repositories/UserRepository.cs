@@ -33,6 +33,7 @@ namespace ASP_MVC_NoAuthentication.Repositories
                 dbUser.SummerFactor = user.SummerFactor;
                 dbUser.WinterFactor = user.WinterFactor;
                 dbUser.DrivingStyle = user.DrivingStyle;
+                dbUser.ShowOnlyMyCars = user.ShowOnlyMyCars;
             }
             await _context.SaveChangesAsync();
         }

@@ -85,9 +85,10 @@
             </table>
         </div>
 
-
         <div class="spacing"></div>
+
         <!---- User settings ----->
+
         <h2>
             Ustawienia:
         </h2>
@@ -133,7 +134,18 @@
                     }
                     </optgroup>
                  </select>
-                 <br /><br /><br /><br />
+                 <br /><br /><br />
+                 <h3>Pokazuj tylko moje samochody&nbsp;&nbsp;
+                    <img src="@Url.Content("~/images/question_mark.png")" class="questionMark" data-toggle="tooltip" data-placement="bottom" title="Zaznacz, aby na liście samochodów na stronie głównej planowania trasy pojawiały się tylko Twoje samochody. Pozostaw puste, a oprócz Twoich samochodów zostaną wyświetlone domyślne."/></h3>
+                 @if (Model.currentUser.ShowOnlyMyCars)
+                 {
+                    <input class="form-check-input" type="checkbox" id="showMyCarsCheckBox" name="showMyCarsCheckBox" checked>
+                 }
+                 @if (!Model.currentUser.ShowOnlyMyCars)
+                 {
+                    <input class="form-check-input" type="checkbox" id="showMyCarsCheckBox" name="showMyCarsCheckBox">
+                 }
+            <br /><br /><br /><br />
                  <button type = "submit" class="myButton button-safe settings-button">Zapisz</button>
              </form>
          </div>

@@ -59,7 +59,11 @@ namespace ASP_MVC_NoAuthentication.Pages
             double summerFactor = ((double)(int.Parse(Request.Form["summerFactorRange"])) / 100);
             double winterFactor = ((double)(int.Parse(Request.Form["winterFactorRange"])) / 100);
             string drivingStyle = Request.Form["drivingStyleSelect"];
-            await _userService.SaveSettings(summerFactor, winterFactor, drivingStyle, currentUser.Id);
+            Boolean showOnlyMyCars = false;
+            string check = Request.Form["showMyCarsCheckBox"];
+            if (check != null)
+                showOnlyMyCars = true;
+            await _userService.SaveSettings(summerFactor, winterFactor, drivingStyle, currentUser.Id, showOnlyMyCars);
             return Redirect(Url.Content("~/UserPanel"));
         }
     }
