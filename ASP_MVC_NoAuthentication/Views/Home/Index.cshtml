@@ -85,13 +85,11 @@
 
 	<!---- End of HTML ---->
 
-	<!-- Google map initialization using personal api key and creating map -->
-	<script src="https://maps.googleapis.com/maps/api/js?key=@(key + "&callback=initMap")" defer></script>
-
+	
 	<!-- JS Libraries -->
 	<script src="~/lib/jquery/dist/jquery.min.js"></script>
 	<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-	<script src="https://js.arcgis.com/4.4/"></script> <!--- ArcGIS geometry API --->
+	<script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
 
 	<!----------- JavaScript functions ----------->
 	<script type="text/javascript">
@@ -104,8 +102,13 @@
 		var carList; //List of cars to choose (from page model, default cars + user cars)
 		var carListComboBox = document.getElementById('selectCar'); //Html combo box for car selection
 		var markersArray = []; //Array of charging stations markers
+		const originField = document.getElementById("origin");
+        const destinationField = document.getElementById("destination");
+
 
 		window.onload = init(); //Call init function on page load
+
+
 
 		//Google map initialization
 		function initMap() {
@@ -122,6 +125,46 @@
 				fillColor: "#14f562",
 				fillOpacity: 0.35,
 			});
+
+			//----Autocomplete init----
+            const originSearchBox = new google.maps.places.SearchBox(originField);
+			const destinationSearchBox = new google.maps.places.SearchBox(destinationField);
+
+            map.addListener("bounds_changed", () => {
+                originSearchBox.setBounds(map.getBounds());
+				destinationSearchBox.setBounds(map.getBounds());
+            });
+
+            originSearchBox.addListener("places_changed", () => {
+                const places = originSearchBox.getPlaces();
+
+                if (places.length == 0) {
+                    return;
+				}
+
+                const bounds = new google.maps.LatLngBounds();
+
+                places.forEach((place) => {
+                    if (!place.geometry || !place.geometry.location) {
+                        console.log("Returned place contains no geometry.");
+                        return;
+					}
+
+                    const icon = {
+						url: place.icon,
+						size: new google.maps.Size(71, 71),
+						origin: new google.maps.Point(17, 34),
+						scaledSize: new google.maps.Size(25, 25),
+                    };
+
+                    if (place.geometry.viewport) {
+                        bounds.union(place.geometry.viewport);
+                    } else {
+                        bounds.extend(place.geometry.location);
+					}
+                });
+                map.fitBounds(bounds);
+            });
 		}
 
 		//Function called on page load - parsing list of cars array to JavaScript, initializing and adding list to choice box
@@ -137,10 +180,7 @@
 		//Set route, find charging stations near route and set markers 
 		async function calcRoute() {
 
-			var originTextField = document.getElementById("origin");
-			var destinationTextField = document.getElementById("destination");
-
-			if(!originTextField.value||!destinationTextField.value) {
+			if(!originField.value||!destinationField.value) {
 				window.alert("Proszę wypełnić pola trasy.");
 			}
 			else if(!(document.getElementById("batteryLevelSelect").value)) {
@@ -159,8 +199,8 @@
 				chargingRadius.setMap(null);
 				chargingRadius.setMap(map);
 
-				var originCoordinates = await fetchAddress(originTextField.value);
-				var destinationCoordinates = await fetchAddress(destinationTextField.value);
+				var originCoordinates = await fetchAddress(originField.value);
+				var destinationCoordinates = await fetchAddress(destinationField.value);
 				const radius = await fetchRealDistance(carList[carListComboBox.selectedIndex].maximumDistance, document.getElementById("batteryLevelSelect").value);
 
 				chargingRadius.setCenter(originCoordinates);
@@ -310,31 +350,36 @@
 			markersArray.length = 0;
 		}
 
-		var element = document.getElementById("origin");
-		document.getElementById("currentLocationButton").addEventListener("click", function(){ var coords = getCurrentLocation(); element.value = coords[0]; });
-
-
+		//Get user's current location function
 		function getCurrentLocation() {
 			if(navigator.geolocation) {
 				navigator.geolocation.getCurrentPosition(useLocation);
 			}
 		}
 
+		//User's location parsing coordinates -> address and set it to origin field
 		function useLocation(position) {
 			url = window.location.href + "geo/getAddress?key=" + "@geoKey" + "&longitude=" + position.coords.longitude + "&latitude=" + position.coords.latitude;
 			fetch(url)
 			.then(res => res.json())
 			.then(data => {
 				if(data["Status"] == "OK")
-					element.value = data["Address"];
+					originField.value = data["Address"];
 				else
 					alert("Problem with getting current localization has occured. Please type address manually.");
 			});
 		}
+
+		//Location button event listener
+		document.getElementById("currentLocationButton").addEventListener("click", function(){ getCurrentLocation(); });
 
 		// Tooltip appearance script
 		$(function () {
               $('[data-toggle="tooltip"]').tooltip()
         })
 	</script>
+
+	<!-- Google map initialization using personal api key and creating map -->
+	<script src="https://maps.googleapis.com/maps/api/js?key=@(key + "&callback=initMap&libraries=places")" async defer></script>
+
 </body>
