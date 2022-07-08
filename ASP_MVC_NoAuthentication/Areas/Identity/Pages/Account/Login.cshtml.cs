@@ -97,7 +97,7 @@ namespace ASP_MVC_NoAuthentication.Views.Home
             ModelState.MarkAllFieldsAsSkipped();
             if (TryValidateModel(InputRegister, nameof(InputRegister)))
             {
-                var user = new User { UserName = InputRegister.EmailRegister, Email = InputRegister.EmailRegister, DrivingStyle = "mieszany", WinterFactor = 0.35, SummerFactor = 0.15, HighwaySpeed = "test", ShowOnlyMyCars = true };
+                var user = new User { UserName = InputRegister.EmailRegister, Email = InputRegister.EmailRegister, DrivingStyle = "mieszany", WinterFactor = 0.35, SummerFactor = 0.15, HighwaySpeed = "test", ShowOnlyMyCars = false };
                 var result = await _userManager.CreateAsync(user, InputRegister.PasswordRegister);
                 if (result.Succeeded)
                 {

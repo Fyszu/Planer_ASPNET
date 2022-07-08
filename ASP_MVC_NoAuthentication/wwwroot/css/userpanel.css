@@ -42,6 +42,10 @@ tbody {
     transition: all 0.3s ease;
 }
 
+.myButton:hover {
+    transform:scale(0.98);
+}
+
 .settings-button {
     background-color: #0111a219;
     border-width: 0.2em !important;
@@ -142,6 +146,15 @@ input[type="checkbox"] {
     height: 1.7em;
 }
 
+hr.rounded {
+    margin-left: 20%;
+    margin-right: 20%;
+    margin-top: 6vh;
+    margin-bottom: 6vh;
+    border-top: 0.4em solid #0111a2;
+    border-radius: 1em;
+}
+
 
 /* PC resolution */
 @media (min-width: 576px) {
@@ -217,11 +230,11 @@ input[type="checkbox"] {
     }
 
     #drivingStyleSelect {
-        font-size:1vw;
+        font-size:1.1vw;
     }
 
     optgroup {
-        font-size: 1vw;
+        font-size: 1.2vw;
     }
 }
 

@@ -92,6 +92,7 @@
         <h2>
             Ustawienia:
         </h2>
+        <hr class="rounded">
         <div class="settings">
              <form asp-route-returnUrl="@Model.ReturnUrl" method="post" asp-page-handler="SaveSettings">
                  <div class="my-tooltip">
@@ -100,14 +101,14 @@
                  </div>
                  <div class="slider-label"><input type="range" name="summerFactorRange" class="slider" id="summerFactorRange" value="@(Model.currentUser.SummerFactor*100)" min="0" max="20" oninput="this.nextElementSibling.value = this.value"/>
                  -<output>@((int)(Model.currentUser.SummerFactor*100))</output>%</div>
-                 <br /><br />
+                 <br />
                  <div class="my-tooltip" >
                      <h3>Współczynnik zimowy&nbsp;&nbsp;
                     <img src="@Url.Content("~/images/question_mark.png")" class="questionMark" data-toggle="tooltip" data-placement="bottom" title="Współczynnik zimowy określa procent spadku wydajności baterii w zimę. Zależy on głównie od Twojego samochodu i używanego wyposażenia, zwłaszcza ogrzewania. Szacuje się, że spadek wydajności zimą może być równy nawet do 50%."/></h3>
                  </div>
                  <div class="slider-label"><input type="range" name="winterFactorRange" id="winterFactorRange" value="@(Model.currentUser.WinterFactor*100)" min="0" max="50" oninput="this.nextElementSibling.value = this.value"/>
                  -<output>@((int)(Model.currentUser.WinterFactor*100))</output>%</div>
-                 <br /><br />
+                 <hr class="rounded">
                  <div class="my-tooltip">
                      <h3>Styl jazdy&nbsp;&nbsp;
                     <img src="@Url.Content("~/images/question_mark.png")" class="questionMark" data-toggle="tooltip" data-placement="bottom" title="Styl jazdy w dużej mierze wpływa na realny zasięg Twojego samochodu. Przy wolnej jeździe (np. do 120 km/h na autostradzie) zaoszczędzisz wiele energii w akumulatorze i dojedziesz dalej."/></h3>
@@ -134,7 +135,7 @@
                     }
                     </optgroup>
                  </select>
-                 <br /><br /><br />
+                 <hr class="rounded">
                  <h3>Pokazuj tylko moje samochody&nbsp;&nbsp;
                     <img src="@Url.Content("~/images/question_mark.png")" class="questionMark" data-toggle="tooltip" data-placement="bottom" title="Zaznacz, aby na liście samochodów na stronie głównej planowania trasy pojawiały się tylko Twoje samochody. Pozostaw puste, a oprócz Twoich samochodów zostaną wyświetlone domyślne."/></h3>
                  @if (Model.currentUser.ShowOnlyMyCars)
@@ -145,8 +146,8 @@
                  {
                     <input class="form-check-input" type="checkbox" id="showMyCarsCheckBox" name="showMyCarsCheckBox">
                  }
-            <br /><br /><br /><br />
-                 <button type = "submit" class="myButton button-safe settings-button">Zapisz</button>
+                 <hr class="rounded">
+                 <button type = "submit" class="myButton button-safe settings-button" style="margin-bottom:8vh">Zapisz</button>
              </form>
          </div>
 
