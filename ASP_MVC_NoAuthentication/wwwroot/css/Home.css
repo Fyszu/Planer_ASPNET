@@ -100,7 +100,6 @@ p {
         visibility: visible;
     }
 
-
 /* PC Resolution */
 @media (min-width: 576px) {
     h1 {
@@ -128,6 +127,14 @@ p {
         font-size: 1.2vw;
         min-width: 25vw;
         border-radius: 1em;
+    }
+
+    .infoWindowContent {
+        font-size: 1.2vw;
+        font-weight: 400;
+        font-family: 'Avenir Next LT Pro';
+        color: #0111a2;
+        margin: 0.3em, 0.3em, 0.3em, 0.3em;
     }
 }
 /* PC resolution END */
@@ -169,6 +176,14 @@ p {
         font-size: 5vw;
         min-width: 80vw;
         border-radius: 1em;
+    }
+
+    .infoWindowContent {
+        font-size: 3.5vw;
+        font-weight: 400;
+        font-family: 'Avenir Next LT Pro';
+        color: #0111a2;
+        margin: 0.3em, 0.3em, 0.3em, 0.3em;
     }
 }
 /* Mobile resolution END */

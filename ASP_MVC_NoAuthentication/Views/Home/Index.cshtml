@@ -266,10 +266,10 @@
 
 								//Create of marker's information window and attach click listener
 								var markerDetails = new google.maps.InfoWindow({
-									content: "<p>Stacja: " + station.name + "<br>Koordynaty: " + station.latitude + ", " 
-									+ station.longitude + "<br>Adres: " + station.city + " " + station.postalAdress + ", "
-									+ station.street + "<br>Godziny otwarcia: " + station.openHours + "<br>Właściciel: "
-									+ station.owner + "<br>Stan stacji: " + stationState + "<br><a href='https://www.google.pl/maps?q=" + station.latitude + ",+" + station.longitude + "'>Otwórz w google maps</a></p>",
+									content: "<div class='infoWindowContent'><b>Stacja:</b> " + station.name + "<br><b>Współrzędne:</b> " + station.latitude.toFixed(6) + ", " 
+									+ station.longitude.toFixed(6) + "<br><b>Adres: </b>" + station.city + " " + station.postalAdress + ", "
+									+ station.street + "<br><b>Godziny otwarcia:</b> " + station.openHours + "<br><b>Właściciel:</b> "
+									+ station.owner + "<br><b>Stan stacji:</b> " + stationState + "<br><b><a href='https://www.google.pl/maps?q=" + station.latitude + ",+" + station.longitude + "'>Otwórz w google maps</a></b></div>",
 								});
 								google.maps.event.addListener(marker, "click", () => {
 									markerDetails.open(map,marker);
