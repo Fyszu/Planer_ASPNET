@@ -36,11 +36,12 @@
     <style>
         @@import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@1,900&display=swap');
     </style>
+    <!-- JQuery -->
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
 </head>
 
 
 <body>
-
     <!-- Main top image -->
     <img src="/images/ecars_banner.jpg" class="img-fluid" id="headerImage" alt="Header image">
     <!-- Header -->
@@ -52,7 +53,7 @@
     <p>Aplikacja korzysta z <b>Google API</b> do wyznaczania tras oraz bierze pod uwagę realny zasięg Twojego samochodu. <br /><em><a href="/Info">Kliknij po więcej informacji.</a></em></p>
     @if (!SignInManager.IsSignedIn(User))
     {
-        <p><b><a href="/Identity/Account/Login">Zaloguj się</a></b> w celu dodania swojego samochodu do listy oraz zmiany ustawień.</p>
+            <p><b><a href="/Identity/Account/Login">Zaloguj się</a></b> w celu dodania swojego samochodu do listy oraz zmiany ustawień.</p>
     }
 
     <!-- Route form  --->
@@ -86,14 +87,26 @@
 
     <!-- Stops on the route form -->
     <div class="stopsForm">
-        
+        <h2>Twoja trasa</h2>
+        <ul id="originStopList">
+
+        </ul>
+        <ul id="sortable">
+
+        </ul>
+        <ul id="destinationStopList">
+
+        </ul>
+        <button id="openStopsInGoogleButton">Otwórz w google maps</button>
     </div>
 
 
     <!---- End of HTML ---->
-    <!-- JS Libraries -->
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <!--- JS Libraries --->
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
 
     <!----------- JavaScript functions ----------->
@@ -110,7 +123,7 @@
         var stops = new Array(); // Two dim. array, corrdinates and names for stops in format [["1.000,1.000",name] , ["1.000,1.000",name]]
         const originField = document.getElementById("origin");
         const destinationField = document.getElementById("destination");
-
+        var stopOrder = 1;
 
         window.onload = init(); //Call init function on page load
 
@@ -176,12 +189,48 @@
         //Function called on page load - parsing list of cars array to JavaScript, initializing and adding list to choice box
         function init() {
             document.getElementById("findRouteButton").addEventListener("click", function () { calcRoute(); });
+            document.getElementById("openStopsInGoogleButton").addEventListener("click", function () { openStopsInGoogleMaps(); });
             carList = @Html.Raw(Json.Serialize(Model));
         @for (int i = 0; i < Model.Count; i++)
         {
             @:$("#selectCar").append("<option value='" + @i + "'>" + "@Model[i].Brand" + " " + "@Model[i].Model" + " Zasięg: " + "@Model[i].MaximumDistance" + "km (" + "@Model[i].ConnectorsToString()" + ")" + "</option>");
         }
-                        }
+        }
+
+        // Add sortable function for stops list
+        $( function() {
+            $( "#sortable" ).sortable({
+                 start: function(e, ui) {
+                    $(this).attr('stopOrder', ui.item.index() + 1);
+                },
+                update: function(event, ui) {
+                    var newIndex = ui.item.index() + 1;
+                    var oldIndex = $(this).attr('stopOrder');
+                    window.alert("new = " + newIndex + " old = " + oldIndex);
+                    stops.forEach(stop => {
+                        if (newIndex < oldIndex && (oldIndex > stop[3] && newIndex <= stop[3]))
+                            stop[3]++;
+                        if (newIndex > oldIndex && (newIndex >= stop[3] && oldIndex < stop[3]))
+                            stop[3]--;
+                    });
+                    stops[oldIndex][3] = newIndex;
+                    stops.sort((a,b) => (a[3] > b[3]) ? 1 : -1);
+                    //$(this).attr('stopOrder', index + 1);
+                    $(this).removeAttr('stopOrder');
+                }
+            });
+        } );
+
+        // Delete stops on button click function
+        $("#sortable").on('click','.btn-delete',function() {
+            r = confirm('Usunąć ten przystanek?');
+            if(r) {
+                $(this).closest('li').remove();
+                var stopName = $(this).closest('li').innerText;
+                stops = stops.filter(stop => stop[1] != stopName);
+                stopOrder--;
+            }
+        });
 
         //Set route, find charging stations near route and set markers
         async function calcRoute() {
@@ -206,6 +255,11 @@
 
                 var originCoordinates = await fetchAddress(originField.value);
                 var destinationCoordinates = await fetchAddress(destinationField.value);
+
+                // Add origin and destination as stops in floating form
+                addStopToArray(originCoordinates.lat(), originCoordinates.lng(), originField.value, "originStop");
+                addStopToArray(destinationCoordinates.lat(), destinationCoordinates.lng(), destinationField.value, "destinationStop");
+
                 const radius = await fetchRealDistance(carList[carListComboBox.selectedIndex].maximumDistance, document.getElementById("batteryLevelSelect").value);
 
                 chargingRadius.setCenter(originCoordinates);
@@ -275,7 +329,7 @@
                                         + "<br><b>Godziny otwarcia:</b> " + station.openHours 
                                         + "<br><b>Właściciel:</b> " + station.owner
                                         + "<br><b>Stan stacji:</b> " + stationState 
-                                        + "<br><br><b><a href='#' onclick='addStopToArray(\"" + station.latitude + "\",\"" + station.longitude + "\",\"" + station.name +"\");'>Dodaj jako przystanek</a></b>"
+                                        + "<br><br><b><a href='#' onclick='addStopToArray(\"" + station.latitude + "\",\"" + station.longitude + "\",\"" + station.name +"\"," + station.id +");'>Dodaj jako przystanek</a></b>"
                                         + "<br>Lub:"
                                         + "<br><b><a href='https://www.google.pl/maps?q=" + station.latitude + "," + station.longitude + "'>Otwórz w google maps</a></b></div>",
                                 });
@@ -379,14 +433,66 @@
                 });
         }
 
-        function addStopToArray(latitude, longitude, name) {
-            var coordinates = latitude + "," + longitude;
-            var stop = [coordinates, name];
-            stops.push(stop);
-            stopsArrayRefresh();
+        // Add stop to floating form
+        function addStopToArray(latitude, longitude, stopName, stopId) {
+            if (stopOrder >= 20) {
+                window.alert("Maksymalna liczba przystanków to 20.");
+            }
+            else {
+                var coordinates = latitude + "," + longitude;
+                var stopsListElement;
+                var node = document.createElement("li");
+                var stopElement = document.createElement("a");
+                stopElement.innerText = stopName;
+                stopElement.setAttribute('id', stopId);
+                var removeButton;
+
+                if (stopId == "originStop") {
+                    stopsListElement = document.getElementById("originStopList");
+                    node.appendChild(stopElement);
+                    stopsListElement.appendChild(node);
+                    stopElement.setAttribute('stopOrder',1);
+                    var stop = [coordinates, stopName, stopId, 0];
+                    stops.push(stop);
+                }
+                else if (stopId == "destinationStop") {
+                    stopsListElement = document.getElementById("destinationStopList");
+                    node.appendChild(stopElement);
+                    stopsListElement.appendChild(node);
+                    stopElement.setAttribute('stopOrder',20);
+                    var stop = [coordinates, stopName, stopId, 20];
+                    stops.push(stop);
+                    stops.sort((a,b) => (a[3] > b[3]) ? 1 : -1);
+                }
+                else {
+                    stopsListElement = document.getElementById("sortable");
+                    stopElement.setAttribute('class', 'ui-state-default');
+                    removeButton = document.createElement("a");
+                    removeButton.innerText = "Usuń";
+                    removeButton.setAttribute('class', 'btn btn-delete btn-danger');
+                    node.appendChild(stopElement);
+                    node.appendChild(removeButton);
+                    stopsListElement.appendChild(node);
+                    stopElement.setAttribute('stopOrder',stopOrder);
+                    var stop = [coordinates, stopName, stopId, stopOrder];
+                    stops.push(stop);
+                    stopOrder++;
+                    stops.sort((a,b) => (a[3] > b[3]) ? 1 : -1);
+                }
+            }
         }
 
-        function stopsArrayRefresh() {
+
+        function openStopsInGoogleMaps() {
+            var link = "https://www.google.com/maps/dir/";
+            var destinationCoordinates = "";
+            stops.sort((a,b) => (a[3] > b[3]) ? 1 : -1);
+            stops.forEach(stop => {
+                link += stop[0] + "/";
+                window.alert(stop[1] + ":"  + stop[3]);
+            });
+            link += destinationCoordinates;
+            window.open(link);
         }
 
         // Tooltip appearance script

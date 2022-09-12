@@ -101,15 +101,22 @@ p {
     }
 
 .stopsForm {
-    position:fixed;
-    min-width: 20vw;
-    min-height: 40vh;
-    background-color:white;
-    border: 10px solid black;
+    position: fixed;
+    background: white;
+    border: 0.3em solid #0111a2;
     border-radius: 3em;
     z-index: 10;
-    margin-bottom: 80vh;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
+
+.ui-sortable tr {
+    cursor: pointer;
+}
+
+    .ui-sortable tr:hover {
+        background: rgba(244,251,17,0.45);
+    }
 
 /* PC Resolution */
 @media (min-width: 576px) {
@@ -146,6 +153,14 @@ p {
         font-family: 'Avenir Next LT Pro';
         color: #0111a2;
         margin: 0.3em, 0.3em, 0.3em, 0.3em;
+    }
+
+    .stopsForm {
+        height: 40vh;
+        width: 20vw;
+        top: 30vh;
+        left:2.5vw;
+        padding: 1em;
     }
 }
 /* PC resolution END */
