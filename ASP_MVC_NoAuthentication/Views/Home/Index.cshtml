@@ -120,10 +120,10 @@
         var carList; //List of cars to choose (from page model, default cars + user cars)
         var carListComboBox = document.getElementById('selectCar'); //Html combo box for car selection
         var markersArray = []; //Array of charging stations markers
-        var stops = new Array(); // Two dim. array, corrdinates and names for stops in format [["1.000,1.000",name] , ["1.000,1.000",name]]
+        var stops = new Array(); // array for stops in format [["1.000,1.000",name,id,order],["2.000,2.000",name2,id2,order2]]
         const originField = document.getElementById("origin");
         const destinationField = document.getElementById("destination");
-        var stopOrder = 1;
+        var stopCount = 1;
 
         window.onload = init(); //Call init function on page load
 
@@ -215,7 +215,6 @@
                     });
                     stops[oldIndex][3] = newIndex;
                     stops.sort((a,b) => (a[3] > b[3]) ? 1 : -1);
-                    //$(this).attr('stopOrder', index + 1);
                     $(this).removeAttr('stopOrder');
                 }
             });
@@ -225,10 +224,16 @@
         $("#sortable").on('click','.btn-delete',function() {
             r = confirm('Usunąć ten przystanek?');
             if(r) {
+                let stopName = $(this).closest('li').text().replace('Usuń','');
                 $(this).closest('li').remove();
-                var stopName = $(this).closest('li').innerText;
+                order = stops.find(stop => stop[1] == stopName)[3];
                 stops = stops.filter(stop => stop[1] != stopName);
-                stopOrder--;
+                stops.forEach(stop => {
+                    if (stop[3] > order)
+                        stop[3]--;
+                });
+                stops.sort((a,b) => (a[3] > b[3]) ? 1 : -1);
+                stopCount--;
             }
         });
 
@@ -435,7 +440,7 @@
 
         // Add stop to floating form
         function addStopToArray(latitude, longitude, stopName, stopId) {
-            if (stopOrder >= 20) {
+            if (stopCount >= 20) {
                 window.alert("Maksymalna liczba przystanków to 20.");
             }
             else {
@@ -473,10 +478,10 @@
                     node.appendChild(stopElement);
                     node.appendChild(removeButton);
                     stopsListElement.appendChild(node);
-                    stopElement.setAttribute('stopOrder',stopOrder);
-                    var stop = [coordinates, stopName, stopId, stopOrder];
+                    stopElement.setAttribute('stopOrder',stopCount);
+                    var stop = [coordinates, stopName, stopId, stopCount];
                     stops.push(stop);
-                    stopOrder++;
+                    stopCount++;
                     stops.sort((a,b) => (a[3] > b[3]) ? 1 : -1);
                 }
             }
@@ -489,7 +494,6 @@
             stops.sort((a,b) => (a[3] > b[3]) ? 1 : -1);
             stops.forEach(stop => {
                 link += stop[0] + "/";
-                window.alert(stop[1] + ":"  + stop[3]);
             });
             link += destinationCoordinates;
             window.open(link);
