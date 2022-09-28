@@ -18,10 +18,10 @@ namespace ASP_MVC_NoAuthentication.Services
         {
             //wyparsować usera z nazwy
             double currentDistance = (maximumDistance * 1000) * (currentBatteryLevel * 0.01);
+            if (userName == null)
+                userName = "default";
             if (userName == "default")
-            {
                 userName = "default@default.pl";
-            }
             User user = await _userRepository.GetByName(userName);
             switch (user.DrivingStyle)
             {

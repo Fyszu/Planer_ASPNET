@@ -15,6 +15,8 @@
 @model List<Car> //List of default cars + potential user's cars if logged in, returned by controlller
 @inject IConfiguration Configuration
 @{
+    string baseUrl = $"{Context.Request.Scheme}://{Context.Request.Host}";
+    string geoControllerLocation = Configuration.GetValue<string>("GeoControllerLocation");
     string geoKey = Configuration.GetValue<string>("MyApiKey");
     string key = Configuration.GetValue<string>("AuthKey");
     List<ChargingStation> chargingStationsList = new List<ChargingStation>();
@@ -206,7 +208,6 @@
                 update: function(event, ui) {
                     var newIndex = ui.item.index() + 1;
                     var oldIndex = $(this).attr('stopOrder');
-                    window.alert("new = " + newIndex + " old = " + oldIndex);
                     stops.forEach(stop => {
                         if (newIndex < oldIndex && (oldIndex > stop[3] && newIndex <= stop[3]))
                             stop[3]++;
@@ -239,7 +240,6 @@
 
         //Set route, find charging stations near route and set markers
         async function calcRoute() {
-
             if (!originField.value || !destinationField.value) {
                 window.alert("Proszę wypełnić pola trasy.");
             }
@@ -249,24 +249,25 @@
             else if ((document.getElementById("batteryLevelSelect").value > 100) || document.getElementById("batteryLevelSelect").value < 1) {
                 window.alert("Proszę podać realny stan baterii.");
             }
-
-            else {
+            else { // All forms are filled properly - calculate route
                 var choosedCar = carList[carListComboBox.selectedIndex];
-                directionsRenderer.setMap(null); //Reset map (clear from previous routes)
+
+                // Reset map, markers and stops
+                directionsRenderer.setMap(null);
                 clearMarkers();
                 directionsRenderer.setMap(map);
                 chargingRadius.setMap(null);
                 chargingRadius.setMap(map);
-
+                resetStopsList();
+                // Convert address for coordinates
                 var originCoordinates = await fetchAddress(originField.value);
                 var destinationCoordinates = await fetchAddress(destinationField.value);
-
                 // Add origin and destination as stops in floating form
                 addStopToArray(originCoordinates.lat(), originCoordinates.lng(), originField.value, "originStop");
                 addStopToArray(destinationCoordinates.lat(), destinationCoordinates.lng(), destinationField.value, "destinationStop");
 
+                // Get charging radius and set in on the map
                 const radius = await fetchRealDistance(carList[carListComboBox.selectedIndex].maximumDistance, document.getElementById("batteryLevelSelect").value);
-
                 chargingRadius.setCenter(originCoordinates);
                 chargingRadius.setRadius(radius);
 
@@ -377,7 +378,7 @@
         //Converting address to coordinates, using GeoController (getCoordinates), ultimately using google api
         async function fetchAddress(address) {
             try {
-                const response = await fetch(window.location.href + "geo/getCoordinates?key=" + "@geoKey" + "&address=" + address);
+                const response = await fetch("@baseUrl" + "/" + "@geoControllerLocation" + "?key=" + "@geoKey" + "&address=" + address);
                 const geoArray = await response.json();
                 if (geoArray["Status"] == "OK")
                     return new google.maps.LatLng(parseFloat(geoArray["Coordinates"]["Lat"]), parseFloat(geoArray["Coordinates"]["Lng"]));
@@ -391,7 +392,7 @@
         //Get number of car recharges for currrent route from api controller (DistanceController | getNumberOfRecharges)
         async function fetchNumberOfRecharges(distance, maxDistance, batteryLevel) {
             try {
-                const response = await fetch(window.location.href + "distance/getNumberOfRecharges?routeDistance=" + distance + "&maxDistance=" + maxDistance + "&batteryLevel=" + batteryLevel);
+                const response = await fetch("@baseUrl" + "/" + "distance/getNumberOfRecharges?routeDistance=" + distance + "&maxDistance=" + maxDistance + "&batteryLevel=" + batteryLevel);
                 const numberOfRecharges = await response.json();
                 return numberOfRecharges;
             } catch (error) {
@@ -402,7 +403,7 @@
         //Get real distance from api controller (DistanceController | getRealDistance)
         async function fetchRealDistance(maxDistance, batteryLevel) {
             try {
-                const response = await fetch(window.location.href + "distance/getRealDistance?maximumDistance=" + maxDistance + "&batteryLevel=" + batteryLevel);
+                const response = await fetch("@baseUrl" + "/" + "distance/getRealDistance?maximumDistance=" + maxDistance + "&batteryLevel=" + batteryLevel);
                 const realDistance = await response.json();
                 return realDistance;
             } catch (error) {
@@ -427,7 +428,7 @@
 
         //User's location parsing coordinates -> address and set it to origin field
         function useLocation(position) {
-            url = window.location.href + "geo/getAddress?key=" + "@geoKey" + "&longitude=" + position.coords.longitude + "&latitude=" + position.coords.latitude;
+            url = "@baseUrl" + "/" + "geo/getAddress?key=" + "@geoKey" + "&longitude=" + position.coords.longitude + "&latitude=" + position.coords.latitude;
             fetch(url)
                 .then(res => res.json())
                 .then(data => {
@@ -487,7 +488,6 @@
             }
         }
 
-
         function openStopsInGoogleMaps() {
             var link = "https://www.google.com/maps/dir/";
             var destinationCoordinates = "";
@@ -497,6 +497,14 @@
             });
             link += destinationCoordinates;
             window.open(link);
+        }
+
+        // remove stops from array and from list in form
+        function resetStopsList() {
+            stops = new Array();
+            $("#sortable").empty();
+            $("#originStopList").empty();
+            $("#destinationStopList").empty();
         }
 
         // Tooltip appearance script
