@@ -93,13 +93,17 @@
         <ul id="originStopList">
 
         </ul>
+        <br />
         <ul id="sortable">
 
         </ul>
+        <br />
         <ul id="destinationStopList">
 
         </ul>
-        <button id="openStopsInGoogleButton">Otwórz w google maps</button>
+        <div style="text-align: center;">
+            <button class="inputForm charger-button" id="openStopsInGoogleButton">Otwórz w google maps</button>
+        </div>
     </div>
 
 
@@ -204,6 +208,7 @@
             $( "#sortable" ).sortable({
                  start: function(e, ui) {
                     $(this).attr('stopOrder', ui.item.index() + 1);
+                    ui.item.css('color','#22e0b1');
                 },
                 update: function(event, ui) {
                     var newIndex = ui.item.index() + 1;
@@ -217,6 +222,9 @@
                     stops[oldIndex][3] = newIndex;
                     stops.sort((a,b) => (a[3] > b[3]) ? 1 : -1);
                     $(this).removeAttr('stopOrder');
+                },
+                stop: function(e, ui) {
+                    ui.item.css('color','#0111a2');
                 }
             });
         } );
@@ -335,9 +343,10 @@
                                         + "<br><b>Godziny otwarcia:</b> " + station.openHours 
                                         + "<br><b>Właściciel:</b> " + station.owner
                                         + "<br><b>Stan stacji:</b> " + stationState 
+                                        + "<div style='text-align: center;'>"
                                         + "<br><br><button class='inputForm charger-button' onclick='addStopToArray(\"" + station.latitude + "\",\"" + station.longitude + "\",\"" + station.name +"\"," + station.id +");'>Dodaj jako przystanek</button>"
                                         + "<br>Lub:"
-                                        + "<br><button class='inputForm charger-button' onclick='openStationInGoogleMaps(\"" + station.latitude + "\",\"" + station.longitude + "\");'>Otwórz w google maps</button></div>",
+                                        + "<br><button class='inputForm charger-button' onclick='openStationInGoogleMaps(\"" + station.latitude + "\",\"" + station.longitude + "\");'>Otwórz w google maps</button></div></div>",
                                 });
                                 google.maps.event.addListener(marker, "click", () => {
                                     markerDetails.open(map, marker);
@@ -448,7 +457,8 @@
                 var coordinates = latitude + "," + longitude;
                 var stopsListElement;
                 var node = document.createElement("li");
-                var stopElement = document.createElement("a");
+                node.setAttribute('class', 'stops-form-list');
+                var stopElement = document.createElement("div");
                 stopElement.innerText = stopName;
                 stopElement.setAttribute('id', stopId);
                 var removeButton;
@@ -472,10 +482,11 @@
                 }
                 else {
                     stopsListElement = document.getElementById("sortable");
-                    stopElement.setAttribute('class', 'ui-state-default');
+                    stopElement.setAttribute('class', 'ui-state-default stop-element');
+                    stopElement.setAttribute("style", "font-family: 'Avenir Next LT Pro'; font-weight: 400; color: #0111a2;");
                     removeButton = document.createElement("a");
                     removeButton.innerText = "Usuń";
-                    removeButton.setAttribute('class', 'btn btn-delete btn-danger');
+                    removeButton.setAttribute('class', 'btn btn-delete btn-danger btn-sm stop-remove-btn');
                     node.appendChild(stopElement);
                     node.appendChild(removeButton);
                     stopsListElement.appendChild(node);

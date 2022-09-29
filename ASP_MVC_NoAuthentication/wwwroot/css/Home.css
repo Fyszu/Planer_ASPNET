@@ -31,6 +31,14 @@ p {
     margin-left: 4%;
 }
 
+.vertical-center {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+}
+
 .inputForm {
     border: 2px solid;
     border-color: #0111a2;
@@ -81,6 +89,7 @@ p {
     transition: all 0.3s ease;
     margin-top: 0.5em;
     margin-bottom: 0.5em;
+    text-align: center;
     padding-left: 0.5em;
     padding-right: 0.5em;
     padding-bottom: 0.2em;
@@ -128,12 +137,27 @@ p {
     overflow-y: auto;
 }
 
-.ui-sortable tr {
-    cursor: pointer;
+.stops-form-list {
+    font-family: 'Avenir Next LT Pro';
+    font-weight: 400;
+    color: #0111a2;
+    float: left;
+    width: 100%;
+    margin-bottom: 3%;
 }
 
-    .ui-sortable tr:hover {
+.stop-element {
+    font-family: 'Avenir Next LT Pro';
+    font-weight: 400;
+    color: #0111a2;
+}
+
+.ui-state-default {
+}
+
+    .ui-state-default:hover {
         background: rgba(244,251,17,0.45);
+        cursor: pointer;
     }
 
 /* PC Resolution */
@@ -174,11 +198,25 @@ p {
     }
 
     .stopsForm {
-        height: 40vh;
-        width: 20vw;
+        height: 60vh;
+        width: 25vw;
         top: 30vh;
         left:2.5vw;
         padding: 1em;
+    }
+
+    .stop-element {
+        font-size: 1vw;
+        width: 76%;
+        float: left;
+        padding: 0.25em;
+        margin-right: 5%;
+    }
+
+    .stop-remove-btn {
+        font-size: 0.9vw;
+        width: 19%;
+        float: left;
     }
 }
 /* PC resolution END */
