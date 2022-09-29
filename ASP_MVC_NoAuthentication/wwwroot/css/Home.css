@@ -74,6 +74,24 @@ p {
         transform: scale(0.98);
     }
 
+.charger-button {
+    color: #0111a2;
+    font-weight: 600;
+    -webkit-transition: all 0.3s ease;
+    transition: all 0.3s ease;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    padding-bottom: 0.2em;
+    padding-top: 0.2em;
+}
+
+    .charger-button:hover {
+        background: #22e0b1;
+        transform: scale(0.98);
+    }
+
 #currentLocationButton {
     height: 10%;
     width: 10%;

@@ -335,9 +335,9 @@
                                         + "<br><b>Godziny otwarcia:</b> " + station.openHours 
                                         + "<br><b>Właściciel:</b> " + station.owner
                                         + "<br><b>Stan stacji:</b> " + stationState 
-                                        + "<br><br><b><a href='#' onclick='addStopToArray(\"" + station.latitude + "\",\"" + station.longitude + "\",\"" + station.name +"\"," + station.id +");'>Dodaj jako przystanek</a></b>"
+                                        + "<br><br><button class='inputForm charger-button' onclick='addStopToArray(\"" + station.latitude + "\",\"" + station.longitude + "\",\"" + station.name +"\"," + station.id +");'>Dodaj jako przystanek</button>"
                                         + "<br>Lub:"
-                                        + "<br><b><a href='https://www.google.pl/maps?q=" + station.latitude + "," + station.longitude + "'>Otwórz w google maps</a></b></div>",
+                                        + "<br><button class='inputForm charger-button' onclick='openStationInGoogleMaps(\"" + station.latitude + "\",\"" + station.longitude + "\");'>Otwórz w google maps</button></div>",
                                 });
                                 google.maps.event.addListener(marker, "click", () => {
                                     markerDetails.open(map, marker);
@@ -496,6 +496,11 @@
                 link += stop[0] + "/";
             });
             link += destinationCoordinates;
+            window.open(link);
+        }
+
+        function openStationInGoogleMaps(latitude, longitude) {
+            var link = "https://www.google.pl/maps?q=" + latitude + "," + longitude;
             window.open(link);
         }
 
