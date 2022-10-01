@@ -152,6 +152,12 @@ p {
     color: #0111a2;
 }
 
+    .stop-element::before {
+        content: '\1F50C';
+        margin-left: -25px;
+        margin-right: 8px;
+    }
+
 .ui-state-default {
 }
 
@@ -159,6 +165,18 @@ p {
         background: rgba(244,251,17,0.45);
         cursor: pointer;
     }
+
+#originStop::before {
+    content: '\1F3E0';
+    margin-left: -20px;
+    margin-right: 5px;
+}
+
+#destinationStop::before {
+    content: '\1F9ED';
+    margin-left: -20px;
+    margin-right: 5px;
+}
 
 /* PC Resolution */
 @media (min-width: 576px) {
@@ -203,11 +221,17 @@ p {
         top: 30vh;
         left:2.5vw;
         padding: 1em;
+        display: none;
+    }
+
+    .stop-bullet {
+        float: left;
+        width: 10%;
     }
 
     .stop-element {
         font-size: 1vw;
-        width: 76%;
+        width: 66%;
         float: left;
         padding: 0.25em;
         margin-right: 5%;

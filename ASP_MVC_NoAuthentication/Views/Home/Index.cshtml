@@ -88,17 +88,17 @@
     <div class="map" id="map"></div>
 
     <!-- Stops on the route form -->
-    <div class="stopsForm">
+    <div class="stopsForm" id="stopsForm">
         <h2>Twoja trasa</h2>
-        <ul id="originStopList">
+        <ul id="originStopList" style="list-style: none;">
 
         </ul>
         <br />
-        <ul id="sortable">
+        <ul id="sortable" style="list-style: none;">
 
         </ul>
         <br />
-        <ul id="destinationStopList">
+        <ul id="destinationStopList" style="list-style: none;">
 
         </ul>
         <div style="text-align: center;">
@@ -229,7 +229,7 @@
             });
         } );
 
-        // Delete stops on button click function
+        // Delete stop on removal button click
         $("#sortable").on('click','.btn-delete',function() {
             r = confirm('Usunąć ten przystanek?');
             if(r) {
@@ -243,6 +243,9 @@
                 });
                 stops.sort((a,b) => (a[3] > b[3]) ? 1 : -1);
                 stopCount--;
+                if (stopCount <= 1) {
+                    $("#stopsForm").hide(300);
+                }
             }
         });
 
@@ -465,6 +468,7 @@
 
                 if (stopId == "originStop") {
                     stopsListElement = document.getElementById("originStopList");
+                    node.setAttribute('class', 'stops-form-list origin-element');
                     node.appendChild(stopElement);
                     stopsListElement.appendChild(node);
                     stopElement.setAttribute('stopOrder',1);
@@ -495,6 +499,11 @@
                     stops.push(stop);
                     stopCount++;
                     stops.sort((a,b) => (a[3] > b[3]) ? 1 : -1);
+
+                    // Show if form is hidden and stop has been added
+                    if ($("#stopsForm").is(':hidden')) {
+                        $("#stopsForm").show(300);
+                    }
                 }
             }
         }
@@ -517,10 +526,12 @@
 
         // remove stops from array and from list in form
         function resetStopsList() {
+            $("#stopsForm").hide(300);
             stops = new Array();
             $("#sortable").empty();
             $("#originStopList").empty();
             $("#destinationStopList").empty();
+            stopCount = 1;
         }
 
         // Tooltip appearance script
