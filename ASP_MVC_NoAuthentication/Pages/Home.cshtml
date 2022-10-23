@@ -1,4 +1,6 @@
-﻿@using Microsoft.AspNetCore.Identity
+﻿@page "/"
+
+@using Microsoft.AspNetCore.Identity
 @using ASP_MVC_NoAuthentication.Data
 @using Microsoft.Extensions.Configuration
 @using System.Net
@@ -6,28 +8,12 @@
 @using System.Web;
 @using Newtonsoft.Json;
 @using System.Globalization
-@inject SignInManager<User> SignInManager
-@inject UserManager<User> UserManager
+
+@model ASP_MVC_NoAuthentication.Pages.HomeModel
 
 @{
     ViewData["Title"] = "Planer tras";
-}
-@model List<Car> //List of default cars + potential user's cars if logged in, returned by controlller
-@inject IConfiguration Configuration
-@{
-    string baseUrl = $"{Context.Request.Scheme}://{Context.Request.Host}";
-    string geoControllerLocation = Configuration.GetValue<string>("GeoControllerLocation");
-    string geoKey = Configuration.GetValue<string>("MyApiKey");
-    string key = Configuration.GetValue<string>("AuthKey");
-    List<ChargingStation> chargingStationsList = new List<ChargingStation>();
-    using (WebClient wc = new WebClient())
-    {
-        wc.Headers[HttpRequestHeader.ContentType] = "application/json";
-        wc.Encoding = Encoding.UTF8;
-        wc.Headers.Add("User-Agent: Other");
-        string result = wc.DownloadString("https://localhost:7288/chargingstation/getAllChargingStations");
-        chargingStationsList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ChargingStation>>(result);
-    }
+    Layout = "_Layout";
 }
 
 
@@ -53,7 +39,7 @@
     <p>Cześć! Znajdujesz się na stronie aplikacji automatyzującej planowanie podróży samochodem elektrycznym.</p>
     <p>Wypełnij pola poniżej oraz klknij "<b>Szukaj ładowarek</b>", a zostaną znalezione dla Ciebie ładowarki w pobliżu trasy podróży.</p>
     <p>Aplikacja korzysta z <b>Google API</b> do wyznaczania tras oraz bierze pod uwagę realny zasięg Twojego samochodu. <br /><em><a href="/Info">Kliknij po więcej informacji.</a></em></p>
-    @if (!SignInManager.IsSignedIn(User))
+    @if (!Model.IsLoggedIn)
     {
             <p><b><a href="/Identity/Account/Login">Zaloguj się</a></b> w celu dodania swojego samochodu do listy oraz zmiany ustawień.</p>
     }
@@ -121,7 +107,7 @@
         var map; //Google map object
         var directionsService; //Google map routes services for javascript
         var directionsRenderer;
-        var chargingStations = @Html.Raw(Json.Serialize(chargingStationsList)); //Charging stations from page model
+        var chargingStations = @Html.Raw(Json.Serialize(Model.ChargingStations)); //Charging stations from page model
         var chargingRadius; //Real distance which car can travel on current battery level
         var carList; //List of cars to choose (from page model, default cars + user cars)
         var carListComboBox = document.getElementById('selectCar'); //Html combo box for car selection
@@ -196,10 +182,10 @@
         function init() {
             document.getElementById("findRouteButton").addEventListener("click", function () { calcRoute(); });
             document.getElementById("openStopsInGoogleButton").addEventListener("click", function () { openStopsInGoogleMaps(); });
-            carList = @Html.Raw(Json.Serialize(Model));
-        @for (int i = 0; i < Model.Count; i++)
+            carList = @Html.Raw(Json.Serialize(Model.Cars));
+        @for (int i = 0; i < Model.Cars.Count; i++)
         {
-            @:$("#selectCar").append("<option value='" + @i + "'>" + "@Model[i].Brand" + " " + "@Model[i].Model" + " Zasięg: " + "@Model[i].MaximumDistance" + "km (" + "@Model[i].ConnectorsToString()" + ")" + "</option>");
+            @:$("#selectCar").append("<option value='" + @i + "'>" + "@Model.Cars[i].Brand" + " " + "@Model.Cars[i].Model" + " Zasięg: " + "@Model.Cars[i].MaximumDistance" + "km (" + "@Model.Cars[i].ConnectorsToString()" + ")" + "</option>");
         }
         }
 
@@ -390,7 +376,7 @@
         //Converting address to coordinates, using GeoController (getCoordinates), ultimately using google api
         async function fetchAddress(address) {
             try {
-                const response = await fetch("@baseUrl" + "/" + "@geoControllerLocation" + "?key=" + "@geoKey" + "&address=" + address);
+                const response = await fetch("@Model.BaseUrl" + "/" + "@Model.GeoControllerLocation" + "?key=" + "@Model.GeoKey" + "&address=" + address);
                 const geoArray = await response.json();
                 if (geoArray["Status"] == "OK")
                     return new google.maps.LatLng(parseFloat(geoArray["Coordinates"]["Lat"]), parseFloat(geoArray["Coordinates"]["Lng"]));
@@ -404,7 +390,7 @@
         //Get number of car recharges for currrent route from api controller (DistanceController | getNumberOfRecharges)
         async function fetchNumberOfRecharges(distance, maxDistance, batteryLevel) {
             try {
-                const response = await fetch("@baseUrl" + "/" + "distance/getNumberOfRecharges?routeDistance=" + distance + "&maxDistance=" + maxDistance + "&batteryLevel=" + batteryLevel);
+                const response = await fetch("@Model.BaseUrl" + "/" + "distance/getNumberOfRecharges?routeDistance=" + distance + "&maxDistance=" + maxDistance + "&batteryLevel=" + batteryLevel);
                 const numberOfRecharges = await response.json();
                 return numberOfRecharges;
             } catch (error) {
@@ -415,7 +401,7 @@
         //Get real distance from api controller (DistanceController | getRealDistance)
         async function fetchRealDistance(maxDistance, batteryLevel) {
             try {
-                const response = await fetch("@baseUrl" + "/" + "distance/getRealDistance?maximumDistance=" + maxDistance + "&batteryLevel=" + batteryLevel);
+                const response = await fetch("@Model.BaseUrl" + "/" + "distance/getRealDistance?maximumDistance=" + maxDistance + "&batteryLevel=" + batteryLevel);
                 const realDistance = await response.json();
                 return realDistance;
             } catch (error) {
@@ -440,7 +426,7 @@
 
         //User's location parsing coordinates -> address and set it to origin field
         function useLocation(position) {
-            url = "@baseUrl" + "/" + "geo/getAddress?key=" + "@geoKey" + "&longitude=" + position.coords.longitude + "&latitude=" + position.coords.latitude;
+            url = "@Model.BaseUrl" + "/" + "geo/getAddress?key=" + "@Model.GeoKey" + "&longitude=" + position.coords.longitude + "&latitude=" + position.coords.latitude;
             fetch(url)
                 .then(res => res.json())
                 .then(data => {
@@ -541,6 +527,6 @@
     </script>
 
     <!-- Google map initialization using personal api key and creating map -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=@(key + "&callback=initMap&libraries=places")" async defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=@(Model.Key + "&callback=initMap&libraries=places")" async defer></script>
 
 </body>
