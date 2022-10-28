@@ -11,41 +11,36 @@ namespace ASP_MVC_NoAuthentication.Controllers
     public class DistanceController : Controller
     {
 
-        private readonly IDistanceService _service;
+        private readonly IDistanceService _distanceService;
+        private readonly IWeatherAPIService _weatherService;
         private readonly SignInManager<User> _signInManager;
         private readonly UserManager<User> _userManager;
 
-        public DistanceController(IDistanceService service, UserManager<User> userManager, SignInManager<User> signInManager)
+        public DistanceController(IDistanceService service, IWeatherAPIService weatherService, UserManager<User> userManager, SignInManager<User> signInManager)
         {
-            _service = service;
+            _distanceService = service;
+            _weatherService = weatherService;
             _signInManager = signInManager;
             _userManager = userManager;
         }
 
 
-
-        [HttpGet("getRealDistance")]
-        public async Task<int> getRealDistance([FromQuery] int maximumDistance, int batteryLevel)
+        [HttpGet("GetRealDistance")]
+        public async Task<int> GetRealDistance([FromQuery] int maximumDistance, int batteryLevel, float origLat, float origLng, float destLat, float destLng, int estimatedTravelTime)
         {
-            if (_signInManager.IsSignedIn(User))
-                return await _service.getRealMaximumDistance(batteryLevel, maximumDistance, User.Identity.Name);
+            estimatedTravelTime = estimatedTravelTime / 3600; // seconds -> hours
+            estimatedTravelTime = estimatedTravelTime == 0 ? 1 : estimatedTravelTime;
+            estimatedTravelTime = estimatedTravelTime > 24 ? 24 : estimatedTravelTime;
+            float temperatureOfOrigin = await _weatherService.GetTemperatureForLocation(origLat, origLng, estimatedTravelTime);
+            float temperatureOfDestination = await _weatherService.GetTemperatureForLocation(destLat, destLng, estimatedTravelTime);
+            if (temperatureOfOrigin != -300f && temperatureOfDestination != -300f)
+            {
+                return _distanceService.GetRealMaximumDistance(batteryLevel, maximumDistance, DataHelper.DrivingStyle.City, (temperatureOfDestination + temperatureOfOrigin) / 2);
+            }
             else
-                return await _service.getRealMaximumDistance(batteryLevel, maximumDistance, "default");
-        }
-
-
-        [HttpGet("getNumberOfRecharges")]
-        public int getNumberOfRecharges([FromQuery] string routeDistance, int maxDistance, int batteryLevel)
-        { 
-            if(string.IsNullOrEmpty(routeDistance)) return -1;
-
-            else {
-                //Regex cleaning string leaving only number
-                Regex regex = new Regex(@"[^\d]+");
-                string cleaned = regex.Replace(routeDistance, "");
-                return _service.getNumberOfRecharges(Double.Parse(cleaned), maxDistance, batteryLevel);
+            {
+                return -1;
             }
         }
-
     }
 }

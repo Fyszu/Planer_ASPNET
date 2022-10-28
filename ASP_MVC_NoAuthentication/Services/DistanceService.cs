@@ -6,114 +6,145 @@ namespace ASP_MVC_NoAuthentication.Services
     public class DistanceService : IDistanceService
     {
         private readonly ILogger<DistanceService> _logger;
-        private readonly UserRepository _userRepository;
 
-        public DistanceService(ILogger<DistanceService> logger, UserRepository userRepository)
+        public DistanceService(ILogger<DistanceService> logger)
         {
             _logger = logger;
-            _userRepository = userRepository;
         }
 
-        public async Task<int> getRealMaximumDistance(int currentBatteryLevel, int maximumDistance, String? userName) // string 
+        // Get real maximum distance in meters
+        public int GetRealMaximumDistance(int batteryLevel, int maximumDistance, DataHelper.DrivingStyle drivingStyle, float temperature) 
         {
-            //wyparsować usera z nazwy
-            double currentDistance = (maximumDistance * 1000) * (currentBatteryLevel * 0.01);
-            if (userName == null)
-                userName = "default";
-            if (userName == "default")
-                userName = "default@default.pl";
-            User user = await _userRepository.GetByName(userName);
-            switch (user.DrivingStyle)
+            float realDistance = ((float)batteryLevel / 100f) * (maximumDistance * 1000); // *1000: conversion to meters, /100: conversion to precentage
+            realDistance = CalculateDistanceByTemperature(realDistance, temperature);
+            realDistance = CalculateDistanceByDrivingStyle(realDistance, drivingStyle);
+            return (int)Math.Round(realDistance);
+        }
+
+        private float CalculateDistanceByTemperature(float distance, float temperature)
+        {
+            switch (temperature)
             {
-                case "ekonomiczny":
-                    break;
+                case <= -24:
+                    return distance * 0.45f;
 
-                case "mieszany":
-                    currentDistance = currentDistance * 0.9;
-                    break;
+                case <= -22:
+                    return distance * 0.48f;
 
-                case "dynamiczny":
-                    currentDistance = currentDistance * 0.8;
-                    break;
+                case <= -20:
+                    return distance * 0.5f;
+
+                case <= -18:
+                    return distance * 0.51f;
+
+                case <= -16:
+                    return distance * 0.53f;
+
+                case <= -14:
+                    return distance * 0.56f;
+
+                case <= -12:
+                    return distance * 0.58f;
+
+                case <= -10:
+                    return distance * 0.6f;
+
+                case <= -8:
+                    return distance * 0.62f;
+
+                case <= -6:
+                    return distance * 0.65f;
+
+                case <= -4:
+                    return distance * 0.71f;
+
+                case <= -2:
+                    return distance * 0.75f;
+
+                case <= 0:
+                    return distance * 0.78f;
+
+                case <= 2:
+                    return distance * 0.8f;
+
+                case <= 4:
+                    return distance * 0.84f;
+
+                case <= 6:
+                    return distance * 0.92f;
+
+                case <= 8:
+                    return distance * 0.97f;
+
+                case <= 10:
+                    return distance * 0.98f;
+
+                case <= 32:
+                    return distance;
+
+                case <= 34:
+                    return distance * 0.98f;
+
+                case <= 35:
+                    return distance * 0.92f;
+
+                case <= 36:
+                    return distance * 0.9f;
+
+                case <= 37:
+                    return distance * 0.88f;
+
+                case <= 38:
+                    return distance * 0.85f;
+
+                case <= 39:
+                    return distance * 0.83f;
+
+                case <= 40:
+                    return distance * 0.8f;
+
+                case <= 41:
+                    return distance * 0.77f;
+
+                case <= 42:
+                    return distance * 0.73f;
+
+                case <= 43:
+                    return distance * 0.7f;
+
+                case <= 44:
+                    return distance * 0.67f;
+
+                case <= 45:
+                    return distance * 0.65f;
 
                 default:
-                    return 0;
+                    return distance * 0.5f;
             }
+        }
 
-            DateTime aktualnaData = DateTime.Now;
-            var summerDateStartV = "1/6/" + aktualnaData.Year + " 0:00:00 AM";
-            var summerDateEndV = "1/9/" + aktualnaData.Year + " 0:00:00 AM";
-            var winterDateStartV = "1/11/" + aktualnaData.Year + " 0:00:00 AM";
-            var winterDateEndV = "1/3/" + (aktualnaData.Year + 1) + " 0:00:00 AM";
-            DateTime summerDateStart = DateTime.Parse(summerDateStartV, System.Globalization.CultureInfo.InvariantCulture);
-            DateTime summerDateEnd = DateTime.Parse(summerDateEndV, System.Globalization.CultureInfo.InvariantCulture);
-            DateTime winterDateStart = DateTime.Parse(winterDateStartV, System.Globalization.CultureInfo.InvariantCulture);
-            DateTime winterDateEnd = DateTime.Parse(winterDateEndV, System.Globalization.CultureInfo.InvariantCulture);
-
-            if (aktualnaData > summerDateStart && aktualnaData < summerDateEnd)
+        private float CalculateDistanceByDrivingStyle(float distance, DataHelper.DrivingStyle drivingStyle)
+        {
+            switch(drivingStyle)
             {
-                currentDistance = currentDistance * (1 - user.SummerFactor);
+                case DataHelper.DrivingStyle.City:
+                    return distance;
+
+                case DataHelper.DrivingStyle.Combined:
+                    return distance * 0.88f;
+
+                case DataHelper.DrivingStyle.HighwaySlow:
+                    return distance * 0.8f;
+
+                case DataHelper.DrivingStyle.HighwayNormal:
+                    return distance * 0.7f;
+
+                case DataHelper.DrivingStyle.HighwayFast:
+                    return distance * 0.5f;
+
+                default:
+                    return distance * 0.5f;
             }
-
-            else if (aktualnaData > winterDateStart && aktualnaData < winterDateEnd)
-            {
-                currentDistance = currentDistance * (1 - user.WinterFactor);
-            }
-
-            return (int)Math.Round(currentDistance);
-        }
-
-
-        
-        public int getNumberOfRecharges(double routeDistance, int maximumDistance, int batteryLevel)
-        {
-           /* double distance = routeDistance / maximumDistance;
-          //  if ((route.Distance / maximumDistance) < 0.8) //Da radę dojechać na obecnym naładowaniu
-          //  {
-          //      double estimatedBatteryLevel = (maximumDistance - route.Distance) / maximumDistance;
-          //      return estimatedBatteryLevel;
-          //  }
-            else if (distance < 0.8)
-                return 1;
-            else if (distance >= 0.8 && distance < 1.8)
-                return 2;
-            else if (distance >= 1.8 && distance < 2.8)
-                return 3;*/
-            return 4;
-        }
-
-
-        public double[] FindPointAtDistanceFrom(double[] startPoint, double initialBearingRadians, double distanceKilometres)
-        {
-            const double radiusEarthKilometres = 6371.01;
-            var distRatio = distanceKilometres / radiusEarthKilometres;
-            var distRatioSine = Math.Sin(distRatio);
-            var distRatioCosine = Math.Cos(distRatio);
-
-            var startLatRad = DegreesToRadians(startPoint[0]);
-            var startLonRad = DegreesToRadians(startPoint[1]);
-
-            var startLatCos = Math.Cos(startLatRad);
-            var startLatSin = Math.Sin(startLatRad);
-
-            var endLatRads = Math.Asin((startLatSin * distRatioCosine) + (startLatCos * distRatioSine * Math.Cos(initialBearingRadians)));
-            var endLonRads = startLonRad + Math.Atan2(Math.Sin(initialBearingRadians) * distRatioSine * startLatCos, distRatioCosine - startLatSin * Math.Sin(endLatRads));
-
-            double[] resultArray = new double[2] { endLatRads, endLonRads };
-
-            return resultArray;
-        }
-
-        public double DegreesToRadians(double degrees)
-        {
-            const double degToRadFactor = Math.PI / 180;
-            return degrees * degToRadFactor;
-        }
-
-        public double RadiansToDegrees(double radians)
-        {
-            const double radToDegFactor = 180 / Math.PI;
-            return radians * radToDegFactor;
         }
     }
 }

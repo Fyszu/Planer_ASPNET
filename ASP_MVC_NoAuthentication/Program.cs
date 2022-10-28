@@ -43,6 +43,7 @@ builder.Services.AddTransient<IDistanceService, DistanceService>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IConnectorService, ConnectorService>();
 builder.Services.AddTransient<ICarService, CarService>();
+builder.Services.AddTransient<IWeatherAPIService, WeatherAPIService>();
 builder.Services.AddScoped<CarRepository, CarRepository>();
 builder.Services.AddScoped<ConnectorRepository, ConnectorRepository>();
 builder.Services.AddScoped<UserRepository, UserRepository>();
