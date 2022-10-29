@@ -36,8 +36,8 @@
     <h1>Planer tras dla samochodów elektrycznych</h1>
 
     <!-- Short description -->
-    <p>Cześć! Znajdujesz się na stronie aplikacji automatyzującej planowanie podróży samochodem elektrycznym.</p>
-    <p>Wypełnij pola poniżej oraz klknij "<b>Szukaj ładowarek</b>", a zostaną znalezione dla Ciebie ładowarki w pobliżu trasy podróży.</p>
+    <p>Cześć! Witaj na stronie aplikacji automatyzującej planowanie podróży samochodem elektrycznym.</p>
+    <p>Wypełnij pola poniżej oraz klknij "<b>Szukaj ładowarek</b>", a zostaną znalezione ładowarki w pobliżu Twojej trasy podróży.</p>
     <p>Aplikacja korzysta z <b>Google API</b> do wyznaczania tras oraz bierze pod uwagę realny zasięg Twojego samochodu. <br /><em><a href="/Info">Kliknij po więcej informacji.</a></em></p>
     @if (!Model.IsLoggedIn)
     {
@@ -430,6 +430,7 @@
 
         //Get user's current location function
         function getCurrentLocation() {
+            document.getElementById("currentLocationButton").src = "/images/loading.gif";
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(useLocation);
             }
@@ -446,6 +447,7 @@
                     else
                         alert("Problem with getting current localization has occured. Please type address manually.");
                 });
+            document.getElementById("currentLocationButton").src = "/images/currentLocation.png";
         }
 
         // Add stop to floating form
