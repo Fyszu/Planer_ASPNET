@@ -60,11 +60,6 @@ namespace ASP_MVC_NoAuthentication.Views.Home
             [Display(Name = "Powtórz has³o")]
             [Compare("PasswordRegister", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPasswordRegister { get; set; }
-
-            public string DrivingStyle = "mieszany";
-            public double WinterFactor = 0.35;
-            public double SummerFactor = 0.15;
-            public string HighwaySpeed = "test";
         }
 
         public class InputLoginModel
@@ -94,7 +89,7 @@ namespace ASP_MVC_NoAuthentication.Views.Home
             ModelState.MarkAllFieldsAsSkipped();
             if (TryValidateModel(InputRegister, nameof(InputRegister)))
             {
-                var user = new User { UserName = InputRegister.EmailRegister, Email = InputRegister.EmailRegister, DrivingStyle = "mieszany", WinterFactor = 0.35, SummerFactor = 0.15, HighwaySpeed = "test", ShowOnlyMyCars = false };
+                var user = new User { UserName = InputRegister.EmailRegister, Email = InputRegister.EmailRegister, ShowOnlyMyCars = false };
                 var result = await _userManager.CreateAsync(user, InputRegister.PasswordRegister);
                 if (result.Succeeded)
                 {

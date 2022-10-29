@@ -53,17 +53,11 @@ namespace ASP_MVC_NoAuthentication.Pages
         public async Task<IActionResult> OnPostSaveSettingsAsync(string? returnUrl = null)
         {
             currentUser = await _userService.GetUserByName(User.Identity.Name);
-            var summer = Request.Form["summerFactorRange"];
-            var summer2 = int.Parse(summer);
-            double summer3 = (double)summer2 / 100;
-            double summerFactor = ((double)(int.Parse(Request.Form["summerFactorRange"])) / 100);
-            double winterFactor = ((double)(int.Parse(Request.Form["winterFactorRange"])) / 100);
-            string drivingStyle = Request.Form["drivingStyleSelect"];
             Boolean showOnlyMyCars = false;
             string check = Request.Form["showMyCarsCheckBox"];
             if (check != null)
                 showOnlyMyCars = true;
-            await _userService.SaveSettings(summerFactor, winterFactor, drivingStyle, currentUser.Id, showOnlyMyCars);
+            await _userService.SaveSettings(currentUser.Id, showOnlyMyCars);
             return Redirect(Url.Content("~/UserPanel"));
         }
     }

@@ -6,6 +6,6 @@ namespace ASP_MVC_NoAuthentication.Services
     {
         public Task<User> GetUserByName(string name);
 
-        public Task SaveSettings(double summerFactor, double winterFactor, string drivingStyle, string userId, Boolean showOnlyMyCars);
+        public Task SaveSettings(string userId, Boolean showOnlyMyCars);
     }
 }

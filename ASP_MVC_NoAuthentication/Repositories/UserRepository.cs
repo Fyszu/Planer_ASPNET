@@ -30,9 +30,6 @@ namespace ASP_MVC_NoAuthentication.Repositories
             User dbUser = _context.Users.Find(user.Id);
             if (dbUser != null)
             {
-                dbUser.SummerFactor = user.SummerFactor;
-                dbUser.WinterFactor = user.WinterFactor;
-                dbUser.DrivingStyle = user.DrivingStyle;
                 dbUser.ShowOnlyMyCars = user.ShowOnlyMyCars;
             }
             await _context.SaveChangesAsync();

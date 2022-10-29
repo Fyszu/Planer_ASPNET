@@ -49,12 +49,12 @@
         <div class="row align-items-end" style="margin-left:3%; margin-right: 3%; margin-top:4%">
             <div class="col-sm top-buffer text-center origin-column">
                 <h2 style="margin-right:12%;">Początek podróży</h2>
-                <input class="inputForm align-middle" type="text" id="origin" style="width:86%; max-width:70vw; min-height: 5vh;" placeholder="Wpisz punkt początkowy" required>
+                <input class="inputForm align-middle" type="text" id="origin" style="width:86%; max-width:70vw; min-height: 5vh;" placeholder="Początek podróży" required>
                 <input class="align-middle" type="image" id="currentLocationButton" name="currentLocationButton" src="/images/currentLocation.png" onClick="getCurrentLocation(); return false;">
             </div>
             <div class="col-sm top-buffer text-center">
                 <h2>Koniec podróży</h2>
-                <input class="inputForm align-middle" type="text" style="width:100%; max-width:70vw; min-height: 5vh;" id="destination" placeholder="Wpisz punkt docelowy" required>
+                <input class="inputForm align-middle" type="text" style="width:100%; max-width:70vw; min-height: 5vh;" id="destination" placeholder="Cel podróży" required>
             </div>
             <div class="col-sm top-buffer text-center">
                 <h2><img src="@Url.Content("~/images/question_mark.png")" class="questionMark" data-toggle="tooltip" data-placement="bottom" title="Nie możesz znaleźć swojego samochodu na liście? Zaloguj się i dodaj własny!" /> Samochód:</h2>
@@ -63,6 +63,16 @@
             <div class="col-sm top-buffer text-center">
                 <h2><img src="@Url.Content("~/images/question_mark.png")" class="questionMark" data-toggle="tooltip" data-placement="bottom" title="Podaj aktualny (lub planowany) stan baterii Twojego samochodu." /> Stan baterii</h2>
                 <input class="inputForm align-middle" type=number id="batteryLevelSelect" style="width:100%; max-width:70vw; min-height: 5vh;" placeholder="Poziom baterii [%]" min=1 max=100>
+            </div>
+            <div class="col-sm top-buffer text-center">
+                <h2><img src="@Url.Content("~/images/question_mark.png")" class="questionMark" data-toggle="tooltip" data-placement="bottom" title="Prędkość przejazdu ma bardzo duży wpływ na szybkość rozładowania baterii. Wybierz prędkość, która będzie utrzymywana przez większość podróży." /> Prędkość:</h2>
+                <select class="inputForm align-middle" id="drivingStyleComboBox" style="width:100%; max-width:70vw; min-height: 5vh;">
+                    <option value="1">Miejska (50km/h - 70km/h)</option>
+                    <option value="2">Mieszana (70km/h - 100km/h)</option>
+                    <option value="3">Autostrada (do 120km/h)</option>
+                    <option selected value="4">Autostrada (do 140km/h)</option>
+                    <option value="5">Autostrada (powyżej 140km/h)</option>
+                </select>
             </div>
             <div class="col-sm top-buffer text-center" style="min-height:100%">
                 <button class="inputForm search-button align-middle" type="button" style="width:100%; max-width:70vw; min-height: 5vh;" id="findRouteButton">Szukaj ładowarek</button>
@@ -237,17 +247,19 @@
 
         //Set route, find charging stations near route and set markers
         async function calcRoute() {
+            var batteryLevel = document.getElementById("batteryLevelSelect").value;
             if (!originField.value || !destinationField.value) {
                 window.alert("Proszę wypełnić pola trasy.");
             }
-            else if (!(document.getElementById("batteryLevelSelect").value)) {
+            else if (!batteryLevel) {
                 window.alert("Proszę podać stan baterii.");
             }
-            else if ((document.getElementById("batteryLevelSelect").value > 100) || document.getElementById("batteryLevelSelect").value < 1) {
+            else if ((batteryLevel > 100) || batteryLevel < 1) {
                 window.alert("Proszę podać realny stan baterii.");
             }
             else { // All forms are filled properly - calculate route
                 var choosedCar = carList[carListComboBox.selectedIndex];
+                var choosedDrivingStyle = document.getElementById("drivingStyleComboBox").value;
 
                 // Reset map, markers and stops
                 directionsRenderer.setMap(null);
@@ -288,7 +300,7 @@
                     routeEstimatedTravelTime = route.legs[0].duration.value; // Estimated time in seconds 
 
                     // Get charging radius and set in on the map
-                    const radius = await fetchRealDistance(carList[carListComboBox.selectedIndex].maximumDistance, document.getElementById("batteryLevelSelect").value, originCoordinates, destinationCoordinates, routeEstimatedTravelTime);
+                    const radius = await fetchRealDistance(carList[carListComboBox.selectedIndex].maximumDistance, batteryLevel, originCoordinates, destinationCoordinates, routeEstimatedTravelTime, choosedDrivingStyle);
                     if (radius == -1 || radius == null)
                     {
                         window.alert("Wystąpił błąd przy określaniu zasięgu samochodu. Spróbuj jeszcze raz, a jak nie zadziała skontaktuj się z administratorem.");
@@ -410,9 +422,9 @@
         }*/
 
         //Get real distance from api controller (DistanceController -> GetRealDistance)
-        async function fetchRealDistance(maxDistance, batteryLevel, originCoordinates, destinationCoordinates, routeEstimatedTravelTime) {
+        async function fetchRealDistance(maxDistance, batteryLevel, originCoordinates, destinationCoordinates, routeEstimatedTravelTime, choosedDrivingStyle) {
             try {
-                const response = await fetch("@Model.BaseUrl" + "/" + "distance/GetRealDistance?maximumDistance=" + maxDistance + "&batteryLevel=" + batteryLevel + "&origLat=" + originCoordinates.lat() + "&origLng=" + originCoordinates.lng() + "&destLat=" + destinationCoordinates.lat() + "&destLng=" + destinationCoordinates.lng() + "&estimatedTravelTime=" + routeEstimatedTravelTime);
+                const response = await fetch("@Model.BaseUrl" + "/" + "distance/GetRealDistance?maximumDistance=" + maxDistance + "&batteryLevel=" + batteryLevel + "&origLat=" + originCoordinates.lat() + "&origLng=" + originCoordinates.lng() + "&destLat=" + destinationCoordinates.lat() + "&destLng=" + destinationCoordinates.lng() + "&estimatedTravelTime=" + routeEstimatedTravelTime + "&drivingStyle=" + choosedDrivingStyle);
                 const realDistance = await response.json();
                 return realDistance;
             } catch (error) {

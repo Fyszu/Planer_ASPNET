@@ -26,7 +26,7 @@ namespace ASP_MVC_NoAuthentication.Controllers
 
 
         [HttpGet("GetRealDistance")]
-        public async Task<int> GetRealDistance([FromQuery] int maximumDistance, int batteryLevel, float origLat, float origLng, float destLat, float destLng, int estimatedTravelTime)
+        public async Task<int> GetRealDistance([FromQuery] int maximumDistance, int batteryLevel, float origLat, float origLng, float destLat, float destLng, int estimatedTravelTime, int drivingStyle)
         {
             estimatedTravelTime = estimatedTravelTime / 3600; // seconds -> hours
             estimatedTravelTime = estimatedTravelTime == 0 ? 1 : estimatedTravelTime;
@@ -35,7 +35,7 @@ namespace ASP_MVC_NoAuthentication.Controllers
             float temperatureOfDestination = await _weatherService.GetTemperatureForLocation(destLat, destLng, estimatedTravelTime);
             if (temperatureOfOrigin != -300f && temperatureOfDestination != -300f)
             {
-                return _distanceService.GetRealMaximumDistance(batteryLevel, maximumDistance, DataHelper.DrivingStyle.City, (temperatureOfDestination + temperatureOfOrigin) / 2);
+                return _distanceService.GetRealMaximumDistance(batteryLevel, maximumDistance, (DataHelper.DrivingStyle)drivingStyle, (temperatureOfDestination + temperatureOfOrigin) / 2);
             }
             else
             {
