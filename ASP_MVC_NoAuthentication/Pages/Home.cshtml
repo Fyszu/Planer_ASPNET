@@ -446,6 +446,10 @@
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(useLocation);
             }
+            else {
+                window.alert("Wystąpił problem z pobraniem Twojej lokalizacji.");
+                document.getElementById("currentLocationButton").src = "/images/currentLocation.png";
+            }
         }
 
         //User's location parsing coordinates -> address and set it to origin field
