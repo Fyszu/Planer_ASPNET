@@ -7,7 +7,7 @@ namespace ASP_MVC_NoAuthentication.Data
     {
         public ChargingStation()
         {
-            OperatingHours = new HashSet<OperatingHour>();
+            OperatingHours = new List<OperatingHour>();
             ChargingPoints = new HashSet<ChargingPoint>();
         }
         public long Id { get; set; }
@@ -26,6 +26,7 @@ namespace ASP_MVC_NoAuthentication.Data
         public string? District { get; set; }
         public string? Province { get; set; }
         public ICollection<OperatingHour> OperatingHours { get; set; }
+        public bool AllTimeOpen { get; set; }
         public string? Accessibility { get; set; }
         public string? PaymentMethods { get; set; }
         public string? AuthenticationMethods { get; set; }
@@ -34,7 +35,7 @@ namespace ASP_MVC_NoAuthentication.Data
         {
             public long Id { get; set; }
             public ChargingStation Station { get; set; }
-            public bool WholeDay
+            public bool OpenedWholeDay
             {
                 get
                 {
@@ -102,6 +103,39 @@ namespace ASP_MVC_NoAuthentication.Data
             else
             {
                 return new List<string>();
+            }
+        }
+
+        public string GetOperatingHoursString()
+        {
+            if (AllTimeOpen)
+            {
+                return "Właściciel podaje, że stacja jest czynna 24/7.";
+            }
+            else
+            {
+                string result = "";
+                foreach (var operatingHour in OperatingHours)
+                {
+                    result += $"{operatingHour.Weekday}: ";
+                    if (operatingHour.OpenedWholeDay)
+                    {
+                        result += "Czynne całodobowo";
+                    }
+                    else
+                    {
+                        result = $"{operatingHour.FromTime} - {operatingHour.ToTime}";
+                    }
+                    result += "\n";
+                }
+                if (string.IsNullOrEmpty(result) || result.Length < 8)
+                {
+                    return "Brak danych.";
+                }
+                else
+                {
+                    return result.Remove(result.Length - 1);
+                }
             }
         }
     }

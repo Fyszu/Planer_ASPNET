@@ -1,5 +1,6 @@
 ﻿using ASP_MVC_NoAuthentication.Data;
 using EipaUdtImportingTools.Data;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,23 +26,26 @@ namespace EipaUdtImportingTools.Tools
         };
 
         private static readonly HttpClient client = new HttpClient();
-
+        private static readonly ILogger _logger = ApplicationLogging.CreateLogger("ApiImporter");
         public async static Task<bool> TransformApiDataToInternal()
         {
+            _logger.LogTrace("Pobieranie danych z API.");
             List<ProviderData>? providersData = await GetProvidersData() ?? throw new ArgumentNullException(nameof(providersData));
             List<PoolData>? poolsData = await GetPoolsData() ?? throw new ArgumentNullException(nameof(poolsData));
             List<ChargingStationData>? chargingStationsData = await GetChargingStationsData() ?? throw new ArgumentNullException(nameof(chargingStationsData));
             List<ChargingPointData>? chargingPointsData = await GetChargingPointsData() ?? throw new ArgumentNullException(nameof(chargingPointsData));
             List<DynamicData>? dynamicData = await GetDynamicData() ?? throw new ArgumentNullException(nameof(dynamicData));
             Dictionaries? dictionaries = await GetDictionaries() ?? throw new ArgumentNullException(nameof(dictionaries));
+            _logger.LogTrace("Pobieranie danych z API zakończone.");
 
             try
             {
                 // Initialize
-                List<ASP_MVC_NoAuthentication.Data.ConnectorInterface> internalConnectorInterfaces = new();
-                List<ASP_MVC_NoAuthentication.Data.Provider> internalProviders = new();
+                HashSet<ASP_MVC_NoAuthentication.Data.ConnectorInterface> internalConnectorInterfaces = new();
+                HashSet<ASP_MVC_NoAuthentication.Data.Provider> internalProviders = new();
                 HashSet<ASP_MVC_NoAuthentication.Data.ConnectorInterface> connectorInterfacesInUsage = new();
 
+                _logger.LogTrace("Pobieranie interfejsów ładowania ze słownika.");
                 // Get connector interfaces from dictionaries
                 foreach (var connectorInterface in dictionaries.ConnectorInterface)
                 {
@@ -54,8 +58,10 @@ namespace EipaUdtImportingTools.Tools
                         });
                 }
 
+                _logger.LogTrace("Przetwarzanie stacji ładowania.");
+
                 // Create charging stations
-                List<ASP_MVC_NoAuthentication.Data.ChargingStation> internalChargingStations = new();
+                HashSet<ASP_MVC_NoAuthentication.Data.ChargingStation> internalChargingStations = new();
                 foreach (var poolData in poolsData)
                 {
                     ChargingStationData? chargingStationData = null;
@@ -121,6 +127,14 @@ namespace EipaUdtImportingTools.Tools
                         }
                     }
 
+                    bool allTimeOpen = true;
+                    // Find out, if station is opened all time - if yes, operating hours won't be added (unnecessary)
+                    foreach (var operatingHours in internalOperatingHours)
+                    {
+                        if (!operatingHours.OpenedWholeDay)
+                            allTimeOpen = false;
+                    }
+
                     // Get charging points for station
                     List<ASP_MVC_NoAuthentication.Data.ChargingPoint> internalChargingPoints = new();
                     foreach (ChargingPointData chargingPointData in chargingPointsData.Where(point => point.StationId == chargingStationData.Id))
@@ -148,8 +162,7 @@ namespace EipaUdtImportingTools.Tools
                                 }
                                 catch (Exception ex)
                                 {
-                                    Console.WriteLine("Problem z przypisaniem ceny dla punktu ładowania o ID: " + chargingPointData.Id + ". Treść błędu: ");
-                                    Console.WriteLine(ex.Message);
+                                    _logger.LogError($"Problem z przypisaniem ceny dla punktu ładowania o ID: {chargingPointData.Id}. Treść błędu: \n{ex.Message}");
                                 }
                             }
                             if (dynamicRecord.Status != null && dynamicRecord.Status.StatusStatus != 1)
@@ -159,11 +172,11 @@ namespace EipaUdtImportingTools.Tools
                         }
 
                         // Get connectors for charging point
-                        List<ASP_MVC_NoAuthentication.Data.ChargingPoint.Connector> internalConnectors = new();
+                        HashSet<ASP_MVC_NoAuthentication.Data.ChargingPoint.Connector> internalConnectors = new();
                         foreach (EipaUdtImportingTools.Data.Connector connectorData in chargingPointData.Connectors)
                         {
                             // Get interfaces for connector
-                            List<ASP_MVC_NoAuthentication.Data.ConnectorInterface> interfacesForConnector = new();
+                            HashSet<ASP_MVC_NoAuthentication.Data.ConnectorInterface> interfacesForConnector = new();
                             foreach (var connectorInterface in internalConnectorInterfaces.Where(cni => connectorData.Interfaces.Contains(cni.Id)))
                             {
                                 interfacesForConnector.Add(connectorInterface);
@@ -213,7 +226,8 @@ namespace EipaUdtImportingTools.Tools
                         Community = chargingStationData.Location.Community,
                         District = chargingStationData.Location.District,
                         Province = chargingStationData.Location.Province,
-                        OperatingHours = internalOperatingHours,
+                        OperatingHours = allTimeOpen ? new List<ASP_MVC_NoAuthentication.Data.ChargingStation.OperatingHour>() : internalOperatingHours,
+                        AllTimeOpen = allTimeOpen,
                         Accessibility = poolData.Accessibility,
                         ChargingPoints = internalChargingPoints
                     };
@@ -232,6 +246,8 @@ namespace EipaUdtImportingTools.Tools
                     internalChargingStations.Add(internalChargingStation);
                 }
 
+                _logger.LogTrace("Przetwarzanie stacji ładowania zakończone.");
+
                 // Save data into static updater properties
                 UDTApiDatabaseUpdater.ChargingStations = internalChargingStations ?? throw new ArgumentNullException(nameof(internalChargingStations));
                 UDTApiDatabaseUpdater.ConnectorInterfacesInUsage = connectorInterfacesInUsage ?? throw new ArgumentNullException(nameof(connectorInterfacesInUsage));
@@ -239,20 +255,19 @@ namespace EipaUdtImportingTools.Tools
             }
             catch (ArgumentNullException ex)
             {
-                Console.WriteLine("Wystąpił wyjątek podczas przetwarzania danych z API na obiekty klas wewnętrznych. Obiekt był nullem: ");
-                Console.WriteLine(ex.ParamName);
+                _logger.LogCritical($"Wystąpił wyjątek podczas przetwarzania danych z API na obiekty klas wewnętrznych. Obiekt był nullem: {ex.ParamName}");
                 return false;
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Wystąpił wyjątek podczas przetwarzania danych z API na obiekty klas wewnętrznych. Treść wyjątku:");
-                Console.WriteLine(ex.Message);
+                _logger.LogCritical($"Wystąpił wyjątek podczas przetwarzania danych z API na obiekty klas wewnętrznych. Treść wyjątku:\n{ex.Message}");
                 return false;
             }
         }
 
         public static async Task<List<ProviderData>?> GetProvidersData()
         {
+            _logger.LogTrace("Pobieranie danych dostawców usług.");
             try
             {
                 if (ApiUrls.TryGetValue("Providers", out string? url))
@@ -271,18 +286,18 @@ namespace EipaUdtImportingTools.Tools
                         throw new Exception("ProviderInstance lub jego lista danych jest pusta lub jest nullem.");
                 }
                 else
-                    throw new Exception("Nie znaleziono dostawców w słowniku.");
+                    throw new Exception("Nie znaleziono URL dostawców w słowniku.");
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Wystąpił błąd podczas importowania danych.");
-                Console.WriteLine("Treść błędu: " + ex.Message);
+                _logger.LogCritical($"Wystąpił błąd podczas importowania danych.\n{ex.Message}");
                 return null;
             }
         }
 
         public static async Task<List<PoolData>?> GetPoolsData()
         {
+            _logger.LogTrace("Pobieranie danych baz.");
             try
             {
                 if (ApiUrls.TryGetValue("Pools", out string? url))
@@ -301,18 +316,18 @@ namespace EipaUdtImportingTools.Tools
                         throw new Exception("PoolInstance lub jego lista danych jest pusta lub jest nullem.");
                 }
                 else
-                    throw new Exception("Nie znaleziono baz w słowniku.");
+                    throw new Exception("Nie znaleziono URL baz w słowniku.");
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Wystąpił błąd podczas importowania danych.");
-                Console.WriteLine("Treść błędu: " + ex.Message);
+                _logger.LogCritical($"Wystąpił błąd podczas importowania danych.\n{ex.Message}");
                 return null;
             }
         }
 
         public static async Task<List<ChargingStationData>?> GetChargingStationsData()
         {
+            _logger.LogTrace("Pobieranie danych stacji ładowania.");
             try
             {
                 if (ApiUrls.TryGetValue("ChargingStations", out string? url))
@@ -331,18 +346,18 @@ namespace EipaUdtImportingTools.Tools
                         throw new Exception("ChargingStationInstance lub jego lista danych jest pusta lub jest nullem.");
                 }
                 else
-                    throw new Exception("Nie znaleziono stacji ładowania w słowniku.");
+                    throw new Exception("Nie znaleziono URL stacji ładowania w słowniku.");
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Wystąpił błąd podczas importowania danych.");
-                Console.WriteLine("Treść błędu: " + ex.Message);
+                _logger.LogCritical($"Wystąpił błąd podczas importowania danych.\n{ex.Message}");
                 return null;
             }
         }
 
         public static async Task<List<ChargingPointData>?> GetChargingPointsData()
         {
+            _logger.LogTrace("Pobieranie danych punktów ładowania.");
             try
             {
                 if (ApiUrls.TryGetValue("ChargingPoints", out string? url))
@@ -361,18 +376,18 @@ namespace EipaUdtImportingTools.Tools
                         throw new Exception("ChargingPointsInstance lub jego lista danych jest pusta lub jest nullem.");
                 }
                 else
-                    throw new Exception("Nie znaleziono punktów ładowania w słowniku.");
+                    throw new Exception("Nie znaleziono URL punktów ładowania w słowniku.");
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Wystąpił błąd podczas importowania danych.");
-                Console.WriteLine("Treść błędu: " + ex.Message);
+                _logger.LogCritical($"Wystąpił błąd podczas importowania danych.\n{ex.Message}");
                 return null;
             }
         }
 
         public static async Task<Dictionaries?> GetDictionaries()
         {
+            _logger.LogTrace("Pobieranie danych słowników.");
             try
             {
                 if (ApiUrls.TryGetValue("Dictionaries", out string? url))
@@ -391,18 +406,18 @@ namespace EipaUdtImportingTools.Tools
                         throw new Exception("Dictionaries jest nullem.");
                 }
                 else
-                    throw new Exception("Nie znaleziono słowników w słowniku.");
+                    throw new Exception("Nie znaleziono URL słowników w słowniku.");
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Wystąpił błąd podczas importowania danych.");
-                Console.WriteLine("Treść błędu: " + ex.Message);
+                _logger.LogCritical($"Wystąpił błąd podczas importowania danych.\n{ex.Message}");
                 return null;
             }
         }
 
         public static async Task<List<DynamicData>?> GetDynamicData()
         {
+            _logger.LogTrace("Pobieranie danych dynamicznych.");
             try
             {
                 if (ApiUrls.TryGetValue("Dynamic", out string? url))
@@ -421,12 +436,11 @@ namespace EipaUdtImportingTools.Tools
                         throw new Exception("DynamicInstance lub jego lista danych jest pusta lub jest nullem.");
                 }
                 else
-                    throw new Exception("Nie znaleziono danych dynamicznych w słowniku.");
+                    throw new Exception("Nie znaleziono URL danych dynamicznych w słowniku.");
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Wystąpił błąd podczas importowania danych.");
-                Console.WriteLine("Treść błędu: " + ex.Message);
+                _logger.LogCritical($"Wystąpił błąd podczas importowania danych.\n{ex.Message}");
                 return null;
             }
         }

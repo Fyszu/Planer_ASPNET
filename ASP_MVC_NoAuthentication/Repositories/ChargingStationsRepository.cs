@@ -26,7 +26,7 @@ namespace ASP_MVC_NoAuthentication.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task AddRange(List<ChargingStation> chargingStations)
+        public async Task AddRange(HashSet<ChargingStation> chargingStations)
         {
             await _context.ChargingStations.AddRangeAsync(chargingStations);
             await _context.SaveChangesAsync();

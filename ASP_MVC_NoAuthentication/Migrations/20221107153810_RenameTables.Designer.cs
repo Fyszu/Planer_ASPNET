@@ -3,14 +3,16 @@ using System;
 using ASP_MVC_NoAuthentication.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ASP_MVC_NoAuthentication.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    partial class MyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221107153810_RenameTables")]
+    partial class RenameTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -102,9 +104,6 @@ namespace ASP_MVC_NoAuthentication.Migrations
 
                     b.Property<string>("Accessibility")
                         .HasColumnType("text");
-
-                    b.Property<bool>("AllTimeOpen")
-                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("AuthenticationMethods")
                         .HasColumnType("text");

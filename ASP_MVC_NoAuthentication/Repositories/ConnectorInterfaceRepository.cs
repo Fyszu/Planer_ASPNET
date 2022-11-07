@@ -14,33 +14,33 @@ namespace ASP_MVC_NoAuthentication.Repositories
         public async Task Add(ConnectorInterface connectorInterface)
         {
             if (connectorInterface != null)
-                await _context.Interfaces.AddAsync(connectorInterface);
+                await _context.ConnectorInterfaces.AddAsync(connectorInterface);
             await _context.SaveChangesAsync();
         }
 
         public async Task<List<ConnectorInterface>> GetAll()
         {
-            return await _context.Interfaces.ToListAsync();
+            return await _context.ConnectorInterfaces.ToListAsync();
         }
 
         public async Task<ConnectorInterface> GetById(long id)
         {
-            return await _context.Interfaces.Where(cni => cni.Id.Equals(id)).SingleOrDefaultAsync();
+            return await _context.ConnectorInterfaces.Where(cni => cni.Id.Equals(id)).SingleOrDefaultAsync();
         }
 
         public async Task Remove(ConnectorInterface connectorInterface)
         {
             if (connectorInterface != null)
-                _context.Interfaces.Remove(connectorInterface);
+                _context.ConnectorInterfaces.Remove(connectorInterface);
             await _context.SaveChangesAsync();
         }
 
         // Removes all records from ConnectorInterfaces table
         public async Task RemoveAll()
         {
-            await _context.Interfaces.ForEachAsync(cInterface => {
+            await _context.ConnectorInterfaces.ForEachAsync(cInterface => {
                 if (cInterface != null)
-                    _context.Interfaces.Remove(cInterface);
+                    _context.ConnectorInterfaces.Remove(cInterface);
             });
             await _context.SaveChangesAsync();
         }

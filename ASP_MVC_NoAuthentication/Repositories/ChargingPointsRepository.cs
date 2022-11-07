@@ -47,10 +47,10 @@ namespace ASP_MVC_NoAuthentication.Repositories
         public async Task RemoveAll() 
         {
             // Remove also connectors
-            await _context.Connector.ForEachAsync(connector =>
+            await _context.Connectors.ForEachAsync(connector =>
             {
                 if (connector != null)
-                    _context.Connector.Remove(connector);
+                    _context.Connectors.Remove(connector);
             });
 
             await _context.SaveChangesAsync();

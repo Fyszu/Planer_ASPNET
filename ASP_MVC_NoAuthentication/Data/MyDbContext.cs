@@ -18,9 +18,9 @@ namespace ASP_MVC_NoAuthentication.Data
         public DbSet<ChargingPoint> ChargingPoints { get; set; }
         public DbSet<ChargingStation> ChargingStations { get; set;}
         public DbSet<Car> Cars { get; set; }
-        public DbSet<ConnectorInterface> Interfaces { get; set; }
+        public DbSet<ConnectorInterface> ConnectorInterfaces { get; set; }
         public DbSet<Provider> Providers { get; set; }
-        public DbSet<ChargingPoint.Connector> Connector { get; set; }
+        public DbSet<ChargingPoint.Connector> Connectors { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

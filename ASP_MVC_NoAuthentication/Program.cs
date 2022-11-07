@@ -36,6 +36,12 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = "/Identity/Account/AccessDenied";
     options.SlidingExpiration = true;
 });
+
+// Logging
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+
+// Services and repositories
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddScoped<IGeoService, GeoService>();
 builder.Services.AddScoped<IChargingStationService, ChargingStationService>();
