@@ -5,6 +5,8 @@ VisualStudioVersion = 17.1.31911.260
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ASP_MVC_NoAuthentication", "ASP_MVC_NoAuthentication\ASP_MVC_NoAuthentication.csproj", "{3A6AA54A-D6F4-4BE8-A766-317163721811}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EipaUdtImportingTools", "EipaUdtImportingTools\EipaUdtImportingTools.csproj", "{A08F3787-7A68-464B-9A8D-55EB5A38D3C8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{3A6AA54A-D6F4-4BE8-A766-317163721811}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3A6AA54A-D6F4-4BE8-A766-317163721811}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3A6AA54A-D6F4-4BE8-A766-317163721811}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A08F3787-7A68-464B-9A8D-55EB5A38D3C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A08F3787-7A68-464B-9A8D-55EB5A38D3C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A08F3787-7A68-464B-9A8D-55EB5A38D3C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A08F3787-7A68-464B-9A8D-55EB5A38D3C8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

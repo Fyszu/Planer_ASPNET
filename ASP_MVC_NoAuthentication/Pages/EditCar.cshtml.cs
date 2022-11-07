@@ -15,19 +15,19 @@ namespace ASP_MVC_NoAuthentication.Pages
         private readonly UserManager<User> _userManager;
         private readonly ICarService _carService;
         private readonly IUserService _userService;
-        private readonly IConnectorService _connectorService;
-        public List<Connector> _connectors = null;
+        private readonly IConnectorInterfaceService _connectorInterfacesService;
+        public List<ConnectorInterface> _connectorInterfaces = null;
         public User _currentUser;
         public Car _editedCar;
         public Boolean _canEditCar;
         private static int CarId { get; set; }
-        public EditCarModel(UserManager<User> userManager, SignInManager<User> signInManager, ICarService carService, IUserService userService, IConnectorService connectorService)
+        public EditCarModel(UserManager<User> userManager, SignInManager<User> signInManager, ICarService carService, IUserService userService, IConnectorInterfaceService connectorInterfaceService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _carService = carService;
             _userService = userService;
-            _connectorService = connectorService;
+            _connectorInterfacesService = connectorInterfaceService;
         }
 
         public async Task OnGetAsync()
@@ -36,7 +36,7 @@ namespace ASP_MVC_NoAuthentication.Pages
         }
         public async Task GetPage()
         {
-            _connectors = await _connectorService.GetAllConnectors();
+            _connectorInterfaces = await _connectorInterfacesService.GetAllConnectorInterfaces();
             _currentUser = await _userService.GetUserByName(User.Identity.Name);
             CarId = int.Parse(Request.Query["carid"]);
             _editedCar = await _carService.GetCarById(CarId);
@@ -49,20 +49,20 @@ namespace ASP_MVC_NoAuthentication.Pages
             _editedCar = await _carService.GetCarById(CarId);
             if (await _carService.CheckIfCarBelongsToUser(_currentUser, _editedCar))
             {
-                _connectors = await _connectorService.GetAllConnectors();
+                _connectorInterfaces = await _connectorInterfacesService.GetAllConnectorInterfaces();
                 string brand = Request.Form["brand"];
                 string model = Request.Form["carmodel"];
                 int maximumDistance = (int.Parse(Request.Form["maximumdistance"]));
                 string check;
-                List<Connector> carConnectors = new List<Connector>();
-                foreach (Connector connector in _connectors)
+                List<ConnectorInterface> carInterfaces = new List<ConnectorInterface>();
+                foreach (ConnectorInterface cnInterface in _connectorInterfaces)
                 {
-                    string cb = "checkbox" + connector.Id;
+                    string cb = "checkbox" + cnInterface.Id;
                     check = Request.Form[cb];
                     if (check != null)
-                        carConnectors.Add(connector);
+                        carInterfaces.Add(cnInterface);
                 }
-                await _carService.UpdateCar(new Car(_editedCar.Id, brand, model, maximumDistance, carConnectors, _currentUser));
+                await _carService.UpdateCar(new Car(_editedCar.Id, brand, model, maximumDistance, carInterfaces, _currentUser));
             }
             return Redirect(Url.Content("~/UserPanel"));
         }

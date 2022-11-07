@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.Extensions.Options;
+using System.Reflection.Emit;
 
 namespace ASP_MVC_NoAuthentication.Data
 {
@@ -12,12 +15,12 @@ namespace ASP_MVC_NoAuthentication.Data
 
         }
         public DbSet<User> Users { get; set; }
-        public DbSet<ChargingPoint> ChargingPoints {get;set;}
+        public DbSet<ChargingPoint> ChargingPoints { get; set; }
         public DbSet<ChargingStation> ChargingStations { get; set;}
         public DbSet<Car> Cars { get; set; }
-        public DbSet<Connector> Connectors { get; set; }
-        public DbSet<PaymentMethod> PaymentMethods { get; set; }
-
+        public DbSet<ConnectorInterface> Interfaces { get; set; }
+        public DbSet<Provider> Providers { get; set; }
+        public DbSet<ChargingPoint.Connector> Connector { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -32,9 +35,32 @@ namespace ASP_MVC_NoAuthentication.Data
             }
         }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder builder)
         {
-            base.OnModelCreating(modelBuilder);
+            base.OnModelCreating(builder);
+
+            builder.Entity<IdentityUser>(entity => entity.Property(m => m.Id).HasMaxLength(85));
+            builder.Entity<IdentityUser>(entity => entity.Property(m => m.NormalizedEmail).HasMaxLength(85));
+            builder.Entity<IdentityUser>(entity => entity.Property(m => m.NormalizedUserName).HasMaxLength(85));
+
+            builder.Entity<IdentityRole>(entity => entity.Property(m => m.Id).HasMaxLength(85));
+            builder.Entity<IdentityRole>(entity => entity.Property(m => m.NormalizedName).HasMaxLength(85));
+
+            builder.Entity<IdentityUserLogin<string>>(entity => entity.Property(m => m.LoginProvider).HasMaxLength(85));
+            builder.Entity<IdentityUserLogin<string>>(entity => entity.Property(m => m.ProviderKey).HasMaxLength(85));
+            builder.Entity<IdentityUserLogin<string>>(entity => entity.Property(m => m.UserId).HasMaxLength(85));
+            builder.Entity<IdentityUserRole<string>>(entity => entity.Property(m => m.UserId).HasMaxLength(85));
+
+            builder.Entity<IdentityUserRole<string>>(entity => entity.Property(m => m.RoleId).HasMaxLength(85));
+
+            builder.Entity<IdentityUserToken<string>>(entity => entity.Property(m => m.UserId).HasMaxLength(85));
+            builder.Entity<IdentityUserToken<string>>(entity => entity.Property(m => m.LoginProvider).HasMaxLength(85));
+            builder.Entity<IdentityUserToken<string>>(entity => entity.Property(m => m.Name).HasMaxLength(85));
+
+            builder.Entity<IdentityUserClaim<string>>(entity => entity.Property(m => m.Id).HasMaxLength(85));
+            builder.Entity<IdentityUserClaim<string>>(entity => entity.Property(m => m.UserId).HasMaxLength(85));
+            builder.Entity<IdentityRoleClaim<string>>(entity => entity.Property(m => m.Id).HasMaxLength(85));
+            builder.Entity<IdentityRoleClaim<string>>(entity => entity.Property(m => m.RoleId).HasMaxLength(85));
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ASP_MVC_NoAuthentication.Data
@@ -8,55 +9,57 @@ namespace ASP_MVC_NoAuthentication.Data
     {
         public Car()
         {
-            this.Connectors = new HashSet<Connector>();
-        }   
+            ConnectorInterfaces = new HashSet<ConnectorInterface>();
+        }
         public int Id { get; set; }
-        public String Brand { set; get; }
-        public String Model { set; get; }
+        [Required]
+        public string Brand { set; get; }
+        [Required]
+        public string Model { set; get; }
+        [Required]
         public int MaximumDistance { set; get; }
-        public virtual ICollection<Connector> Connectors { get; set; }
+        public ICollection<ConnectorInterface> ConnectorInterfaces { get; set; }
         public User? User { get; set; }
-
-        public Car(int id, string brand, string model, int maximumDistance, ICollection<Connector> connectors, User user)
+        public Car(int id, string brand, string model, int maximumDistance, ICollection<ConnectorInterface> interfaces, User user)
 		{
             this.Id = id;
             this.Brand = brand;
             this.Model = model;
             this.MaximumDistance = maximumDistance;
-            this.Connectors = connectors;
+            this.ConnectorInterfaces = interfaces;
             this.User = user;
 		}
 
-        public Car(string brand, string model, int maximumDistance, ICollection<Connector> connectors)
+        public Car(string brand, string model, int maximumDistance, ICollection<ConnectorInterface> interfaces)
         {
             this.Brand = brand;
             this.Model = model;
             this.MaximumDistance = maximumDistance;
-            this.Connectors = connectors;
+            this.ConnectorInterfaces = interfaces;
         }
 
-        public Car(string brand, string model, int maximumDistance, ICollection<Connector> connectors, User user)
+        public Car(string brand, string model, int maximumDistance, ICollection<ConnectorInterface> interfaces, User user)
         {
             this.Brand= brand;
             this.Model = model;
             this.MaximumDistance = maximumDistance;
-            this.Connectors = connectors;
+            this.ConnectorInterfaces = interfaces;
             this.User = user;
         }
 
         public override string ToString()
         {
-            return $"{Brand} {Model} ({MaximumDistance}, {ConnectorsToString()})";
+            return $"{Brand} {Model} ({MaximumDistance}, {CarConnectorInterfacesToString()})";
         }
 
-        public string ConnectorsToString()
+        public string CarConnectorInterfacesToString()
         {
             string ret = "";
-            if (Connectors.Count > 0)
+            if (ConnectorInterfaces.Count > 0)
             {
-                foreach (Connector connector in Connectors)
+                foreach (ConnectorInterface cnInterface in ConnectorInterfaces)
                 {
-                    ret += connector.ToString() + ", ";
+                    ret += cnInterface.ToString() + ", ";
                 }
                 ret = ret.Remove(ret.Length - 2);
 
@@ -67,6 +70,5 @@ namespace ASP_MVC_NoAuthentication.Data
             }
             return ret;
         }
-
     }
 }

@@ -15,17 +15,17 @@ namespace ASP_MVC_NoAuthentication.Pages
         private readonly UserManager<User> _userManager;
         private readonly IUserService _userService;
         private readonly ICarService _carService;
-        private readonly IConnectorService _connectorService;
-        public List<Connector> _connectors = null;
+        private readonly IConnectorInterfaceService _connectorInterfaceService;
+        public List<ConnectorInterface> _connectorInterfaces = null;
         public User _currentUser;
 
-        public AddNewCarModel(UserManager<User> userManager, SignInManager<User> signInManager, IUserService userService, ICarService carService, IConnectorService connectorService)
+        public AddNewCarModel(UserManager<User> userManager, SignInManager<User> signInManager, IUserService userService, ICarService carService, IConnectorInterfaceService connectorInterfaceService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _userService = userService;
             _carService = carService;
-            _connectorService = connectorService;
+            _connectorInterfaceService = connectorInterfaceService;
         }
 
         public async Task OnGetAsync()
@@ -34,27 +34,27 @@ namespace ASP_MVC_NoAuthentication.Pages
         }
         public async Task GetPage()
         {
-            _connectors = await _connectorService.GetAllConnectors();
+            _connectorInterfaces = await _connectorInterfaceService.GetAllConnectorInterfaces();
             _currentUser = await _userService.GetUserByName(User.Identity.Name);
         }
         public async Task<IActionResult> OnPostAddCarAsync(string? returnUrl = null)
         {
             _currentUser = await _userService.GetUserByName(User.Identity.Name);
-            _connectors = await _connectorService.GetAllConnectors();
+            _connectorInterfaces = await _connectorInterfaceService.GetAllConnectorInterfaces();
             string brand = Request.Form["brand"];
             string model = Request.Form["carmodel"];
             int maximumDistance = int.Parse(Request.Form["maximumdistance"]);
             string check;
-            List<Connector> carConnectors = new List<Connector>();
-            foreach(Connector connector in _connectors)
+            List<ConnectorInterface> carInterfaces = new List<ConnectorInterface>();
+            foreach(ConnectorInterface cnInterface in _connectorInterfaces)
             {
-                string cb = "checkbox" + connector.Id;
+                string cb = "checkbox" + cnInterface.Id;
                 check = Request.Form[cb];
                 if(check != null)
-                    carConnectors.Add(connector);
+                    carInterfaces.Add(cnInterface);
             }
 
-            await _carService.AddNewCar(new Car(brand, model, maximumDistance, carConnectors, _currentUser));
+            await _carService.AddNewCar(new Car(brand, model, maximumDistance, carInterfaces, _currentUser));
             return Redirect(Url.Content("~/UserPanel"));
         }
     }

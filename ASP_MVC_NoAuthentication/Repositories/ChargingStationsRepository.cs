@@ -1,5 +1,6 @@
 ﻿using ASP_MVC_NoAuthentication.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.Metrics;
 
 namespace ASP_MVC_NoAuthentication.Repositories
 {
@@ -13,9 +14,9 @@ namespace ASP_MVC_NoAuthentication.Repositories
 
 
 
-        public async Task<ChargingStation> GetById(int id)
+        public async Task<ChargingStation> GetById(long id)
         {
-            return await _context.ChargingStations.Include(station => station.ChargingPoints).ThenInclude(point => point.Connector).Where(station => station.Id.Equals(id)).SingleOrDefaultAsync();
+            return await _context.ChargingStations.Include(station => station.Provider).Include(station => station.OperatingHours).Include(station => station.ChargingPoints).ThenInclude(point => point.Connectors).ThenInclude(connector => connector.Interfaces).Where(station => station.Id.Equals(id)).SingleOrDefaultAsync();
         }
 
         public async Task Add(ChargingStation chargingStation)
@@ -25,22 +26,33 @@ namespace ASP_MVC_NoAuthentication.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task AddRange(List<ChargingStation> chargingStations)
+        {
+            await _context.ChargingStations.AddRangeAsync(chargingStations);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task Update(ChargingStation chargingStation)
         {
             if (chargingStation != null)
             {
                 ChargingStation dbChargingStation = await GetById(chargingStation.Id);
-                dbChargingStation.Street = chargingStation.Street;
-                dbChargingStation.ChargingPoints = chargingStation.ChargingPoints;
-                dbChargingStation.PaymentMethods = chargingStation.PaymentMethods;
-                dbChargingStation.StationState = chargingStation.StationState;
+                dbChargingStation.Provider = chargingStation.Provider;
                 dbChargingStation.Latitude = chargingStation.Latitude;
                 dbChargingStation.Longitude = chargingStation.Longitude;
-                dbChargingStation.OpenHours = chargingStation.OpenHours;
-                dbChargingStation.City = chargingStation.City;
-                dbChargingStation.Owner = chargingStation.Owner;
                 dbChargingStation.Name = chargingStation.Name;
-                dbChargingStation.PostalAdress = chargingStation.PostalAdress;
+                dbChargingStation.City = chargingStation.City;
+                dbChargingStation.PostalCode = chargingStation.PostalCode;
+                dbChargingStation.Street = chargingStation.Street;
+                dbChargingStation.HouseNumber = chargingStation.HouseNumber;
+                dbChargingStation.Community = chargingStation.Community;
+                dbChargingStation.District = chargingStation.District;
+                dbChargingStation.Province = chargingStation.Province;
+                dbChargingStation.OperatingHours = chargingStation.OperatingHours;
+                dbChargingStation.Accessibility = chargingStation.Accessibility;
+                dbChargingStation.PaymentMethods = chargingStation.PaymentMethods;
+                dbChargingStation.AuthenticationMethods = chargingStation.AuthenticationMethods;
+                dbChargingStation.ChargingPoints = chargingStation.ChargingPoints;
             }
             await _context.SaveChangesAsync();
         }
@@ -52,9 +64,24 @@ namespace ASP_MVC_NoAuthentication.Repositories
             await _context.SaveChangesAsync();
         }
 
+        // Removes all records from ChargingStations repository
+        public async Task RemoveAll()
+        {
+            await _context.ChargingStations
+                .Include(station => station.OperatingHours)
+                .Include(station => station.ChargingPoints)
+                .ThenInclude(point => point.Connectors)
+                .ThenInclude(connector => connector.Interfaces)
+                .ForEachAsync(station => {
+                if (station != null)
+                    _context.ChargingStations.Remove(station);
+            });
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<List<ChargingStation>> GetAll()
         {
-            return await _context.ChargingStations.Include(station => station.ChargingPoints).ThenInclude(point => point.Connector).ToListAsync();
+            return await _context.ChargingStations.Include(station => station.Provider).Include(station => station.OperatingHours).Include(station => station.ChargingPoints).ThenInclude(point => point.Connectors).ThenInclude(connector => connector.Interfaces).ToListAsync();
         }
     }
 }

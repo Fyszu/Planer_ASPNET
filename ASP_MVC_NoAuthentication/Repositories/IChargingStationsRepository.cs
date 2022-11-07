@@ -2,7 +2,9 @@
 
 namespace ASP_MVC_NoAuthentication.Repositories
 {
-    public interface IChargingStationsRepository : IRepository<ChargingStation, int>
+    public interface IChargingStationsRepository : IRepository<ChargingStation, long>
     {
+        public Task RemoveAll();
+        public Task AddRange(List<ChargingStation> chargingStations);
     }
 }

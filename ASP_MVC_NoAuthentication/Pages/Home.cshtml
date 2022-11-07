@@ -195,7 +195,7 @@
             carList = @Html.Raw(Json.Serialize(Model.Cars));
         @for (int i = 0; i < Model.Cars.Count; i++)
         {
-            @:$("#selectCar").append("<option value='" + @i + "'>" + "@Model.Cars[i].Brand" + " " + "@Model.Cars[i].Model" + " Zasięg: " + "@Model.Cars[i].MaximumDistance" + "km (" + "@Model.Cars[i].ConnectorsToString()" + ")" + "</option>");
+            @:$("#selectCar").append("<option value='" + @i + "'>" + "@Model.Cars[i].Brand" + " " + "@Model.Cars[i].Model" + " Zasięg: " + "@Model.Cars[i].MaximumDistance" + "km (" + "@Model.Cars[i].CarConnectorInterfacesToString()" + ")" + "</option>");
         }
         }
 
@@ -322,11 +322,17 @@
                     else {
                         //Set charging stations as markers with info
                         chargingStationsNearRoute.forEach(station => {
-                            var stationState = "Aktywna";
-                            if (station.stationState == 0) {
+                            var stationState;
+                            if (station.stationState == 0)
+                            {
                                 stationState = "Zamknięta";
                             }
+                            else
+                            {
+                                stationState = "Aktywna";
+                            }
                             var stationCoordinates = [station.latitude, station.longitude];
+
                             //Check if station has same connector as car - then, if yes show marker as green, otherwise show as yellow
                             var stationHasCorrectConnector = false;
                             station.chargingPoints.forEach(chargingPoint => {
@@ -341,15 +347,16 @@
                                 position: { lat: station.latitude, lng: station.longitude },
                                 map: map,
                             });
-                            if (stationHasCorrectConnector)
+
+                            if (station.stationState == 0)
+                                marker.setIcon('http://maps.google.com/mapfiles/ms/icons/red-dot.png');
+                            else if (stationHasCorrectConnector)
                                 marker.setIcon('http://maps.google.com/mapfiles/ms/icons/green-dot.png');
                             else
-                                marker.setIcon('http://maps.google.com/mapfiles/ms/icons/yellow-dot.png');
+                                marker.setIcon('http://maps.google.com/mapfiles/ms/icons/orange-dot.png');
                             markersArray.push(marker);
 
-                            //Create of marker's information window and attach click listener
-                            var markerDetails = new google.maps.InfoWindow({
-                                content: "<div class='infoWindowContent'><b>Stacja:</b> " + station.name 
+                            var markerContent = "<div class='infoWindowContent'><b>Stacja:</b> " + station.name 
                                     + "<br><b>Współrzędne:</b> " + station.latitude.toFixed(6) + ", " + station.longitude.toFixed(6)
                                     + "<br><b>Adres: </b>" + station.city + " " + station.postalAdress + ", " + station.street 
                                     + "<br><b>Godziny otwarcia:</b> " + station.openHours 
@@ -358,8 +365,32 @@
                                     + "<div style='text-align: center;'>"
                                     + "<br><br><button class='inputForm charger-button' onclick='addStopToArray(\"" + station.latitude + "\",\"" + station.longitude + "\",\"" + station.name +"\"," + station.id +");'>Dodaj jako przystanek</button>"
                                     + "<br>Lub:"
-                                    + "<br><button class='inputForm charger-button' onclick='openStationInGoogleMaps(\"" + station.latitude + "\",\"" + station.longitude + "\");'>Otwórz w google maps</button></div></div>",
+                                    + "<br><button class='inputForm charger-button' onclick='openStationInGoogleMaps(\"" + station.latitude + "\",\"" + station.longitude + "\");'>Otwórz w google maps</button></div>";
+                            
+                            if (station.stationState == 0)
+                            {
+                                markerContent += "<br><div class='warning' style='color:red'><b>Uwaga: stacja jest oznaczona jako zamknięta.</b></div></div>";
+                            }
+                            else if (!stationHasCorrectConnector)
+                            {
+                                markerContent = markerContent + "<br><div style='color:orange'><b>Uwaga: według bieżących informacji, stacja nie posiada wtyczki odpowiedniej dla Twojego samochodu (może posiadasz przejściówkę?). Wtyczki skatalogowane dla tej stacji to:";
+                                station.chargingPoints.forEach(chargingPoint => {
+                                    markerContent += " " + chargingPoint.connector.name + ",";
+                                });
+                                markerContent = markerContent.slice(0, -1); // remove unnecessary comma at end
+                                markerContent += ".</b></div></div>";
+                            }
+                            else
+                            {
+                                markerContent += "</div>";
+                            }
+
+                            //Create of marker's information window
+                            var markerDetails = new google.maps.InfoWindow({
+                                content: markerContent
                             });
+
+                            //Attach click listener so info window will show up
                             google.maps.event.addListener(marker, "click", () => {
                                 markerDetails.open(map, marker);
                             });

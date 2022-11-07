@@ -15,7 +15,7 @@ namespace ASP_MVC_NoAuthentication.Repositories
 
         public async Task<Car> GetById(int id)
         {
-            return await _context.Cars.Include(car => car.Connectors).Where(car => car.Id == id).SingleOrDefaultAsync();
+            return await _context.Cars.Include(car => car.ConnectorInterfaces).Where(car => car.Id == id).SingleOrDefaultAsync();
         }
 
         public async Task Add(Car car)
@@ -33,7 +33,7 @@ namespace ASP_MVC_NoAuthentication.Repositories
                 dbCar.Brand = car.Brand;
                 dbCar.Model = car.Model;
                 dbCar.MaximumDistance = car.MaximumDistance;
-                dbCar.Connectors = car.Connectors;
+                dbCar.ConnectorInterfaces = car.ConnectorInterfaces;
             }
             await _context.SaveChangesAsync();
         }
@@ -49,25 +49,55 @@ namespace ASP_MVC_NoAuthentication.Repositories
 
         public async Task<List<Car>> GetAll()
         {
-            return await _context.Cars.ToListAsync();
+            return await _context.Cars.Include(car => car.ConnectorInterfaces).Include(car => car.User).ToListAsync();
         }
 
         public async Task<List<Car>> GetDefaultCars()
         {
-            return await _context.Cars.Include(car => car.User).Include(car => car.Connectors).Where(car => car.User.Equals(null)).ToListAsync();
+            return await _context.Cars.Include(car => car.User).Include(car => car.ConnectorInterfaces).Where(car => car.User.Equals(null)).ToListAsync();
         }
 
         public async Task<List<Car>> GetCarsByUser(User user)
         {
-            return await _context.Cars.Include(car => car.User).Include(car => car.Connectors).Where(car => car.User.Equals(user)).ToListAsync();
+            return await _context.Cars.Include(car => car.User).Include(car => car.ConnectorInterfaces).Where(car => car.User.Equals(user)).ToListAsync();
         }
 
         public async Task RemoveById(int id)
         {
             Car car = await GetById(id);
             if(car != null)
-                Remove(car);
+                _context.Cars.Remove(car);
             await _context.SaveChangesAsync();
+        }
+
+        // Removes all records from Cars table
+        public async Task RemoveAll()
+        {
+            await _context.Cars
+                .ForEachAsync(car =>
+                {
+                    if (car != null)
+                        _context.Cars.Remove(car);
+                });
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task AddRange(List<Car> cars)
+        {
+            await _context.Cars.AddRangeAsync(cars);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateInterfaces(int carId, List<ConnectorInterface> connectorInterfaces)
+        {
+            Car dbCar = await GetById(carId);
+            if (dbCar != null)
+            {
+                dbCar.ConnectorInterfaces = connectorInterfaces;
+                await _context.SaveChangesAsync();
+            }
+            else
+                throw new Exception($"Zły numer id samochodu ({carId}).");
         }
     }
 }
