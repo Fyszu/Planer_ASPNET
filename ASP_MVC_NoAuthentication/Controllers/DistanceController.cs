@@ -33,7 +33,7 @@ namespace ASP_MVC_NoAuthentication.Controllers
             estimatedTravelTime = estimatedTravelTime > 24 ? 24 : estimatedTravelTime;
             float temperatureOfOrigin = await _weatherService.GetTemperatureForLocation(origLat, origLng, estimatedTravelTime);
             float temperatureOfDestination = await _weatherService.GetTemperatureForLocation(destLat, destLng, estimatedTravelTime);
-            if (temperatureOfOrigin != -300f && temperatureOfDestination != -300f)
+            if (temperatureOfOrigin != -300f && temperatureOfDestination != -300f) // -300 is error code for weather service
             {
                 return _distanceService.GetRealMaximumDistance(batteryLevel, maximumDistance, (DataHelper.DrivingStyle)drivingStyle, (temperatureOfDestination + temperatureOfOrigin) / 2);
             }

@@ -8,6 +8,7 @@ using ASP_MVC_NoAuthentication.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
 // Add services to the container.
 builder.Services.AddDbContext<MyDbContext>(options => options.UseMySQL(builder.Configuration.GetConnectionString("Default")));
 builder.Services.AddAuthentication(CertificateAuthenticationDefaults.AuthenticationScheme).AddCertificate();
@@ -26,7 +27,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Cookie.HttpOnly = true;
 
-// Remember me expire time
+    // Remember me expire time
     options.ExpireTimeSpan = TimeSpan.FromDays(30);
     options.Cookie.Name = "Planer.AuthCookieAspNetCore";
 
@@ -40,6 +41,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 // Logging
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
+builder.Logging.SetMinimumLevel(LogLevel.Trace);
 
 // Services and repositories
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -50,11 +52,12 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IConnectorInterfaceService, ConnectorInterfaceService>();
 builder.Services.AddScoped<ICarService, CarService>();
 builder.Services.AddScoped<IWeatherAPIService, WeatherAPIService>();
-builder.Services.AddScoped<CarRepository, CarRepository>();
-builder.Services.AddScoped<ConnectorInterfaceRepository, ConnectorInterfaceRepository>();
-builder.Services.AddScoped<UserRepository, UserRepository>();
-builder.Services.AddScoped<ChargingStationsRepository, ChargingStationsRepository>();
-builder.Services.AddControllersWithViews().AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+builder.Services.AddScoped<ICarRepository, CarRepository>();
+builder.Services.AddScoped<IConnectorInterfaceRepository, ConnectorInterfaceRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IChargingStationsRepository, ChargingStationsRepository>();
+builder.Services.AddControllers()
+    .AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 builder.Services.AddRazorPages();
 var app = builder.Build();
 

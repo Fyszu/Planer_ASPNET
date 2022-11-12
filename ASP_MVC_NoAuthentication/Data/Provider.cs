@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace ASP_MVC_NoAuthentication.Data
 {
@@ -18,6 +19,7 @@ namespace ASP_MVC_NoAuthentication.Data
         public string? Country { get; set; }
         public string? Email { get; set; }
         public string? Website { get; set; }
+        [JsonIgnore]
         public ICollection<ChargingStation> ChargingStations { get; set; }
     }
 }

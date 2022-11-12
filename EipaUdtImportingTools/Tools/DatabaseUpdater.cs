@@ -11,13 +11,13 @@ using System.Threading.Tasks;
 
 namespace EipaUdtImportingTools.Tools
 {
-    internal static class UDTApiDatabaseUpdater
+    internal static class DatabaseUpdater
     {
         public static HashSet<ChargingStation> ChargingStations { get; set; }
         public static HashSet<ConnectorInterface> ConnectorInterfacesInUsage { get; set; }
 
-        private static readonly ILogger _logger = ApplicationLogging.CreateLogger("UDTApiDatabaseUpdater");
-        public static async Task<bool> UpdateDatabase(MyDbContext dbContext, ChargingStationsRepository chargingStationsRepository, ChargingPointsRepository chargingPointsRepository, ProvidersRepository providersRepository, ConnectorInterfaceRepository connectorInterfaceRepository, CarRepository carRepository)
+        private static readonly ILogger _logger = ApplicationLogging.CreateLogger("DatabaseUpdater");
+        public static async Task<bool> UpdateDatabase(MyDbContext dbContext, ChargingStationsRepository chargingStationsRepository, ChargingPointsRepository chargingPointsRepository, ProvidersRepository providersRepository, ConnectorInterfaceRepository connectorInterfaceRepository, CarRepository carRepository, UserRepository userRepository)
         {
             try
             {
@@ -31,7 +31,7 @@ namespace EipaUdtImportingTools.Tools
                 generalStopwatch.Start();
                 stopwatch.Start();
                 
-                if (await ApiImporter.TransformApiDataToInternal())
+                if (await EIPAConverter.TransformApiDataToInternal())
                 {
                     stopwatch.Stop();
                     _logger.LogInformation($"Czas konwersji danych: {stopwatch.ElapsedMilliseconds}ms");
@@ -89,7 +89,7 @@ namespace EipaUdtImportingTools.Tools
                     _logger.LogTrace("Koniec transakcji.");
 
                     generalStopwatch.Stop();
-                    _logger.LogInformation($"Czas wykonania całej transakcji: {generalStopwatch.ElapsedMilliseconds}ms.");
+                    _logger.LogInformation($"Czas wykonania całej operacji: {generalStopwatch.ElapsedMilliseconds}ms.");
 
                     _logger.LogInformation("\n\n--------------------------------\nBaza danych została zaktualizowana.\n--------------------------------");
                     return true;
@@ -164,7 +164,7 @@ namespace EipaUdtImportingTools.Tools
                         break;
 
                     case ConnectorInterfaceChange.Removed:
-                        _logger.LogCritical($"Interfejs ładowania {changedConnectorInterface.Key.Key} został usunięty z bazy danych.");
+                        _logger.LogWarning($"Interfejs ładowania {changedConnectorInterface.Key.Key} został usunięty z bazy danych.");
                         break;
 
                     default:

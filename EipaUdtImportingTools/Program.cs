@@ -15,7 +15,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<MyDbContext>(options => {
     options.UseMySQL(builder.Configuration.GetConnectionString("Default"));
     options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
-    });
+    options.EnableSensitiveDataLogging();
+});
 
 // Logging - filter sql queries by EF in appsettings.json
 ApplicationLogging.LoggerFactory = LoggerFactory.Create(
@@ -29,17 +30,18 @@ builder.Services.AddScoped<ChargingPointsRepository, ChargingPointsRepository>()
 builder.Services.AddScoped<ProvidersRepository, ProvidersRepository>();
 builder.Services.AddScoped<ConnectorInterfaceRepository, ConnectorInterfaceRepository>();
 builder.Services.AddScoped<CarRepository, CarRepository>();
+builder.Services.AddScoped<UserRepository, UserRepository>();
 
 var provider = builder.Services.BuildServiceProvider();
 
 // Run tools
 bool result = false;
-int retryCount = 3;
+int retryCount = 1;
 
 for(int i = 0; i < retryCount; i++)
 {
     Console.WriteLine($"\n\n--------------------------------\nPróba aktualizacji bazy danych numer {i + 1}\n--------------------------------\n");
-    result = await UDTApiDatabaseUpdater.UpdateDatabase(provider.GetService<MyDbContext>(), provider.GetService<ChargingStationsRepository>(), provider.GetService<ChargingPointsRepository>(), provider.GetService<ProvidersRepository>(), provider.GetService<ConnectorInterfaceRepository>(), provider.GetService<CarRepository>());
+    result = await DatabaseUpdater.UpdateDatabase(provider.GetService<MyDbContext>(), provider.GetService<ChargingStationsRepository>(), provider.GetService<ChargingPointsRepository>(), provider.GetService<ProvidersRepository>(), provider.GetService<ConnectorInterfaceRepository>(), provider.GetService<CarRepository>(), provider.GetService<UserRepository>());
     if (result) break;
 }
 

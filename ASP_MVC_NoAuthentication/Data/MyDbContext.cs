@@ -31,7 +31,7 @@ namespace ASP_MVC_NoAuthentication.Data
                    .AddJsonFile("appsettings.json")
                    .Build();
                 var connectionString = configuration.GetConnectionString("Default");
-                optionsBuilder.UseMySQL(connectionString);
+                optionsBuilder.UseMySQL(connectionString);   
             }
         }
 

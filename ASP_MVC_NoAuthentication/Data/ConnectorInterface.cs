@@ -1,4 +1,6 @@
-﻿namespace ASP_MVC_NoAuthentication.Data
+﻿using System.Text.Json.Serialization;
+
+namespace ASP_MVC_NoAuthentication.Data
 {
     public class ConnectorInterface
     {
@@ -11,7 +13,9 @@
         public long Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
+        [JsonIgnore]
         public ICollection<Car> Cars { get; set; }
+        [JsonIgnore]
         public ICollection<ChargingPoint.Connector> Connectors { get; set; }
         public override string ToString()
         {

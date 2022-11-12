@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Text.Json.Serialization;
+using System.ComponentModel.DataAnnotations;
 
 namespace ASP_MVC_NoAuthentication.Data
 {
@@ -15,6 +16,7 @@ namespace ASP_MVC_NoAuthentication.Data
         [Required]
         public bool Status { get; set; }
         [Required]
+        [JsonIgnore]
         public ChargingStation Station { set; get; }
         public ICollection<Connector> Connectors { get; set; }
         public partial class Connector
@@ -35,21 +37,21 @@ namespace ASP_MVC_NoAuthentication.Data
             if (string.IsNullOrEmpty(ChargingModes))
                 ChargingModes = chargingMode;
             else
-                ChargingModes += ";;" + chargingMode;
+                ChargingModes += ", " + chargingMode;
         }
 
         public void RemoveChargingMode(string chargingMode)
         {
             if (!string.IsNullOrEmpty(ChargingModes) && ChargingModes.Contains(chargingMode))
             {
-                ChargingModes = ChargingModes.Replace(";;" + chargingMode, "");
+                ChargingModes = ChargingModes.Replace(", " + chargingMode, "");
             }
         }
 
         public List<string> GetChargingModesList()
         {
             if (!string.IsNullOrEmpty(ChargingModes))
-                return ChargingModes.Split(";;").ToList();
+                return ChargingModes.Split(", ").ToList();
             else
                 return new List<string>();
         }

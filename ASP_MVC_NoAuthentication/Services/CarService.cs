@@ -6,10 +6,10 @@ namespace ASP_MVC_NoAuthentication.Services
     public class CarService : ICarService
     {
         private readonly ILogger<CarService> _logger;
-        private readonly UserRepository _userRepository;
-        private readonly CarRepository _carRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly ICarRepository _carRepository;
 
-        public CarService(ILogger<CarService> logger, UserRepository userRepository, CarRepository carRepository)
+        public CarService(ILogger<CarService> logger, IUserRepository userRepository, ICarRepository carRepository)
         {
             _logger = logger;
             _userRepository = userRepository;

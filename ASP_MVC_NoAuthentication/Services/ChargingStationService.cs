@@ -8,9 +8,9 @@ namespace ASP_MVC_NoAuthentication.Services
     public class ChargingStationService : IChargingStationService
     {
         private readonly ILogger<ChargingStationService> _logger;
-        private readonly ChargingStationsRepository _chargingStationsRepository;
+        private readonly IChargingStationsRepository _chargingStationsRepository;
 
-        public ChargingStationService(ILogger<ChargingStationService> logger, ChargingStationsRepository chargingStationsRepository)
+        public ChargingStationService(ILogger<ChargingStationService> logger, IChargingStationsRepository chargingStationsRepository)
         {
             _logger = logger;
             _chargingStationsRepository = chargingStationsRepository;

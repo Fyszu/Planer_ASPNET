@@ -8,7 +8,7 @@ namespace ASP_MVC_NoAuthentication.Services
     public class WeatherAPIService : IWeatherAPIService
     {
         private readonly ILogger<WeatherAPIService> _logger;
-        private readonly HttpClient client = new HttpClient();
+        private readonly HttpClient client = new();
         private float latitude;
         private float longitude;
         private string Url { 
@@ -68,7 +68,7 @@ namespace ASP_MVC_NoAuthentication.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError("Wystąpił wyjątek podczas pobierania temperatury (WeatherAPIService). Wiadomość: " + ex.Message);
+                _logger.LogCritical($"Wystąpił wyjątek podczas pobierania temperatury (WeatherAPIService). Wyjątek: {ex.Message}\n{ex.InnerException}");
                 return -300;
             }
         }

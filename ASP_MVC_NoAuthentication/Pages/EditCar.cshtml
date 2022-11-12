@@ -42,17 +42,17 @@
                         <h3>
                             Gniazda ładowania:
                         </h3>
-                        @foreach (var cnInterface in Model._connectorInterfaces)
+                        @foreach (var connectorInterface in Model._connectorInterfaces)
                         {
-                        if (Model._editedCar.ConnectorInterfaces.Contains(cnInterface))
+                        if (Model._editedCar.ConnectorInterfaces.Contains(connectorInterface))
                             {
-                                <input type="checkbox" id="@(cb + cnInterface.Id)" name="@(cb + cnInterface.Id)" checked>
+                                <input type="checkbox" id="@(cb + connectorInterface.Id)" name="@(cb + connectorInterface.Id)" checked>
                             }
                             else
                             {
-                                <input type="checkbox" id="@(cb + cnInterface.Id)" name="@(cb + cnInterface.Id)">
+                                <input type="checkbox" id="@(cb + connectorInterface.Id)" name="@(cb + connectorInterface.Id)">
                             }
-                            <label class="connector-label" for="@(cb + cnInterface.Id)">@cnInterface.Name</label>
+                            <label class="connector-label" for="@(cb + connectorInterface.Id)">@($"{connectorInterface.Name} ({connectorInterface.Description})")</label>
                             <br />
                         }
 

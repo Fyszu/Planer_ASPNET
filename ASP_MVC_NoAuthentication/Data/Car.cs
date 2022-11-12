@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace ASP_MVC_NoAuthentication.Data
 {
@@ -19,6 +20,7 @@ namespace ASP_MVC_NoAuthentication.Data
         [Required]
         public int MaximumDistance { set; get; }
         public ICollection<ConnectorInterface> ConnectorInterfaces { get; set; }
+        [JsonIgnore]
         public User? User { get; set; }
         public Car(int id, string brand, string model, int maximumDistance, ICollection<ConnectorInterface> interfaces, User user)
 		{
@@ -59,9 +61,9 @@ namespace ASP_MVC_NoAuthentication.Data
             {
                 foreach (ConnectorInterface cnInterface in ConnectorInterfaces)
                 {
-                    ret += cnInterface.ToString() + ", ";
+                    ret += cnInterface.Name + ", ";
                 }
-                ret = ret.Remove(ret.Length - 2);
+                ret = ret.Remove(ret.Length - 2); // remove comma and space
 
             }
             else

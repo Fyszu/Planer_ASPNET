@@ -1,5 +1,6 @@
 ﻿using ASP_MVC_NoAuthentication.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Security.AccessControl;
 
 namespace ASP_MVC_NoAuthentication.Repositories
 {
@@ -84,7 +85,22 @@ namespace ASP_MVC_NoAuthentication.Repositories
 
         public async Task AddRange(List<Car> cars)
         {
+            List<User> users = await _context.Users.ToListAsync();
+            foreach (Car car in cars)
+            {
+                if (car.User != null)
+                {
+                    car.User = users.Where(user => car.User.Id.Equals(user.Id)).FirstOrDefault() ?? throw new Exception("Nie znaleziono użytkownika po ID na nowej liście.");
+                }
+            }
             await _context.Cars.AddRangeAsync(cars);
+            HashSet<User> usersTracked = new();
+            cars.ForEach(c => {
+                if (c.User != null)
+                {
+                    _context.Entry(c.User).State = EntityState.Unchanged;
+                }
+            });
             await _context.SaveChangesAsync();
         }
 

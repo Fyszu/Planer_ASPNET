@@ -43,10 +43,10 @@
                     <h3>
                         Gniazda ładowania:
                     </h3>
-                    @foreach(var connector in Model._connectorInterfaces)
+                    @foreach(var connectorInterface in Model._connectorInterfaces)
                     {
-                        <input type="checkbox" id="@(cb + connector.Id)" name="@(cb + connector.Id)">
-                        <label class="connector-label" for="@(cb + connector.Id)">@connector.Name</label>
+                        <input type="checkbox" id="@(cb + connectorInterface.Id)" name="@(cb + connectorInterface.Id)">
+                        <label class="connector-label" for="@(cb + connectorInterface.Id)">@($"{connectorInterface.Name} ({connectorInterface.Description})")</label>
                         <br />
                     }
 

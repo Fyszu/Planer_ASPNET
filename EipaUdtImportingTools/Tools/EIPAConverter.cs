@@ -13,7 +13,7 @@ using static ASP_MVC_NoAuthentication.Data.ChargingStation;
 
 namespace EipaUdtImportingTools.Tools
 {
-    public static class ApiImporter
+    public static class EIPAConverter
     {
         private static readonly Dictionary<string, string> ApiUrls = new()
         {
@@ -26,7 +26,7 @@ namespace EipaUdtImportingTools.Tools
         };
 
         private static readonly HttpClient client = new HttpClient();
-        private static readonly ILogger _logger = ApplicationLogging.CreateLogger("ApiImporter");
+        private static readonly ILogger _logger = ApplicationLogging.CreateLogger("EIPAConverter");
         public async static Task<bool> TransformApiDataToInternal()
         {
             _logger.LogTrace("Pobieranie danych z API.");
@@ -165,7 +165,7 @@ namespace EipaUdtImportingTools.Tools
                                     _logger.LogError($"Problem z przypisaniem ceny dla punktu ładowania o ID: {chargingPointData.Id}. Treść błędu: \n{ex.Message}");
                                 }
                             }
-                            if (dynamicRecord.Status != null && dynamicRecord.Status.StatusStatus != 1)
+                            if (dynamicRecord.Status != null && dynamicRecord.Status.Availability != 1)
                             {
                                 chargingPointStatus = false;
                             }
@@ -249,8 +249,8 @@ namespace EipaUdtImportingTools.Tools
                 _logger.LogTrace("Przetwarzanie stacji ładowania zakończone.");
 
                 // Save data into static updater properties
-                UDTApiDatabaseUpdater.ChargingStations = internalChargingStations ?? throw new ArgumentNullException(nameof(internalChargingStations));
-                UDTApiDatabaseUpdater.ConnectorInterfacesInUsage = connectorInterfacesInUsage ?? throw new ArgumentNullException(nameof(connectorInterfacesInUsage));
+                DatabaseUpdater.ChargingStations = internalChargingStations ?? throw new ArgumentNullException(nameof(internalChargingStations));
+                DatabaseUpdater.ConnectorInterfacesInUsage = connectorInterfacesInUsage ?? throw new ArgumentNullException(nameof(connectorInterfacesInUsage));
                 return true;
             }
             catch (ArgumentNullException ex)
