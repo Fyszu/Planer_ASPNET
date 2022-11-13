@@ -10,30 +10,25 @@ namespace ASP_MVC_NoAuthentication.Controllers
     //GeoController - provider of responses from google api (parsing coordinates and addresses)
     [ApiController]
     [Route("[controller]")]
+    [RestrictDomain("localhost")]
     public class GeoController : Controller
     {
         private readonly IGeoService _service;
-        private readonly IConfiguration _configuration;
         public GeoController(IGeoService service)
         {
             _service = service;
         }
-        public ActionResult Index()
+
+        [HttpGet("GetAddress")]
+        public async Task<string> GetAddress([FromQuery] string longitude, [FromQuery] string latitude)
         {
-            return null;
+            return await _service.GetAddress(longitude, latitude);
         }
 
-
-        [HttpGet("getAddress")]
-        public async Task<string> GetAddress([FromQuery] string key, [FromQuery] string longitude, [FromQuery] string latitude)
+        [HttpGet("GetCoordinates")]
+        public async Task<string> GetCoordinates([FromQuery] string address)
         {
-            return await _service.GetAddress(key, longitude, latitude);
-        }
-
-        [HttpGet("getCoordinates")]
-        public async Task<string> GetCoordinates([FromQuery] string key, [FromQuery] string address)
-        {
-            return await _service.GetCoordinates(key, address);
+            return await _service.GetCoordinates(address);
         }
 
     }

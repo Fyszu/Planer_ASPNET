@@ -23,9 +23,10 @@ namespace ASP_MVC_NoAuthentication.Pages
         public string JsonChargingStations { get; set; }
         public bool IsLoggedIn { get; set; }
         internal string? BaseUrl { get; set; }
-        internal string? GeoControllerLocation { get; set; }
-        internal string? GeoKey { get; set; }
-        internal string? Key { get; set; }
+        internal string? GeoControllerCoordinatesLocation { get; private set; }
+        internal string? GeoControllerAddressLocation { get; private set; }
+        internal string? GoogleMapApiKey { get; private set; }
+
 
         public HomeModel(ILogger<HomeModel> logger, SignInManager<User> signInManager, ICarService carService, IUserService userService, IChargingStationService chargingStationsService, IConfiguration configuration)
         {
@@ -128,9 +129,9 @@ namespace ASP_MVC_NoAuthentication.Pages
         private void SetKeys()
         {
             BaseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}";
-            GeoControllerLocation = _config.GetValue<string>("GeoControllerLocation");
-            GeoKey = _config.GetValue<string>("MyApiKey");
-            Key = _config.GetValue<string>("AuthKey");
+            GeoControllerCoordinatesLocation = _config.GetValue<string>("GeoControllerCoordinatesLocation");
+            GeoControllerAddressLocation = _config.GetValue<string>("GeoControllerAddressLocation");
+            GoogleMapApiKey = _config.GetValue<string>("GoogleMapApiKey");
         }
     }
 }

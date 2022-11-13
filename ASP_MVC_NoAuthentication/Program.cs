@@ -5,9 +5,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.Certificate;
 using System.Text.Json.Serialization;
 using ASP_MVC_NoAuthentication.Repositories;
+using AspNetCoreRateLimit;
 
 var builder = WebApplication.CreateBuilder(args);
-
 
 // Add services to the container.
 builder.Services.AddDbContext<MyDbContext>(options => options.UseMySQL(builder.Configuration.GetConnectionString("Default")));
@@ -43,7 +43,7 @@ builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 builder.Logging.SetMinimumLevel(LogLevel.Trace);
 
-// Services and repositories
+// Services
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddScoped<IGeoService, GeoService>();
 builder.Services.AddScoped<IChargingStationService, ChargingStationService>();
@@ -52,14 +52,91 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IConnectorInterfaceService, ConnectorInterfaceService>();
 builder.Services.AddScoped<ICarService, CarService>();
 builder.Services.AddScoped<IWeatherAPIService, WeatherAPIService>();
+
+// Repositories
 builder.Services.AddScoped<ICarRepository, CarRepository>();
 builder.Services.AddScoped<IConnectorInterfaceRepository, ConnectorInterfaceRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IChargingStationsRepository, ChargingStationsRepository>();
-builder.Services.AddControllers()
-    .AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+
+// Ingore cycles - ingore reference looping while JSON serializing
+builder.Services.AddControllers().AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+
+// Throttle rate limit - services
+builder.Services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
+builder.Services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
+builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+builder.Services.AddSingleton<IProcessingStrategy, AsyncKeyLockProcessingStrategy>();
+builder.Services.AddInMemoryRateLimiting();
+
+// Throttle rate limit - configuration for controllers
+builder.Services.Configure<IpRateLimitOptions>(options =>
+{
+    options.EnableEndpointRateLimiting = true;
+    options.StackBlockedRequests = false;
+    options.HttpStatusCode = 429;
+    options.RealIpHeader = "X-Real-IP";
+    options.ClientIdHeader = "X-ClientId";
+    options.GeneralRules = new List<RateLimitRule>
+        {
+            // GeoController -> GetCoordinates
+            new RateLimitRule
+            {
+                Endpoint = "GET:/geo/getCoordinates",
+                Period = "15s",
+                Limit = 6,
+            },
+            new RateLimitRule
+            {
+                Endpoint = "GET:/geo/getCoordinates",
+                Period = "1h",
+                Limit = 200,
+            },
+
+            // GeoController -> GetAddress
+            new RateLimitRule
+            {
+                Endpoint = "*:/geo/getAddress",
+                Period = "15s",
+                Limit = 3,
+            },
+            new RateLimitRule
+            {
+                Endpoint = "*:/geo/getAddress",
+                Period = "1h",
+                Limit = 100,
+            },
+
+            // DistanceController -> GetRealDistance
+            new RateLimitRule
+            {
+                Endpoint = "*:/distance/GetRealDistance",
+                Period = "15s",
+                Limit = 3,
+            },
+            new RateLimitRule
+            {
+                Endpoint = "*:/distance/GetRealDistance",
+                Period = "1h",
+                Limit = 100,
+            },
+
+            // CarController -> *
+            new RateLimitRule
+            {
+                Endpoint = "*:/car/*",
+                Period = "10s",
+                Limit = 10,
+            },
+        };
+});
+
 builder.Services.AddRazorPages();
+
 var app = builder.Build();
+
+// Throttle rate limit - turn on in application
+app.UseIpRateLimiting();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

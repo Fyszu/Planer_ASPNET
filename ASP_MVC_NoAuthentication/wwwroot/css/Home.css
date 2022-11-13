@@ -128,7 +128,6 @@ p {
     }
 
 .stopsForm {
-    position: fixed;
     background: white;
     border: 0.3em solid #0111a2;
     border-radius: 3em;
@@ -216,10 +215,11 @@ p {
     }
 
     .stopsForm {
+        position: fixed;
         height: 60vh;
         width: 25vw;
         top: 30vh;
-        left:2.5vw;
+        left: 2.5vw;
         padding: 1em;
         display: none;
     }
@@ -290,6 +290,29 @@ p {
         font-family: 'Avenir Next LT Pro';
         color: #0111a2;
         margin: 0.3em, 0.3em, 0.3em, 0.3em;
+    }
+
+    .stopsForm {
+        position: static;
+        height: 25vh;
+        width: 90%;
+        margin-top: 5vh;
+        margin-left: 5%;
+        padding: 1em;
+        display: none;
+    }
+
+    .stop-element {
+        font-size: 4vw;
+        width: 66%;
+        float: left;
+        padding: 0.25em;
+        margin-right: 5%;
+    }
+
+    .stop-remove-btn {
+        width: 19%;
+        float: left;
     }
 }
 /* Mobile resolution END */

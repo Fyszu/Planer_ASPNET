@@ -8,6 +8,7 @@ namespace ASP_MVC_NoAuthentication.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [RestrictDomain("localhost")]
     [Authorize]
     public class CarController : Controller
     {
@@ -20,12 +21,6 @@ namespace ASP_MVC_NoAuthentication.Controllers
             _userManager = userManager;
             _carService = carService;
             _userService = userService;
-        }
-
-
-         public IActionResult Index()
-        {
-            return null;
         }
 
         [HttpGet("RemoveUserCar")]

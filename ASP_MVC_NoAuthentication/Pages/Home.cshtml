@@ -78,9 +78,6 @@
         </div>
     </form>
 
-    <!-- Map -->
-    <div class="map" id="map"></div>
-
     <!-- Stops on the route form -->
     <div class="stopsForm" id="stopsForm">
         <h2>Twoja trasa</h2>
@@ -100,8 +97,15 @@
         </div>
     </div>
 
+    <!-- Map -->
+    <div class="map" id="map"></div>
 
-    <!---- End of HTML ---->
+    <!------------------- End of HTML ------------------->
+
+
+
+
+
     <!--- JS Libraries --->
     <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
@@ -109,7 +113,7 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
     
-    <!----------- JavaScript functions ----------->
+    <!--------------- JavaScript functions --------------->
     <script type="text/javascript">
         
         var map; //Google map object
@@ -402,7 +406,7 @@
 
             var warning = "";
             if (!stationHasCorrectConnector)
-                warning = "<br><b style='color:red'>UWAGA: Twój samochód nie ma komptatybilnego gniazda ładowania.</b>";
+                warning = "<br><br><b style='color:red'>UWAGA: Twój samochód nie ma komptatybilnego gniazda ładowania.</b>";
 
             var paymentMethodsContent = "";
             var authenticationMethodsContent = "";
@@ -415,11 +419,15 @@
                 accessibilityContent = "<br><b>Wskazówki dojazdu: </b><br>" + station.accessibility;
 
             var markerContent = "<div class='infoWindowContent'><b>Stacja: " + station.name + "</b>"
+                + "<br>"
                 + addressContent
                 + providerContent
+                + "<br>"
                 + openingHoursContent
+                + "<br>"
                 + chargingPointsContent
                 + warning
+                + "<br>"
                 + paymentMethodsContent
                 + authenticationMethodsContent
                 + accessibilityContent
@@ -473,7 +481,7 @@
         //Converting address to coordinates, using GeoController (getCoordinates), ultimately using google api
         async function fetchAddress(address) {
             try {
-                const response = await fetch("@Model.BaseUrl" + "/" + "@Model.GeoControllerLocation" + "?key=" + "@Model.GeoKey" + "&address=" + address);
+                const response = await fetch("@Model.BaseUrl" + "/" + "@Model.GeoControllerCoordinatesLocation" + "?address=" + address);
                 const geoArray = await response.json();
                 if (geoArray["Status"] == "OK")
                     return new google.maps.LatLng(parseFloat(geoArray["Coordinates"]["Lat"]), parseFloat(geoArray["Coordinates"]["Lng"]));
@@ -517,7 +525,7 @@
 
         //User's location parsing coordinates -> address and set it to origin field
         function useLocation(position) {
-            url = "@Model.BaseUrl" + "/" + "geo/getAddress?key=" + "@Model.GeoKey" + "&longitude=" + position.coords.longitude + "&latitude=" + position.coords.latitude;
+            url = "@Model.BaseUrl" + "/" + "@Model.GeoControllerAddressLocation" + "?longitude=" + position.coords.longitude + "&latitude=" + position.coords.latitude;
             fetch(url)
                 .then(res => res.json())
                 .then(data => {
@@ -619,6 +627,6 @@
     </script>
 
     <!-- Google map initialization using personal api key and creating map -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=@(Model.Key + "&callback=initMap&libraries=places")" async defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=@(Model.GoogleMapApiKey + "&callback=initMap&libraries=places")" async defer></script>
 
 </body>
