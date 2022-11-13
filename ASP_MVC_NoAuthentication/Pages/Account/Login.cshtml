@@ -1,13 +1,14 @@
-﻿@page
-@model ASP_MVC_NoAuthentication.Views.Home.LoginModel
+﻿@page "/Login"
+@model ASP_MVC_NoAuthentication.Pages.Account.LoginModel
 @{
+    ViewData["Title"] = "Panel logowania";
+    Layout = "_Layout";
 }
 
 <!DOCTYPE html>
 <html lang="en" >
 <head>
   <meta charset="UTF-8">
-  <title>Modern Flat Design Login Form Example</title>
   <link rel="stylesheet" href="~/css/LoginPage.css">
 
 </head>

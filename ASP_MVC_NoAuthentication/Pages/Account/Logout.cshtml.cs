@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace ASP_MVC_NoAuthentication.Areas.Identity.Pages.Account
+namespace ASP_MVC_NoAuthentication.Pages.Account
 {
     public class LogoutModel : PageModel
     {

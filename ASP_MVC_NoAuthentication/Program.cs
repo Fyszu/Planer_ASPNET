@@ -32,9 +32,9 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.Name = "Planer.AuthCookieAspNetCore";
 
     // Redirection settings
-    options.LoginPath = "/Identity/Account/Login";
-    options.LogoutPath = "/Identity/Account/Logout";
-    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+    options.LoginPath = "/Login";
+    options.LogoutPath = "/Logout";
+    options.AccessDeniedPath = "/AccessDenied";
     options.SlidingExpiration = true;
 });
 

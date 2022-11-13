@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
 
-namespace ASP_MVC_NoAuthentication.Views.Home
+namespace ASP_MVC_NoAuthentication.Pages.Account
 {
     public static class ModelStateExtensions
     {
