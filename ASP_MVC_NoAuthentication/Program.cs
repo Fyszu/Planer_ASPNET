@@ -12,17 +12,29 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddDbContext<MyDbContext>(options => options.UseMySQL(builder.Configuration.GetConnectionString("Default")));
 builder.Services.AddAuthentication(CertificateAuthenticationDefaults.AuthenticationScheme).AddCertificate();
+
+// Identity library accounts
 builder.Services.AddIdentity<User, IdentityRole>(
     options => {
+        // Register requirements
         options.SignIn.RequireConfirmedAccount = false;
+        options.User.RequireUniqueEmail = true;
+
+        // Password requirements
         options.Password.RequireDigit = false;
         options.Password.RequireLowercase = false;
         options.Password.RequireNonAlphanumeric = false;
-        options.Password.RequireUppercase = false;
-        options.Password.RequiredLength = 6;
-        options.Password.RequiredUniqueChars = 0;
+        options.Password.RequireUppercase = true;
+        options.Password.RequiredLength = 8;
+        options.Password.RequiredUniqueChars = 1;
+
+        // Login attempts - lock after too many wrong attempts
+        options.Lockout.AllowedForNewUsers = true;
+        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(65);
+        options.Lockout.MaxFailedAccessAttempts = 4;
         }
     ).AddEntityFrameworkStores<MyDbContext>();
+
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Cookie.HttpOnly = true;

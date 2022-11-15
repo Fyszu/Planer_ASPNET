@@ -4,15 +4,27 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Win32;
+using Newtonsoft.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 
 namespace ASP_MVC_NoAuthentication.Pages.Account
 {
     public static class ModelStateExtensions
     {
-        public static ModelStateDictionary MarkAllFieldsAsSkipped(this ModelStateDictionary modelState)
+        public static ModelStateDictionary MarkLoginFormAsSkipped(this ModelStateDictionary modelState)
         {
-            foreach (var state in modelState.Select(x => x.Value))
+            foreach (var state in modelState.Where(state => state.Key.Contains("Login")).Select(state => state.Value))
+            {
+                state.Errors.Clear();
+                state.ValidationState = ModelValidationState.Skipped;
+            }
+            return modelState;
+        }
+
+        public static ModelStateDictionary MarkRegisterFormAsSkipped(this ModelStateDictionary modelState)
+        {
+            foreach (var state in modelState.Where(state => state.Key.Contains("Register")).Select(state => state.Value))
             {
                 state.Errors.Clear();
                 state.ValidationState = ModelValidationState.Skipped;
@@ -40,36 +52,41 @@ namespace ASP_MVC_NoAuthentication.Pages.Account
         [BindProperty]
         public InputLoginModel InputLogin { get; set; }
 
+        [BindProperty(SupportsGet = true)]
+        public string Handler { get; set; }
         public string ReturnUrl { get; set; }
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
+        public bool IsReturnFromRegisterPost { get { return Handler != null && Handler.Equals("Register"); } }
 
         public class InputRegisterModel
         {
-            [Required]
-            [EmailAddress]
+            [Required(ErrorMessage = "To pole jest wymagane.<br>")]
+            [EmailAddress(ErrorMessage = "Podano nieprawid³owy adres e-mail.<br>")]
             [Display(Name = "E-mail")]
             public string EmailRegister { get; set; }
 
-            [Required]
-            [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+            [Required(ErrorMessage = "To pole jest wymagane.<br>")]
+            [StringLength(20, ErrorMessage = "{0} musi posiadaæ od {2} do {1} znaków.<br>", MinimumLength = 8)]
+            [RegularExpression(@"(?=.*[^A-Za-z0-9])(?=.*[A-Z]).*$", ErrorMessage = "Has³o musi posiadaæ przynajmniej jeden znak specjalny i jedn¹ wielk¹ literê.<br>")]
             [DataType(DataType.Password)]
             [Display(Name = "Has³o")]
             public string PasswordRegister { get; set; }
 
+            [Required(ErrorMessage = "To pole jest wymagane.<br>")]
             [DataType(DataType.Password)]
             [Display(Name = "Powtórz has³o")]
-            [Compare("PasswordRegister", ErrorMessage = "The password and confirmation password do not match.")]
+            [Compare("PasswordRegister", ErrorMessage = "Has³a nie s¹ takie same.<br>")]
             public string ConfirmPasswordRegister { get; set; }
         }
 
         public class InputLoginModel
         {
-            [Required]
-            [EmailAddress]
+            [Required(ErrorMessage = "To pole jest wymagane.<br>")]
+            [EmailAddress(ErrorMessage = "Podano nieprawid³owy adres e-mail.<br>")]
             [Display(Name = "E-mail")]
             public string EmailLogin { get; set; }
 
-            [Required]
+            [Required(ErrorMessage = "To pole jest wymagane.<br>")]
             [DataType(DataType.Password)]
             [Display(Name = "Has³o")]
             public string PasswordLogin { get; set; }
@@ -86,7 +103,7 @@ namespace ASP_MVC_NoAuthentication.Pages.Account
         public async Task<IActionResult> OnPostRegisterAsync(string? returnUrl = null)
         {
             returnUrl = returnUrl ?? Url.Content("~/");
-            ModelState.MarkAllFieldsAsSkipped();
+            ModelState.MarkLoginFormAsSkipped();
             if (TryValidateModel(InputRegister, nameof(InputRegister)))
             {
                 var user = new User { UserName = InputRegister.EmailRegister, Email = InputRegister.EmailRegister, ShowOnlyMyCars = false };
@@ -98,7 +115,16 @@ namespace ASP_MVC_NoAuthentication.Pages.Account
                 }
                 foreach (var error in result.Errors)
                 {
-                    ModelState.AddModelError(string.Empty, error.Description);
+                    if (error.Description.Contains("is already taken") && (error.Description.Contains("Username") || error.Description.Contains("Email")))
+                    {
+                        ModelState.AddModelError("Register", "Istnieje ju¿ konto o podanym adresie email.");
+                        break;
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("Register", error.Description);
+                        break;
+                    }
                 }
             }
 
@@ -110,19 +136,28 @@ namespace ASP_MVC_NoAuthentication.Pages.Account
         {
             returnUrl ??= Url.Content("~/");
 
-            ModelState.MarkAllFieldsAsSkipped();
+            ModelState.MarkRegisterFormAsSkipped();
             if (TryValidateModel(InputLogin, nameof(InputLogin)))
             {
-                // This doesn't count login failures towards account lockout
-                // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                var result = await _signInManager.PasswordSignInAsync(InputLogin.EmailLogin, InputLogin.PasswordLogin, InputLogin.RememberMe, lockoutOnFailure: false);
+                var result = await _signInManager.PasswordSignInAsync(InputLogin.EmailLogin, InputLogin.PasswordLogin, InputLogin.RememberMe, lockoutOnFailure: true);
                 if (result.Succeeded)
                 {
                     return LocalRedirect(returnUrl);
                 }
+                else if (result.IsLockedOut) // Locked - max. retry attempts and timespan configured in Program.cs
+                {
+                    ModelState.AddModelError("Login", "Twoje konto zosta³o chwilowo zablokowane, spróbuj ponownie za 5 minut.");
+                    return Page();
+                }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    var user = await _userManager.FindByNameAsync(InputLogin.EmailLogin);
+                    if (user != null && user.AccessFailedCount == 3)
+                    {
+                        ModelState.AddModelError("Login", "Pozosta³a jedna próba zalogowania siê. Po nieudanej próbie konto zostanie zablokowane na 5 minut.");
+                        return Page();
+                    }
+                    ModelState.AddModelError("Login", "B³êdny login lub has³o.");
                     return Page();
                 }
             }
