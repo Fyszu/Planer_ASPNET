@@ -8,34 +8,56 @@ namespace ASP_MVC_NoAuthentication.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    [RestrictDomain("localhost")]
     [Authorize]
     public class CarController : Controller
     {
-        private readonly UserManager<User> _userManager;
         private readonly ICarService _carService;
         private readonly IUserService _userService;
+        private readonly ILogger<CarController> _logger;
 
-        public CarController(UserManager<User> userManager, ICarService carService, IUserService userService)
+        public CarController(ILogger<CarController> logger, UserManager<User> userManager, ICarService carService, IUserService userService)
         {
-            _userManager = userManager;
             _carService = carService;
             _userService = userService;
+            _logger = logger;
         }
 
         [HttpGet("RemoveUserCar")]
         public async Task<IActionResult> RemoveUserCar([FromQuery] int carId)
         {
-            if (await _carService.CheckIfCarBelongsToUser(await _userService.GetUserByName(User.Identity.Name), await _carService.GetCarById(carId)))
-                await _carService.RemoveCarByUser(User.Identity.Name, carId);
-            return Redirect(Url.Content("~/UserPanel"));
+            if (User.Identity == null || User.Identity.Name == null || !User.Identity.IsAuthenticated)
+            {
+                _logger.LogError($"Próba usunięcia samochodu o ID: {carId} przez niezalogowanego użytkownika.");
+                return Unauthorized("Użytkownik nie jest zalogowany.");
+            }
+            else
+            {
+                if (await _carService.CheckIfCarBelongsToUser(await _userService.GetUserByName(User.Identity.Name), await _carService.GetCarById(carId)))
+                {
+                    await _carService.RemoveCarByUser(User.Identity.Name, carId);
+                    return Redirect(Url.Content("~/UserPanel"));
+                }
+                else
+                {
+                    _logger.LogWarning($"Próba usunięcia samochodu o ID: {carId} przez użytkownika {User.Identity.Name}.");
+                    return Unauthorized("Samochód nie jest przypisany do Twojego konta.");
+                }
+            }
         }
 
         [HttpGet("AddUserCar")]
         public async Task<IActionResult> AddUserCar(Car car)
         {
-            await _carService.AddNewCar(car);
-            return Redirect(Url.Content("~/UserPanel"));
+            if (User.Identity == null || !User.Identity.IsAuthenticated)
+            {
+                _logger.LogError("Próba dodania samochodu przez niezalogowanego użytkownika.");
+                return Unauthorized();
+            }
+            else
+            {
+                await _carService.AddNewCar(car);
+                return Redirect(Url.Content("~/UserPanel"));
+            }
         }
     }
 }

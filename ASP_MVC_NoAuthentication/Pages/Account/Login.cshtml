@@ -16,7 +16,7 @@
 <!-- partial:index.partial.html -->
     <div class="login-page">
       <div class="form vertical-center">
-        <form class="register-form" asp-route-returnUrl="@Model.ReturnUrl" method="post" asp-page-handler="Register">
+        <form class="register-form" method="post" asp-page-handler="Register">
           <div class="form-group">
                     <span asp-validation-for="InputRegister.EmailRegister" class="text-danger"></span>
                     <label asp-for="InputRegister.EmailRegister"></label>
@@ -54,7 +54,7 @@
                 </div>
           <p class="message">Posiadasz już konto? <a href="#">Zaloguj</a></p>
         </form>
-        <form class="login-form" asp-route-returnUrl="@Model.ReturnUrl" method="post" asp-page-handler="Login">
+        <form class="login-form" method="post" asp-page-handler="Login">
             <div class="form-group">
                 <span asp-validation-for="InputLogin.EmailLogin" class="text-danger"></span>
                 <label asp-for="InputLogin.EmailLogin"></label>

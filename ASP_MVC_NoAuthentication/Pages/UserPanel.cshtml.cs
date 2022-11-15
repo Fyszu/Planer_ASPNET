@@ -46,7 +46,7 @@ namespace ASP_MVC_NoAuthentication.Pages
                 }
                 else
                 {
-                    _logger.LogCritical("U¿ytkownik nie posiada nazwy u¿ytkownika. " + User.Identity);
+                    _logger.LogCritical("Nazwa u¿ytkownika jest pusta. " + User.Identity);
                     throw new Exception("Wyst¹pi³ b³¹d dotycz¹cy konta u¿ytkownika.");
                 }
             }
@@ -54,17 +54,6 @@ namespace ASP_MVC_NoAuthentication.Pages
                 Redirect(Url.Content("~/Login"));
         }
 
-        [HttpGet("success")]
-        public void OnGetSucces()
-        {
-            testMessage = "sukces";
-        }
-
-        [HttpGet("error")]
-        public void OnGetError()
-        {
-            testMessage = "error";
-        }
         public async Task<IActionResult> OnPostSaveSettingsAsync(string? returnUrl = null)
         {
             if (User.Identity != null && User.Identity.IsAuthenticated)

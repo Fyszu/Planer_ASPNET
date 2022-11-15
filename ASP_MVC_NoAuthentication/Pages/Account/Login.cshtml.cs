@@ -54,7 +54,6 @@ namespace ASP_MVC_NoAuthentication.Pages.Account
 
         [BindProperty(SupportsGet = true)]
         public string Handler { get; set; }
-        public string ReturnUrl { get; set; }
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
         public bool IsReturnFromRegisterPost { get { return Handler != null && Handler.Equals("Register"); } }
 
@@ -95,14 +94,15 @@ namespace ASP_MVC_NoAuthentication.Pages.Account
             public bool RememberMe { get; set; }
         }
 
-        public async Task OnGetAsync(string returnUrl = null)
+        public async Task OnGetAsync()
         {
-            ReturnUrl = returnUrl;
+            
         }
 
-        public async Task<IActionResult> OnPostRegisterAsync(string? returnUrl = null)
+        public async Task<IActionResult> OnPostRegisterAsync()
         {
-            returnUrl = returnUrl ?? Url.Content("~/");
+            var returnUrl = Url.Content("~/UserPanel");
+
             ModelState.MarkLoginFormAsSkipped();
             if (TryValidateModel(InputRegister, nameof(InputRegister)))
             {
@@ -132,9 +132,9 @@ namespace ASP_MVC_NoAuthentication.Pages.Account
             return Page();
         }
 
-        public async Task<IActionResult> OnPostLoginAsync(string? returnUrl = null)
+        public async Task<IActionResult> OnPostLoginAsync()
         {
-            returnUrl ??= Url.Content("~/");
+            var returnUrl = Url.Content("~/");
 
             ModelState.MarkRegisterFormAsSkipped();
             if (TryValidateModel(InputLogin, nameof(InputLogin)))

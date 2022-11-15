@@ -6,6 +6,7 @@
     var removeUrl = Url.Content("~/") + "Car/RemoveUserCar?carid=";
     var editUrl = Url.Content("~/") + "EditCar?carid=";
     var addUrl = Url.Content("~/") + "AddNewCar";
+    var removeAccountUrl = Url.Content("~/") + "User/DeleteUser?userId=" + Model.currentUser.Id;
 }
 
 <!DOCTYPE html>
@@ -107,6 +108,8 @@
                  }
                  <hr class="rounded">
                  <button type = "submit" class="myButton button-safe settings-button" style="margin-bottom:8vh">Zapisz</button>
+                 <hr class="rounded">
+                 <input type="button" class="myButton button-remove" onclick="if(window.confirm('Jesteś pewien że chcesz usunąć konto? Ta operacja jest nieodwracalna a wszystkie dane zostaną usunięte.')) { RemoveAccount(); }" value="Usuń konto" />
              </form>
          </div>
 
@@ -118,6 +121,20 @@
             $(function () {
               $('[data-toggle="tooltip"]').tooltip()
             })
+
+            function RemoveAccount() {
+                let email = prompt("Aby potwierdzić usunięcie konta użytkownika, przepisz swój adres email do pola poniżej (Twój adres email: @Model.currentUser.Email)");
+                if (email === null) {
+                    return;
+                }
+                else if (email === "@Model.currentUser.Email") {
+                    window.location.href = "@removeAccountUrl";
+                }
+                else {
+                    alert("Adres email nie zgadza się!");
+                    RemoveAccount();
+                }
+            }
         </script>
     </body>
 </html>

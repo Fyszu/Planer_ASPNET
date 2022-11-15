@@ -1,10 +1,12 @@
 using ASP_MVC_NoAuthentication.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace ASP_MVC_NoAuthentication.Pages.Account
 {
+    [Authorize]
     public class LogoutModel : PageModel
     {
         private readonly SignInManager<User> _signInManager;
