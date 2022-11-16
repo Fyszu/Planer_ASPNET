@@ -13,12 +13,24 @@ namespace ASP_MVC_NoAuthentication.Services
         }
 
         // Get real maximum distance in meters
-        public int GetRealMaximumDistance(int batteryLevel, int maximumDistance, DataHelper.DrivingStyle drivingStyle, float temperature) 
+        public string GetRealMaximumDistance(int batteryLevel, int maximumDistance, DataHelper.DrivingStyle drivingStyle, float temperature) 
         {
             float realDistance = ((float)batteryLevel / 100f) * (maximumDistance * 1000); // *1000: conversion to meters, /100: conversion to precentage
             realDistance = CalculateDistanceByTemperature(realDistance, temperature);
             realDistance = CalculateDistanceByDrivingStyle(realDistance, drivingStyle);
-            return (int)Math.Round(realDistance);
+
+            try
+            {
+                var result = ((int)Math.Round(realDistance)).ToString();
+                InternalApiResponse internalApiResponse = new(InternalApiResponse.StatusCode.OK, result);
+                return internalApiResponse.GetInternalResponseJson();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Problem podczas przetwarzania wyniku obliczeń dystansu samochodu. " +
+                    $"Poziom baterii: {batteryLevel}, maksymalny dystans: {maximumDistance}, styl jazdy: {drivingStyle}, temperatura: {temperature}");
+                return new InternalApiResponse(InternalApiResponse.StatusCode.DistanceControllerOtherError, null).GetInternalResponseJson();
+            }
         }
 
         private float CalculateDistanceByTemperature(float distance, float temperature)

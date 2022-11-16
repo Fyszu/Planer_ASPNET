@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.Certificate;
 using System.Text.Json.Serialization;
 using ASP_MVC_NoAuthentication.Repositories;
 using AspNetCoreRateLimit;
+using ASP_MVC_NoAuthentication.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -94,13 +95,13 @@ builder.Services.Configure<IpRateLimitOptions>(options =>
             // GeoController -> GetCoordinates
             new RateLimitRule
             {
-                Endpoint = "GET:/geo/getCoordinates",
+                Endpoint = "GET:/geo/GetCoordinates",
                 Period = "15s",
                 Limit = 6,
             },
             new RateLimitRule
             {
-                Endpoint = "GET:/geo/getCoordinates",
+                Endpoint = "GET:/geo/GetCoordinates",
                 Period = "1h",
                 Limit = 200,
             },
@@ -108,13 +109,13 @@ builder.Services.Configure<IpRateLimitOptions>(options =>
             // GeoController -> GetAddress
             new RateLimitRule
             {
-                Endpoint = "*:/geo/getAddress",
+                Endpoint = "*:/geo/GetAddress",
                 Period = "15s",
                 Limit = 3,
             },
             new RateLimitRule
             {
-                Endpoint = "*:/geo/getAddress",
+                Endpoint = "*:/geo/GetAddress",
                 Period = "1h",
                 Limit = 100,
             },
@@ -148,7 +149,7 @@ builder.Services.AddRazorPages();
 var app = builder.Build();
 
 // Throttle rate limit - turn on in application
-app.UseIpRateLimiting();
+app.UseMiddleware<InternalIPRateLimitMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

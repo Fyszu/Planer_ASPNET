@@ -16,9 +16,10 @@ namespace ASP_MVC_NoAuthentication.Pages
         private readonly UserManager<User> _userManager;
         private readonly IUserService _userService;
         private readonly ICarService _carService;
-        public List<Car> cars = null;
-        public User currentUser;
-        public string testMessage;
+        private List<Car> cars;
+        private User currentUser;
+        public User CurrentUser { get { return currentUser; } }
+        public List<Car> Cars { get { return cars; } }
         public string ReturnUrl { get; set; }
         public UserPanelModel(ILogger<UserPanelModel> logger, IUserService userService, UserManager<User> userManager, SignInManager<User> signInManager, ICarService carService)
         {
@@ -40,9 +41,21 @@ namespace ASP_MVC_NoAuthentication.Pages
             {
                 if (!string.IsNullOrEmpty(User.Identity.Name))
                 {
-                    cars = await _carService.GetCarsByUser(User.Identity.Name);
                     currentUser = await _userService.GetUserByName(User.Identity.Name);
-                    testMessage = "brak";
+                    if (currentUser != null)
+                    {
+                        cars = currentUser.Cars.ToList();
+                        if (cars == null)
+                        {
+                            throw new Exception("Wyst¹pi³ b³¹d dotycz¹cy konta u¿ytkownika.");
+                        }
+                    }
+                    else
+                    {
+                        _logger.LogCritical($"Nie znaleziono u¿ytkownika {User.Identity.Name} w bazie danych.");
+                        await _signInManager.SignOutAsync();
+                        throw new Exception("Wyst¹pi³ b³¹d dotycz¹cy konta u¿ytkownika.");
+                    }
                 }
                 else
                 {

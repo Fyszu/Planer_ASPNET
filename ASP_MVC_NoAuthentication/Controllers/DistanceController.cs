@@ -8,7 +8,7 @@ namespace ASP_MVC_NoAuthentication.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    [RestrictDomain("localhost")]
+    [RestrictDomain("localhost", "planertras.com")]
     public class DistanceController : Controller
     {
 
@@ -26,9 +26,8 @@ namespace ASP_MVC_NoAuthentication.Controllers
         }
 
         [HttpGet("GetRealDistance")]
-        public async Task<int> GetRealDistance([FromQuery] int maximumDistance, int batteryLevel, float origLat, float origLng, float destLat, float destLng, int estimatedTravelTime, int drivingStyle)
+        public async Task<string> GetRealDistance([FromQuery] int maximumDistance, int batteryLevel, float origLat, float origLng, float destLat, float destLng, int estimatedTravelTime, int drivingStyle)
         {
-            
             estimatedTravelTime = estimatedTravelTime / 3600; // seconds -> hours
             estimatedTravelTime = estimatedTravelTime == 0 ? 1 : estimatedTravelTime;
             estimatedTravelTime = estimatedTravelTime > 24 ? 24 : estimatedTravelTime;
@@ -40,7 +39,8 @@ namespace ASP_MVC_NoAuthentication.Controllers
             }
             else
             {
-                return -1;
+                InternalApiResponse internalApiResponse = new(InternalApiResponse.StatusCode.DistanceControllerWeatherAPIError, null);
+                return internalApiResponse.GetInternalResponseJson();
             }
         }
     }

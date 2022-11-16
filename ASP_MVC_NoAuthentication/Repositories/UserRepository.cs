@@ -49,7 +49,7 @@ namespace ASP_MVC_NoAuthentication.Repositories
 
         public async Task<User> GetByName(string name)
         {
-            return await _context.Users.Where(u => u.UserName == name).SingleOrDefaultAsync();
+            return await _context.Users.Include(user => user.Cars).ThenInclude(car => car.ConnectorInterfaces).Where(u => u.UserName == name).SingleOrDefaultAsync();
         }
     }
 }

@@ -17,26 +17,15 @@ namespace ASP_MVC_NoAuthentication.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
         }
-        public async Task<IActionResult> OnGet(string? returnUrl = null)
+        public async Task<IActionResult> OnGet()
         {
-            returnUrl = returnUrl ?? Url.Content("~/");
+            var returnUrl = Url.Content("~/");
             if (User.Identity.IsAuthenticated)
             {
                 await _signInManager.SignOutAsync();
-                _logger.LogInformation("User logged out.");
-                if (returnUrl != null)
-                {
-                    return LocalRedirect(returnUrl);
-                }
-                else
-                {
-                    return RedirectToPage();
-                }
+                _logger.LogInformation($"User logged {User.Identity.Name} out.");
             }
-            else
-            {
-                return LocalRedirect(returnUrl);
-            }
+            return LocalRedirect(returnUrl);
         }
 
 

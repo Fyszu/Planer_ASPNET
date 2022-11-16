@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using ASP_MVC_NoAuthentication.Data;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
 public class RestrictDomainAttribute : Attribute, IAuthorizationFilter
@@ -12,7 +13,11 @@ public class RestrictDomainAttribute : Attribute, IAuthorizationFilter
         if (!AllowedHosts.Contains(host, StringComparer.OrdinalIgnoreCase))
         {
             //  Request came from an authorized host, return bad request
-            context.Result = new BadRequestObjectResult("Host is not allowed");
+
+            InternalApiResponse internalApiResponse = new(InternalApiResponse.StatusCode.HostNotAllowed, null);
+            internalApiResponse.ErrorMessage = "Host nie jest dopuszczony do tych zasobów.";
+
+            context.Result = new BadRequestObjectResult(internalApiResponse.GetInternalResponseJson());
         }
     }
 }

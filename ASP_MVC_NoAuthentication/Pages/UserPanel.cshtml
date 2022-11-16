@@ -6,7 +6,7 @@
     var removeUrl = Url.Content("~/") + "Car/RemoveUserCar?carid=";
     var editUrl = Url.Content("~/") + "EditCar?carid=";
     var addUrl = Url.Content("~/") + "AddNewCar";
-    var removeAccountUrl = Url.Content("~/") + "User/DeleteUser?userId=" + Model.currentUser.Id;
+    var removeAccountUrl = Url.Content("~/") + "User/DeleteUser?userId=" + Model.CurrentUser.Id;
 }
 
 <!DOCTYPE html>
@@ -21,7 +21,7 @@
         <h1>
             Panel użytkownika
         </h1>
-        <br>
+        <hr class="rounded">
         <h2>
             Twoje samochody:
         </h2>
@@ -30,32 +30,34 @@
                 <thead>
                     <tr>
                         <th>
-                            Marka
+                            @if(Model.Cars.Count > 0)
+                            {
+                               @:Marka 
+                            }
                         </th>
                         <th>
-                            Model
+                            @if(Model.Cars.Count > 0)
+                            {
+                               @:Model 
+                            }
                         </th>
                         <th>
-                            Zasięg maksymalny
+                            @if(Model.Cars.Count > 0)
+                            {
+                               @:Zasięg 
+                            }
                         </th>
                         <th>
-                            Gniazda ładowania
-                        </th>
-                        <th>
-
-                        </th>
-                        <th>
-
                         </th>
                     </tr>
                 </thead>
                 <tbody>
-                    @if(Model.cars != null && Model.cars.Count > 0)
+                    @if(Model.Cars != null && Model.Cars.Count > 0)
                     {
-                    @foreach (var (car, index) in Model.cars.Select((v, i) => (v, i)))
+                    @foreach (var (car, index) in Model.Cars.Select((v, i) => (v, i)))
                     {
                         <tr>
-                            <td>
+                            <td style="padding-bottom:0.7em;padding-top:0.7em">
                                 @Html.DisplayFor(modelItem => car.Brand)
                             </td>
                             <td>
@@ -64,23 +66,22 @@
                             <td>
                                 @Html.DisplayFor(modelItem => car.MaximumDistance) km
                             </td>
-                            <td>
-                                @car.CarConnectorInterfacesToString()
+                            <td class="buttonsTd">
+                                <input type="button" class="myButton editButton button-safe" onclick="location.href='@(editUrl + Model.Cars[index].Id)';" value="Edytuj" />
+                                <input type="button" class="myButton removeButton button-remove" onclick="if(window.confirm('Jesteś pewien że chcesz usunąć ten samochód?')) { location.href='@(removeUrl + Model.Cars[index].Id)'; }" value="Usuń" />
                             </td>
-                            <td>
-                                <input type="button" class="myButton button-safe" onclick="location.href='@(editUrl + Model.cars[index].Id)';" value="Edytuj" />
-                            </td>
-                            <td>
-                                <input type="button" class="myButton button-remove" onclick="if(window.confirm('Jesteś pewien że chcesz usunąć ten samochód?')) { location.href='@(removeUrl + Model.cars[index].Id)'; }" value="Usuń" />
+                        </tr>
+                        <tr>
+                            <td colspan="4" style="padding-bottom:0.7em;padding-top:0.7em">
+                                <b>Złącza: </b>@car.CarConnectorInterfacesToString()
                             </td>
                         </tr>
                     }
                 }
                 <tr>
-                        <td>
-                           <input type="button" class="myButton button-safe" onclick="location.href='@addUrl';" value="Dodaj" />
+                        <td colspan="4" style="text-align:center">
+                            <input type="button" class="myButton addButton button-safe" onclick="location.href='@addUrl';" value="Dodaj nowy samochód" />
                         </td>
-                        <td></td><td></td><td></td><td></td><td></td>
                     </tr>
                 </tbody>
             </table>
@@ -98,24 +99,24 @@
              <form asp-route-returnUrl="@Model.ReturnUrl" method="post" asp-page-handler="SaveSettings">
                  <h3>Pokazuj tylko moje samochody&nbsp;&nbsp;
                     <img src="@Url.Content("~/images/question_mark.png")" class="questionMark" data-toggle="tooltip" data-placement="bottom" title="Zaznacz, aby na liście samochodów na stronie głównej planowania trasy pojawiały się tylko Twoje samochody. Pozostaw puste, a oprócz Twoich samochodów zostaną wyświetlone domyślne."/></h3>
-                 @if (Model.currentUser.ShowOnlyMyCars)
+                 @if (Model.CurrentUser.ShowOnlyMyCars)
                  {
                     <input class="form-check-input" type="checkbox" id="showMyCarsCheckBox" name="showMyCarsCheckBox" checked>
                  }
-                 @if (!Model.currentUser.ShowOnlyMyCars)
+                 @if (!Model.CurrentUser.ShowOnlyMyCars)
                  {
                     <input class="form-check-input" type="checkbox" id="showMyCarsCheckBox" name="showMyCarsCheckBox">
                  }
                  <hr class="rounded">
                  <button type = "submit" class="myButton button-safe settings-button">Zapisz ustawienia</button>
                  <hr class="rounded">
-                 <input type="button" class="myButton button-remove settings-button" style="margin-bottom:8vh" onclick="if(window.confirm('Jesteś pewien że chcesz usunąć konto? Ta operacja jest nieodwracalna a wszystkie dane zostaną usunięte.')) { RemoveAccount(); }" value="Usuń konto" />
+                 <input type="button" class="myButton removeButton settings-button" style="margin-bottom:8vh" onclick="if(window.confirm('Jesteś pewien że chcesz usunąć konto? Ta operacja jest nieodwracalna a wszystkie dane zostaną usunięte.')) { RemoveAccount(); }" value="Usuń konto" />
              </form>
          </div>
 
         <!----- Libraries  ------>
         <script src="~/lib/jquery/dist/jquery.min.js"></script>
-        
+
         <!-- Tooltip appearance script -->
         <script>
             $(function () {
@@ -123,11 +124,11 @@
             })
 
             function RemoveAccount() {
-                let email = prompt("Aby potwierdzić usunięcie konta użytkownika, przepisz swój adres email do pola poniżej (Twój adres email: @Model.currentUser.Email)");
+                let email = prompt("Aby potwierdzić usunięcie konta użytkownika, przepisz swój adres email do pola poniżej (Twój adres email: @Model.CurrentUser.Email)");
                 if (email === null) {
                     return;
                 }
-                else if (email === "@Model.currentUser.Email") {
+                else if (email === "@Model.CurrentUser.Email") {
                     window.location.href = "@removeAccountUrl";
                 }
                 else {

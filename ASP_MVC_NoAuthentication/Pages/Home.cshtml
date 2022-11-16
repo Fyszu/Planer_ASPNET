@@ -18,10 +18,12 @@
 <head>
     <!-- My CSS -->
     <link rel="stylesheet" href="~/css/Home.css">
+
     <!--- Header font import --->
     <style>
         @@import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@1,900&display=swap');
     </style>
+
     <!-- JQuery -->
     <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
 </head>
@@ -109,7 +111,6 @@
     <!--- JS Libraries --->
     <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
     
@@ -307,7 +308,7 @@
                     const radius = await fetchRealDistance(carList[carListComboBox.selectedIndex].maximumDistance, batteryLevel, originCoordinates, destinationCoordinates, routeEstimatedTravelTime, choosedDrivingStyle);
                     if (radius == -1 || radius == null)
                     {
-                        window.alert("Wystąpił błąd przy określaniu zasięgu samochodu. Spróbuj jeszcze raz, a jak nie zadziała skontaktuj się z administratorem.");
+                        window.alert("Wystąpił błąd przy określaniu zasięgu samochodu.");
                         radius = 0;
                     }
                     chargingRadius.setCenter(originCoordinates);
@@ -457,37 +458,19 @@
             return marker;
         }
 
-        //Handling google api responses other than 'OK', while getting coordinates from address
-        function statusErrorHandler(status, address) {
-            switch (status) {
-                case ("ZERO_RESULTS"):
-                    alert("Can't find any results for address \"" + address + "\"");
-                    break;
-                case ("INVALID_REQUEST"):
-                    alert("Invalid request - probably query is missing for address \"" + address + "\"");
-                    break;
-                case ("GOOGLEAPI_ERROR"):
-                    alert("Problem while parsing result from google api has occured for address \"" + address + "\"");
-                    break;
-                case ("WRONG_KEY"):
-                    alert("Wrong geocode api key.");
-                    break;
-                default:
-                    alert("Unknown error has occured for \"" + address + "\" ");
-                    break;
-            }
-        }
-
         //Converting address to coordinates, using GeoController (getCoordinates), ultimately using google api
         async function fetchAddress(address) {
             try {
                 const response = await fetch("@Model.BaseUrl" + "/" + "@Model.GeoControllerCoordinatesLocation" + "?address=" + address);
                 const geoArray = await response.json();
-                if (geoArray["Status"] == "OK")
-                    return new google.maps.LatLng(parseFloat(geoArray["Coordinates"]["Lat"]), parseFloat(geoArray["Coordinates"]["Lng"]));
+                if (geoArray["Status"] == @((int)InternalApiResponse.StatusCode.OK))
+                    return new google.maps.LatLng(parseFloat(geoArray["Response"]["Coordinates"]["Lat"]), parseFloat(geoArray["Response"]["Coordinates"]["Lng"]));
+                else if (geoArray["ErrorMessage"])
+                    alert(geoArray["ErrorMessage"])
                 else
-                    statusErrorHandler(geoArray["Status"], address);
+                    alert("Wystąpił nieznany błąd podczas przetwarzania adresu.");
             } catch (error) {
+                alert("Wystąpił nieznany błąd podczas przetwarzania adresu.");
                 console.error(error);
             }
         }
@@ -496,8 +479,30 @@
         async function fetchRealDistance(maxDistance, batteryLevel, originCoordinates, destinationCoordinates, routeEstimatedTravelTime, choosedDrivingStyle) {
             try {
                 const response = await fetch("@Model.BaseUrl" + "/" + "distance/GetRealDistance?maximumDistance=" + maxDistance + "&batteryLevel=" + batteryLevel + "&origLat=" + originCoordinates.lat() + "&origLng=" + originCoordinates.lng() + "&destLat=" + destinationCoordinates.lat() + "&destLng=" + destinationCoordinates.lng() + "&estimatedTravelTime=" + routeEstimatedTravelTime + "&drivingStyle=" + choosedDrivingStyle);
-                const realDistance = await response.json();
-                return realDistance;
+                const responseArray = await response.json();
+                if (responseArray["Status"] == @((int)InternalApiResponse.StatusCode.OK)) {
+                    if (responseArray["Response"]) {
+                        try {
+                            return parseInt(responseArray["Response"]);
+                        }
+                        catch (error) {
+                            alert("Wystąpił nieznany błąd podczas wyznaczania zasięgu realnego samochodu. Zasięg nie zostanie naniesiony");
+                            console.error(error);
+                            return 0;
+                        }
+                    }
+                    else {
+                        alert("Wystąpił nieznany błąd podczas wyznaczania zasięgu realnego samochodu. Zasięg nie zostanie naniesiony");
+                        return 0;
+                    }
+                }
+                else {
+                    if (responseArray["ErrorMessage"])
+                        alert(responseArray["ErrorMessage"] + " Zasięg nie zostanie naniesiony.")
+                    else
+                        alert("Wystąpił nieznany błąd podczas wyznaczania zasięgu realnego samochodu. Zasięg nie zostanie naniesiony");
+                    return 0;
+                }
             } catch (error) {
                 console.error(error);
             }
@@ -518,7 +523,7 @@
                 navigator.geolocation.getCurrentPosition(useLocation);
             }
             else {
-                window.alert("Wystąpił problem z pobraniem Twojej lokalizacji.");
+                window.alert("Wystąpił problem z pobraniem Twojej lokalizacji (brak uprawnień).");
                 document.getElementById("currentLocationButton").src = "/images/currentLocation.png";
             }
         }
@@ -529,10 +534,12 @@
             fetch(url)
                 .then(res => res.json())
                 .then(data => {
-                    if (data["Status"] == "OK")
-                        originField.value = data["Address"];
+                    if (data["Status"] == @((int)InternalApiResponse.StatusCode.OK))
+                        originField.value = data["Response"]["Address"];
+                    else if (data["ErrorMessage"])
+                        alert(data["ErrorMessage"]);
                     else
-                        alert("Problem with getting current localization has occured. Please type address manually.");
+                        alert("Wystąpił nieznany problem z wyznaczaniem Twojej lokalizacji. Wprowadź proszę adres ręcznie.");
                 });
             document.getElementById("currentLocationButton").src = "/images/currentLocation.png";
         }
