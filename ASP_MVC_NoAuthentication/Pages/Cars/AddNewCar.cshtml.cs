@@ -40,6 +40,10 @@ namespace ASP_MVC_NoAuthentication.Pages
         public async Task<IActionResult> OnPostAddCarAsync(string? returnUrl = null)
         {
             _currentUser = await _userService.GetUserByName(User.Identity.Name);
+            if (_currentUser.Cars.Count > 30)
+            {
+                throw new Exception("Maksymalna liczba samochodów dla u¿ytkownika to 30.");
+            }
             _connectorInterfaces = await _connectorInterfaceService.GetAllConnectorInterfaces();
             string brand = Request.Form["brand"];
             string model = Request.Form["carmodel"];
