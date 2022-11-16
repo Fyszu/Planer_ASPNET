@@ -31,11 +31,11 @@ namespace ASP_MVC_NoAuthentication.Controllers
             estimatedTravelTime = estimatedTravelTime / 3600; // seconds -> hours
             estimatedTravelTime = estimatedTravelTime == 0 ? 1 : estimatedTravelTime;
             estimatedTravelTime = estimatedTravelTime > 24 ? 24 : estimatedTravelTime;
-            float temperatureOfOrigin = await _weatherService.GetTemperatureForLocation(origLat, origLng, estimatedTravelTime);
-            float temperatureOfDestination = await _weatherService.GetTemperatureForLocation(destLat, destLng, estimatedTravelTime);
+            float temperatureOfOrigin = await _weatherService.GetTemperatureForLocationAsync(origLat, origLng, estimatedTravelTime);
+            float temperatureOfDestination = await _weatherService.GetTemperatureForLocationAsync(destLat, destLng, estimatedTravelTime);
             if (temperatureOfOrigin != -300f && temperatureOfDestination != -300f) // -300 is error code for weather service
             {
-                return _distanceService.GetRealMaximumDistance(batteryLevel, maximumDistance, (DataHelper.DrivingStyle)drivingStyle, (temperatureOfDestination + temperatureOfOrigin) / 2);
+                return _distanceService.GetRealMaximumDistanceAsync(batteryLevel, maximumDistance, (DataHelper.DrivingStyle)drivingStyle, (temperatureOfDestination + temperatureOfOrigin) / 2);
             }
             else
             {

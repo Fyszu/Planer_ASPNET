@@ -19,56 +19,51 @@
     </head>
 
     <body>
-        @if (Model._canEditCar)
-        {
-            <div class="customize-page">
-                <h1>Edycja samochodu "@Model._editedCar.Brand @Model._editedCar.Model"</h1>
-                <div class="form">
-                    <form method="post" name="postForm" onsubmit="return checkBoxes()" asp-page-handler="AddCar">
-                        <h3>
-                            Marka:
-                        </h3>
-                        <input class="input-form" id="brand" name="brand" maxlength="30" value="@Model._editedCar.Brand"required/>
-                        <h3>
-                            Model:
-                        </h3>
-                        <input class="input-form" id="carmodel" name="carmodel" maxlength="30" value="@Model._editedCar.Model" required/>
-                        <h3>
-                            Zasięg maksymalny:
-                        </h3>
-                        <div class="slider-label">
-                            <input type="range" name="maximumdistance" value="400" min="30" max="1000" value="@Model._editedCar.MaximumDistance" oninput="this.nextElementSibling.value = this.value"/>
-                            <output>@Model._editedCar.MaximumDistance</output> km</div>
-                        <h3>
-                            Gniazda ładowania:
-                        </h3>
-                        @foreach (var connectorInterface in Model._connectorInterfaces)
+        <div class="customize-page">
+            <h1>Edycja samochodu "@Model.EditedCar.Brand @Model.EditedCar.Model"</h1>
+            <div class="form">
+                <form method="post" name="postForm" onsubmit="return checkBoxes()" asp-page-handler="AddCar">
+                    <h3>
+                        Marka:
+                    </h3>
+                    <input class="input-form" id="brand" name="brand" maxlength="30" value="@Model.EditedCar.Brand"required/>
+                    <h3>
+                        Model:
+                    </h3>
+                    <input class="input-form" id="carmodel" name="carmodel" maxlength="30" value="@Model.EditedCar.Model" required/>
+                    <h3>
+                        Zasięg maksymalny:
+                    </h3>
+                    <div class="slider-label">
+                        <input type="range" name="maximumdistance" value="400" min="30" max="1000" value="@Model.EditedCar.MaximumDistance" oninput="this.nextElementSibling.value = this.value"/>
+                        <output>@Model.EditedCar.MaximumDistance</output> km</div>
+                    <h3>
+                        Gniazda ładowania:
+                    </h3>
+                    @foreach (var connectorInterface in Model.ConnectorInterfaces)
+                    {
+                    if (Model.EditedCar.ConnectorInterfaces.Contains(connectorInterface))
                         {
-                        if (Model._editedCar.ConnectorInterfaces.Contains(connectorInterface))
-                            {
-                                <input type="checkbox" id="@(cb + connectorInterface.Id)" name="@(cb + connectorInterface.Id)" checked>
-                            }
-                            else
-                            {
-                                <input type="checkbox" id="@(cb + connectorInterface.Id)" name="@(cb + connectorInterface.Id)">
-                            }
-                            <label class="connector-label" for="@(cb + connectorInterface.Id)">@($"{connectorInterface.Name} ({connectorInterface.Description})")</label>
-                            <br />
+                            <input type="checkbox" id="@(cb + connectorInterface.Id)" name="@(cb + connectorInterface.Id)" checked>
                         }
+                        else
+                        {
+                            <input type="checkbox" id="@(cb + connectorInterface.Id)" name="@(cb + connectorInterface.Id)">
+                        }
+                        <label class="connector-label" for="@(cb + connectorInterface.Id)">@($"{connectorInterface.Name} ({connectorInterface.Description})")</label>
+                        <br />
+                    }
 
-                        <!--- Bootstrap alert --->
-                        <div class="alert alert-warning alert-dismissible fade show" role="alert" id="alertDiv">
-                            <strong>Uwaga!</strong> Należy zaznaczyć przynajmniej jedno gniazdo ładowania.
-                            <button type="button" class="btn-close" data-dismiss="alert" aria-label="Close"></button>
-                        </div>
+                    <!--- Bootstrap alert --->
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert" id="alertDiv">
+                        <strong>Uwaga!</strong> Należy zaznaczyć przynajmniej jedno gniazdo ładowania.
+                        <button type="button" class="btn-close" data-dismiss="alert" aria-label="Close"></button>
+                    </div>
 
-                        <button class="myButton" type = "submit" onclick="return checkBoxes()">Zapisz</button>
-                    </form>
-                </div>
+                    <button class="myButton" type = "submit" onclick="return checkBoxes()">Zapisz</button>
+                </form>
             </div>
-        }
-
-        @if (!Model._canEditCar) { <h2>Can't edit car that doesn't belongs to you or doesn't exist!</h2> }
+        </div>
 
         <!----- Bootstrap  ------>
         <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
@@ -83,7 +78,7 @@
             });
             function checkBoxes() {
                 var check = false;
-                var connectorsArray = @Html.Raw(Json.Serialize(Model._connectorInterfaces));
+                var connectorsArray = @Html.Raw(Json.Serialize(Model.ConnectorInterfaces));
                 var checkboxName = "";
                 var cb;
                 connectorsArray.forEach(connector => {

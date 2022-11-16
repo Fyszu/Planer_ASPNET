@@ -41,7 +41,7 @@ namespace ASP_MVC_NoAuthentication.Pages
             {
                 if (!string.IsNullOrEmpty(User.Identity.Name))
                 {
-                    currentUser = await _userService.GetUserByName(User.Identity.Name);
+                    currentUser = await _userService.GetUserByNameAsync(User.Identity.Name);
                     if (currentUser != null)
                     {
                         cars = currentUser.Cars.ToList();
@@ -73,13 +73,13 @@ namespace ASP_MVC_NoAuthentication.Pages
             {
                 if (!string.IsNullOrEmpty(User.Identity.Name))
                 {
-                    currentUser = await _userService.GetUserByName(User.Identity.Name);
+                    currentUser = await _userService.GetUserByNameAsync(User.Identity.Name);
                     string check = Request.Form["showMyCarsCheckBox"];
                     if (check != null)
                         currentUser.ShowOnlyMyCars = true;
                     else
                         currentUser.ShowOnlyMyCars = false;
-                    await _userService.SaveSettings(currentUser);
+                    await _userService.SaveSettingsAsync(currentUser);
                     return Redirect(Url.Content("~/UserPanel"));
                 }
                 else

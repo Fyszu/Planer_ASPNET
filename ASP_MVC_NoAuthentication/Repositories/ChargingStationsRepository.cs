@@ -14,29 +14,29 @@ namespace ASP_MVC_NoAuthentication.Repositories
 
 
 
-        public async Task<ChargingStation> GetById(long id)
+        public async Task<ChargingStation> GetByIdAsync(long id)
         {
             return await _context.ChargingStations.Include(station => station.Provider).Include(station => station.OperatingHours).Include(station => station.ChargingPoints).ThenInclude(point => point.Connectors).ThenInclude(connector => connector.Interfaces).Where(station => station.Id.Equals(id)).SingleOrDefaultAsync();
         }
 
-        public async Task Add(ChargingStation chargingStation)
+        public async Task AddAsync(ChargingStation chargingStation)
         {
             if(chargingStation != null)
                 await _context.ChargingStations.AddAsync(chargingStation);
             await _context.SaveChangesAsync();
         }
 
-        public async Task AddRange(HashSet<ChargingStation> chargingStations)
+        public async Task AddRangeAsync(HashSet<ChargingStation> chargingStations)
         {
             await _context.ChargingStations.AddRangeAsync(chargingStations);
             await _context.SaveChangesAsync();
         }
 
-        public async Task Update(ChargingStation chargingStation)
+        public async Task UpdateAsync(ChargingStation chargingStation)
         {
             if (chargingStation != null)
             {
-                ChargingStation dbChargingStation = await GetById(chargingStation.Id);
+                ChargingStation dbChargingStation = await GetByIdAsync(chargingStation.Id);
                 dbChargingStation.Provider = chargingStation.Provider;
                 dbChargingStation.Latitude = chargingStation.Latitude;
                 dbChargingStation.Longitude = chargingStation.Longitude;
@@ -57,7 +57,7 @@ namespace ASP_MVC_NoAuthentication.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task Remove(ChargingStation chargingStation)
+        public async Task RemoveAsync(ChargingStation chargingStation)
         {
             if (chargingStation != null)
                 _context.ChargingStations.Remove(chargingStation);
@@ -65,7 +65,7 @@ namespace ASP_MVC_NoAuthentication.Repositories
         }
 
         // Removes all records from ChargingStations repository
-        public async Task RemoveAll()
+        public async Task RemoveAllAsync()
         {
             await _context.ChargingStations
                 .Include(station => station.OperatingHours)
@@ -79,7 +79,7 @@ namespace ASP_MVC_NoAuthentication.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<List<ChargingStation>> GetAll()
+        public async Task<List<ChargingStation>> GetAllAsync()
         {
             return await _context.ChargingStations.Include(station => station.Provider).Include(station => station.OperatingHours).Include(station => station.ChargingPoints).ThenInclude(point => point.Connectors).ThenInclude(connector => connector.Interfaces).ToListAsync();
         }

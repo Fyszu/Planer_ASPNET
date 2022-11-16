@@ -14,23 +14,23 @@ namespace ASP_MVC_NoAuthentication.Repositories
 
 
 
-        public async Task<Car> GetById(int id)
+        public async Task<Car> GetByIdAsync(int id)
         {
             return await _context.Cars.Include(car => car.ConnectorInterfaces).Where(car => car.Id == id).SingleOrDefaultAsync();
         }
 
-        public async Task Add(Car car)
+        public async Task AddAsync(Car car)
         {
             if(car != null)
                 await _context.Cars.AddAsync(car);
             await _context.SaveChangesAsync();
         }
 
-        public async Task Update(Car car)
+        public async Task UpdateAsync(Car car)
         {
             if (car != null)
             {
-                Car dbCar = await GetById(car.Id);
+                Car dbCar = await GetByIdAsync(car.Id);
                 dbCar.Brand = car.Brand;
                 dbCar.Model = car.Model;
                 dbCar.MaximumDistance = car.MaximumDistance;
@@ -39,7 +39,7 @@ namespace ASP_MVC_NoAuthentication.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task Remove(Car car)
+        public async Task RemoveAsync(Car car)
         {
             if(car != null)
             {
@@ -48,24 +48,24 @@ namespace ASP_MVC_NoAuthentication.Repositories
             }
         }
 
-        public async Task<List<Car>> GetAll()
+        public async Task<List<Car>> GetAllAsync()
         {
             return await _context.Cars.Include(car => car.ConnectorInterfaces).Include(car => car.User).ToListAsync();
         }
 
-        public async Task<List<Car>> GetDefaultCars()
+        public async Task<List<Car>> GetDefaultCarsAsync()
         {
             return await _context.Cars.Include(car => car.User).Include(car => car.ConnectorInterfaces).Where(car => car.User.Equals(null)).ToListAsync();
         }
 
-        public async Task<List<Car>> GetCarsByUser(User user)
+        public async Task<List<Car>> GetCarsByUserAsync(User user)
         {
             return await _context.Cars.Include(car => car.User).Include(car => car.ConnectorInterfaces).Where(car => car.User.Equals(user)).ToListAsync();
         }
 
-        public async Task RemoveById(int id)
+        public async Task RemoveByIdAsync(int id)
         {
-            Car car = await GetById(id);
+            Car car = await GetByIdAsync(id);
             if(car != null)
                 _context.Cars.Remove(car);
             await _context.SaveChangesAsync();
@@ -106,7 +106,7 @@ namespace ASP_MVC_NoAuthentication.Repositories
 
         public async Task UpdateInterfaces(int carId, List<ConnectorInterface> connectorInterfaces)
         {
-            Car dbCar = await GetById(carId);
+            Car dbCar = await GetByIdAsync(carId);
             if (dbCar != null)
             {
                 dbCar.ConnectorInterfaces = connectorInterfaces;

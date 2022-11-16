@@ -11,7 +11,7 @@ namespace ASP_MVC_NoAuthentication.Repositories
             _context = context;
         }
 
-        public async Task Add(Provider entity)
+        public async Task AddAsync(Provider entity)
         {
             if (entity != null)
             {
@@ -22,17 +22,17 @@ namespace ASP_MVC_NoAuthentication.Repositories
                 throw new Exception("Błąd podczas dodawania operatora. Przekazany operator jest nullem.");
         }
 
-        public async Task<List<Provider>> GetAll()
+        public async Task<List<Provider>> GetAllAsync()
         {
             return await _context.Providers.ToListAsync();
         }
 
-        public async Task<Provider> GetById(long id)
+        public async Task<Provider> GetByIdAsync(long id)
         {
             return await _context.Providers.Include(provider => provider.ChargingStations).Where(provider => provider.Id == id).SingleOrDefaultAsync();
         }
 
-        public async Task Remove(Provider entity)
+        public async Task RemoveAsync(Provider entity)
         {
             if (entity != null)
             {
@@ -44,7 +44,7 @@ namespace ASP_MVC_NoAuthentication.Repositories
         }
 
         // Removes all records from Providers table
-        public async Task RemoveAll()
+        public async Task RemoveAllAsync()
         {
             await _context.Providers
                 .ForEachAsync(provider => {
@@ -54,11 +54,11 @@ namespace ASP_MVC_NoAuthentication.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task Update(Provider entity)
+        public async Task UpdateAsync(Provider entity)
         {
             if (entity != null)
             {
-                Provider dbProvider = await GetById(entity.Id);
+                Provider dbProvider = await GetByIdAsync(entity.Id);
                 if (dbProvider != null)
                 {
                     _context.Entry(dbProvider).CurrentValues.SetValues(entity);

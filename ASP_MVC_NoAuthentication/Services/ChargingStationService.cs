@@ -16,9 +16,9 @@ namespace ASP_MVC_NoAuthentication.Services
             _chargingStationsRepository = chargingStationsRepository;
         }
 
-        public async Task<List<ChargingStation>> GetAllChargingStations()
+        public async Task<List<ChargingStation>> GetAllChargingStationsAsync()
         {
-            return await _chargingStationsRepository.GetAll();
+            return await _chargingStationsRepository.GetAllAsync();
         }
     }
 }

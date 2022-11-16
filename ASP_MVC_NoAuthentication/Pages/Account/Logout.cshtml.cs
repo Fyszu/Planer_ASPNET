@@ -9,22 +9,19 @@ namespace ASP_MVC_NoAuthentication.Pages.Account
     [Authorize]
     public class LogoutModel : PageModel
     {
-        private readonly SignInManager<User> _signInManager;
-        private readonly ILogger<LogoutModel> _logger;
+        private readonly SignInManager<User> signInManager;
+        private readonly ILogger<LogoutModel> logger;
 
         public LogoutModel(SignInManager<User> signInManager, ILogger<LogoutModel> logger)
         {
-            _signInManager = signInManager;
-            _logger = logger;
+            this.signInManager = signInManager;
+            this.logger = logger;
         }
-        public async Task<IActionResult> OnGet()
+        public async Task<IActionResult> OnGet(string? returnUrl = null)
         {
-            var returnUrl = Url.Content("~/");
-            if (User.Identity.IsAuthenticated)
-            {
-                await _signInManager.SignOutAsync();
-                _logger.LogInformation($"User logged {User.Identity.Name} out.");
-            }
+            returnUrl ??= Url.Content("~/");
+            await signInManager.SignOutAsync();
+            logger.LogInformation($"Wylogowano u¿ytkownika {User.Identity.Name}.");
             return LocalRedirect(returnUrl);
         }
 

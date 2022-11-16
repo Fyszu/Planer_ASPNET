@@ -10,10 +10,9 @@ namespace ASP_MVC_NoAuthentication.Services
         {
             _repository = repository;
         }
-
-        public async Task<List<ConnectorInterface>> GetAllConnectorInterfaces()
+        public async Task<List<ConnectorInterface>> GetAllConnectorInterfacesAsync()
         {
-            return await _repository.GetAll();
+            return await _repository.GetAllAsync();
         }
     }
 }

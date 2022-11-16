@@ -4,7 +4,7 @@ namespace ASP_MVC_NoAuthentication.Services
 {
     public interface IGeoService
     {
-        public Task<string> GetAddress(string longitude, string latitude);
-        public Task<string> GetCoordinates(string address);
+        public Task<string> GetAddressAsync(string longitude, string latitude);
+        public Task<string> GetCoordinatesAsync(string address);
     }
 }

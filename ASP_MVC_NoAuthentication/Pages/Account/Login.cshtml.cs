@@ -10,40 +10,17 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ASP_MVC_NoAuthentication.Pages.Account
 {
-    public static class ModelStateExtensions
-    {
-        public static ModelStateDictionary MarkLoginFormAsSkipped(this ModelStateDictionary modelState)
-        {
-            foreach (var state in modelState.Where(state => state.Key.Contains("Login")).Select(state => state.Value))
-            {
-                state.Errors.Clear();
-                state.ValidationState = ModelValidationState.Skipped;
-            }
-            return modelState;
-        }
-
-        public static ModelStateDictionary MarkRegisterFormAsSkipped(this ModelStateDictionary modelState)
-        {
-            foreach (var state in modelState.Where(state => state.Key.Contains("Register")).Select(state => state.Value))
-            {
-                state.Errors.Clear();
-                state.ValidationState = ModelValidationState.Skipped;
-            }
-            return modelState;
-        }
-    }
-
     public class LoginModel : PageModel
     {
-        private readonly SignInManager<User> _signInManager;
-        private readonly UserManager<User> _userManager;
-        private readonly ILogger<LoginModel> _logger;
+        private readonly SignInManager<User> signInManager;
+        private readonly UserManager<User> userManager;
+        private readonly ILogger<LoginModel> logger;
 
         public LoginModel (UserManager<User> userManager, SignInManager<User> signInManager, ILogger<LoginModel> logger)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
-            _logger = logger;
+            this.userManager = userManager;
+            this.signInManager = signInManager;
+            this.logger = logger;
         }
 
         [BindProperty]
@@ -51,11 +28,11 @@ namespace ASP_MVC_NoAuthentication.Pages.Account
 
         [BindProperty]
         public InputLoginModel InputLogin { get; set; }
+        public bool IsReturnFromRegisterPost { get { return Handler != null && Handler.Equals("Register"); } }
 
         [BindProperty(SupportsGet = true)]
-        public string Handler { get; set; }
-        public IList<AuthenticationScheme> ExternalLogins { get; set; }
-        public bool IsReturnFromRegisterPost { get { return Handler != null && Handler.Equals("Register"); } }
+        private string Handler { get; set; }
+        private static string ReturnUrl { get; set; }
 
         public class InputRegisterModel
         {
@@ -94,24 +71,23 @@ namespace ASP_MVC_NoAuthentication.Pages.Account
             public bool RememberMe { get; set; }
         }
 
-        public async Task OnGetAsync()
+        public async Task OnGetAsync(string? returnUrl = null)
         {
-            
+            ReturnUrl = returnUrl ?? "~/";
         }
 
         public async Task<IActionResult> OnPostRegisterAsync()
         {
-            var returnUrl = Url.Content("~/UserPanel");
-
             ModelState.MarkLoginFormAsSkipped();
             if (TryValidateModel(InputRegister, nameof(InputRegister)))
             {
                 var user = new User { UserName = InputRegister.EmailRegister, Email = InputRegister.EmailRegister, ShowOnlyMyCars = false };
-                var result = await _userManager.CreateAsync(user, InputRegister.PasswordRegister);
+                var result = await userManager.CreateAsync(user, InputRegister.PasswordRegister);
                 if (result.Succeeded)
                 {
-                    await _signInManager.SignInAsync(user, isPersistent: false);
-                    return LocalRedirect(returnUrl);
+                    await signInManager.SignInAsync(user, isPersistent: false);
+                    logger.LogInformation($"Zosta³ zarejestrowany nowy u¿ytkownik o adresie email {user.UserName}.");
+                    return LocalRedirect("~/UserPanel");
                 }
                 foreach (var error in result.Errors)
                 {
@@ -122,6 +98,7 @@ namespace ASP_MVC_NoAuthentication.Pages.Account
                     }
                     else
                     {
+                        logger.LogError($"Nietypowy b³¹d podczas rejestracji: {error.Description}.");
                         ModelState.AddModelError("Register", error.Description);
                         break;
                     }
@@ -129,20 +106,21 @@ namespace ASP_MVC_NoAuthentication.Pages.Account
             }
 
             // If we got this far, something failed, redisplay form  
+            ModelState.AddModelError("Register", "Coœ posz³o nie tak. Spróbuj jeszcze raz.");
+            logger.LogError($"Nietypowy b³¹d podczas rejestracji - walidacja nie powiod³a siê.");
             return Page();
         }
 
         public async Task<IActionResult> OnPostLoginAsync()
         {
-            var returnUrl = Url.Content("~/");
-
             ModelState.MarkRegisterFormAsSkipped();
             if (TryValidateModel(InputLogin, nameof(InputLogin)))
             {
-                var result = await _signInManager.PasswordSignInAsync(InputLogin.EmailLogin, InputLogin.PasswordLogin, InputLogin.RememberMe, lockoutOnFailure: true);
+                var result = await signInManager.PasswordSignInAsync(InputLogin.EmailLogin, InputLogin.PasswordLogin, InputLogin.RememberMe, lockoutOnFailure: true);
                 if (result.Succeeded)
                 {
-                    return LocalRedirect(returnUrl);
+                    logger.LogInformation($"Zalogowano u¿ytkownika {InputLogin.EmailLogin}.");
+                    return LocalRedirect(ReturnUrl);
                 }
                 else if (result.IsLockedOut) // Locked - max. retry attempts and timespan configured in Program.cs
                 {
@@ -151,19 +129,47 @@ namespace ASP_MVC_NoAuthentication.Pages.Account
                 }
                 else
                 {
-                    var user = await _userManager.FindByNameAsync(InputLogin.EmailLogin);
+                    var user = await userManager.FindByNameAsync(InputLogin.EmailLogin);
                     if (user != null && user.AccessFailedCount == 3)
                     {
+                        logger.LogInformation($"3 nieudana próba zalogowania siê na konto u¿ytkownika {user.UserName}.");
                         ModelState.AddModelError("Login", "Pozosta³a jedna próba zalogowania siê. Po nieudanej próbie konto zostanie zablokowane na 5 minut.");
-                        return Page();
                     }
-                    ModelState.AddModelError("Login", "B³êdny login lub has³o.");
+                    else
+                    {
+                        ModelState.AddModelError("Login", "B³êdny login lub has³o.");
+                    }
                     return Page();
                 }
             }
 
             // If we got this far, something failed, redisplay form
+            ModelState.AddModelError("Login", "Coœ posz³o nie tak. Spróbuj jeszcze raz.");
+            logger.LogError($"Nietypowy b³¹d podczas logowania - walidacja nie powiod³a siê.");
             return Page();
+        }
+    }
+
+    public static class ModelStateExtensions
+    {
+        public static ModelStateDictionary MarkLoginFormAsSkipped(this ModelStateDictionary modelState)
+        {
+            foreach (var state in modelState.Where(state => state.Key.Contains("Login")).Select(state => state.Value))
+            {
+                state.Errors.Clear();
+                state.ValidationState = ModelValidationState.Skipped;
+            }
+            return modelState;
+        }
+
+        public static ModelStateDictionary MarkRegisterFormAsSkipped(this ModelStateDictionary modelState)
+        {
+            foreach (var state in modelState.Where(state => state.Key.Contains("Register")).Select(state => state.Value))
+            {
+                state.Errors.Clear();
+                state.ValidationState = ModelValidationState.Skipped;
+            }
+            return modelState;
         }
     }
 }

@@ -56,7 +56,7 @@ namespace ASP_MVC_NoAuthentication.Pages
             _logger.LogTrace("Pobieranie listy stacji ³adowania.");
 
             stopwatch.Restart();
-            var chargingStations = await _chargingStationsService.GetAllChargingStations();
+            var chargingStations = await _chargingStationsService.GetAllChargingStationsAsync();
             stopwatch.Stop();
 
             _logger.LogInformation($"Czas poœwiêcony na pobranie listy stacji ³adowania: {stopwatch.ElapsedMilliseconds}ms.");
@@ -105,10 +105,10 @@ namespace ASP_MVC_NoAuthentication.Pages
             List<Car> cars = new();
             if (IsLoggedIn)
             {
-                User loggedUser = await _userService.GetUserByName(User.Identity.Name);
+                User loggedUser = await _userService.GetUserByNameAsync(User.Identity.Name);
                 if (loggedUser != null)
                 {
-                    cars = await _carService.GetCarsByUser(loggedUser.UserName);
+                    cars = await _carService.GetCarsByUserAsync(loggedUser.UserName);
                     if (loggedUser.ShowOnlyMyCars)
                     {
                         if (cars.Count > 0)
@@ -118,11 +118,11 @@ namespace ASP_MVC_NoAuthentication.Pages
                     }
                     else if (cars.Count > 0)
                     {
-                        return cars.Concat(await _carService.GetDefaultCars()).OrderBy(car => car.Brand).ToList();
+                        return cars.Concat(await _carService.GetDefaultCarsAsync()).OrderBy(car => car.Brand).ToList();
                     }
                 }
             }
-            cars = await _carService.GetDefaultCars();
+            cars = await _carService.GetDefaultCarsAsync();
             return cars;
         }
 

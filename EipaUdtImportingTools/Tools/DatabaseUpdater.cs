@@ -42,7 +42,7 @@ namespace EipaUdtImportingTools.Tools
                     stopwatch.Restart();
 
                     _logger.LogTrace("Pobieranie danych samochodów.");
-                    List<Car> cars = await carRepository.GetAll() ?? throw new Exception("Problem z pobraniem listy samochodów.");
+                    List<Car> cars = await carRepository.GetAllAsync() ?? throw new Exception("Problem z pobraniem listy samochodów.");
                     if (cars.Count == 0) throw new Exception("Lista samochodów jest pusta.");
 
                     stopwatch.Stop();
@@ -55,10 +55,10 @@ namespace EipaUdtImportingTools.Tools
 
                     // Remove old data from DB
                     _logger.LogTrace("Usuwanie danych z bazy danych.");
-                    await chargingPointsRepository.RemoveAll();
-                    await chargingStationsRepository.RemoveAll();
-                    await connectorInterfaceRepository.RemoveAll();
-                    await providersRepository.RemoveAll();
+                    await chargingPointsRepository.RemoveAllAsync();
+                    await chargingStationsRepository.RemoveAllAsync();
+                    await connectorInterfaceRepository.RemoveAllAsync();
+                    await providersRepository.RemoveAllAsync();
                     await carRepository.RemoveAll();
 
                     stopwatch.Stop();
@@ -67,7 +67,7 @@ namespace EipaUdtImportingTools.Tools
 
                     // Add new data to DB
                     _logger.LogTrace("Dodawanie nowych danych do bazy danych.");
-                    await chargingStationsRepository.AddRange(ChargingStations);
+                    await chargingStationsRepository.AddRangeAsync(ChargingStations);
 
                     stopwatch.Stop();
                     _logger.LogInformation($"Czas aktualizacji bazy ładowarek i tabel referencyjnych: {stopwatch.ElapsedMilliseconds}ms.");

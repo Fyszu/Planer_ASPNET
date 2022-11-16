@@ -25,14 +25,14 @@ namespace ASP_MVC_NoAuthentication.Services
 
 
         //Parse result from google api to address name (passing coordinates)
-        public async Task<string> GetAddress(string longitude, string latitude)
+        public async Task<string> GetAddressAsync(string longitude, string latitude)
         {
             currentRetry = 0;
             return await GetResultFromGoogleApi("latlng=" + latitude + "," + longitude);
         }
 
         //Parse result from google api to coordinates (passing address name)
-        public async Task<string> GetCoordinates(string address)
+        public async Task<string> GetCoordinatesAsync(string address)
         {
             currentRetry = 0;
             return await GetResultFromGoogleApi("address=" + address);

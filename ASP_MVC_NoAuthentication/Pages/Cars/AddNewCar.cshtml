@@ -43,7 +43,7 @@
                     <h3>
                         Gniazda ładowania:
                     </h3>
-                    @foreach(var connectorInterface in Model._connectorInterfaces)
+                    @foreach(var connectorInterface in Model.ConnectorInterfaces)
                     {
                         <input type="checkbox" id="@(cb + connectorInterface.Id)" name="@(cb + connectorInterface.Id)">
                         <label class="connector-label" for="@(cb + connectorInterface.Id)">@($"{connectorInterface.Name} ({connectorInterface.Description})")</label>
@@ -75,7 +75,7 @@
 
             function checkBoxes() {
                 var check = false;
-                var connectorsArray = @Html.Raw(Json.Serialize(Model._connectorInterfaces));
+                var connectorsArray = @Html.Raw(Json.Serialize(Model.ConnectorInterfaces));
                 var checkboxName = "";
                 var cb;
 

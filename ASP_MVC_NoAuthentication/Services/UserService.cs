@@ -14,14 +14,14 @@ namespace ASP_MVC_NoAuthentication.Services
             _repository = userRepository;
         }
 
-        public async Task<User> GetUserByName(string name)
+        public async Task<User> GetUserByNameAsync(string name)
         {
-            return await _repository.GetByName(name);
+            return await _repository.GetByNameAsync(name);
         }
 
-        public async Task SaveSettings(User user)
+        public async Task SaveSettingsAsync(User user)
         {
-            await _repository.Update(user);
+            await _repository.UpdateAsync(user);
         }
     }
 }

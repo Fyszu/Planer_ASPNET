@@ -32,9 +32,9 @@ namespace ASP_MVC_NoAuthentication.Controllers
             }
             else
             {
-                if (await _carService.CheckIfCarBelongsToUser(await _userService.GetUserByName(User.Identity.Name), await _carService.GetCarById(carId)))
+                if (await _carService.CheckIfCarBelongsToUserAsync(await _userService.GetUserByNameAsync(User.Identity.Name), await _carService.GetCarByIdAsync(carId)))
                 {
-                    await _carService.RemoveCarByUser(User.Identity.Name, carId);
+                    await _carService.RemoveCarByUserAsync(User.Identity.Name, carId);
                     return Redirect(Url.Content("~/UserPanel"));
                 }
                 else
@@ -55,7 +55,7 @@ namespace ASP_MVC_NoAuthentication.Controllers
             }
             else
             {
-                await _carService.AddNewCar(car);
+                await _carService.AddNewCarAsync(car);
                 return Redirect(Url.Content("~/UserPanel"));
             }
         }

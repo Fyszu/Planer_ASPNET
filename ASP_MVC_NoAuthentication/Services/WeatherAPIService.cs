@@ -24,7 +24,7 @@ namespace ASP_MVC_NoAuthentication.Services
         }
 
         // Estimated travel time is passed in hours
-        public async Task<float> GetTemperatureForLocation(float lat, float lng, int estimatedTravelTime)
+        public async Task<float> GetTemperatureForLocationAsync(float lat, float lng, int estimatedTravelTime)
         {
             latitude = lat;
             longitude = lng;

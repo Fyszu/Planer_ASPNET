@@ -11,55 +11,86 @@ namespace ASP_MVC_NoAuthentication.Pages
     [Authorize]
     public class AddNewCarModel : PageModel
     {
-        private readonly SignInManager<User> _signInManager;
-        private readonly UserManager<User> _userManager;
-        private readonly IUserService _userService;
-        private readonly ICarService _carService;
-        private readonly IConnectorInterfaceService _connectorInterfaceService;
-        public List<ConnectorInterface> _connectorInterfaces = null;
-        public User _currentUser;
+        private readonly ICarService carService;
+        private readonly IConnectorInterfaceService connectorInterfaceService;
+        private readonly ILogger<AddNewCarModel> logger;
+        private readonly IUserService userService;
+        private User currentUser;
 
-        public AddNewCarModel(UserManager<User> userManager, SignInManager<User> signInManager, IUserService userService, ICarService carService, IConnectorInterfaceService connectorInterfaceService)
+        public AddNewCarModel(ILogger<AddNewCarModel> logger, IUserService userService, ICarService carService, IConnectorInterfaceService connectorInterfaceService)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
-            _userService = userService;
-            _carService = carService;
-            _connectorInterfaceService = connectorInterfaceService;
+            this.userService = userService;
+            this.carService = carService;
+            this.connectorInterfaceService = connectorInterfaceService;
+            this.logger = logger;
         }
+
+        public List<ConnectorInterface> ConnectorInterfaces { get; set; }
 
         public async Task OnGetAsync()
         {
-            await GetPage();
+            await LoadData();
         }
-        public async Task GetPage()
+
+        public async Task<IActionResult> OnPostAddCarAsync()
         {
-            _connectorInterfaces = await _connectorInterfaceService.GetAllConnectorInterfaces();
-            _currentUser = await _userService.GetUserByName(User.Identity.Name);
-        }
-        public async Task<IActionResult> OnPostAddCarAsync(string? returnUrl = null)
-        {
-            _currentUser = await _userService.GetUserByName(User.Identity.Name);
-            if (_currentUser.Cars.Count > 30)
+            await LoadData();
+
+            if (currentUser.Cars.Count > 30)
             {
-                throw new Exception("Maksymalna liczba samochodów dla u¿ytkownika to 30.");
+                logger.LogInformation($"U¿ytkownik {currentUser.UserName} przekroczy³ limit samochodów na koncie.");
+                throw new Exception("Przekroczono limit samochodów na koncie. Maksymalna liczba samochodów dla u¿ytkownika to 30.");
             }
-            _connectorInterfaces = await _connectorInterfaceService.GetAllConnectorInterfaces();
+
             string brand = Request.Form["brand"];
             string model = Request.Form["carmodel"];
             int maximumDistance = int.Parse(Request.Form["maximumdistance"]);
             string check;
-            List<ConnectorInterface> carInterfaces = new List<ConnectorInterface>();
-            foreach(ConnectorInterface cnInterface in _connectorInterfaces)
+
+            List<ConnectorInterface> carInterfaces = new();
+            foreach(ConnectorInterface connectorInterface in ConnectorInterfaces)
             {
-                string cb = "checkbox" + cnInterface.Id;
+                string cb = "checkbox" + connectorInterface.Id;
                 check = Request.Form[cb];
                 if(check != null)
-                    carInterfaces.Add(cnInterface);
+                    carInterfaces.Add(connectorInterface);
             }
 
-            await _carService.AddNewCar(new Car(brand, model, maximumDistance, carInterfaces, _currentUser));
-            return Redirect(Url.Content("~/UserPanel"));
+            if (carInterfaces.Count > 0)
+            {
+                try
+                {
+                    await carService.AddNewCarAsync(new Car(brand, model, maximumDistance, carInterfaces, currentUser));
+                    logger.LogInformation($"Dodano samochód {brand} {model}, {maximumDistance}km dla u¿ytkownika {currentUser.UserName}.");
+                    return Redirect(Url.Content("~/UserPanel"));
+                }
+                catch
+                {
+                    logger.LogError($"Problem podczas dodawania samochodu {brand} {model}, {maximumDistance}km do bazy danych dla u¿ytkownika {currentUser.UserName}.");
+                    throw new DatabaseException("Problem podczas dodawania samochodu do bazy danych.");
+                }
+            }
+            else
+            {
+                logger.LogError($"B³¹d podczas dodawania samochodu - lista interfejsów by³a pusta dla u¿ytkownika {currentUser.UserName}.");
+                throw new NoDataInDatabaseException("B³¹d podczas dodawania samochodu - lista interfejsów dla samochodu nie mo¿e byæ pusta.");
+            }
+        }
+
+        private async Task LoadData()
+        {
+            ConnectorInterfaces = await connectorInterfaceService.GetAllConnectorInterfacesAsync();
+            currentUser = await userService.GetUserByNameAsync(User.Identity.Name);
+            if (ConnectorInterfaces == null || ConnectorInterfaces.Count == 0)
+            {
+                logger.LogError("B³¹d podczas dodawania samochodu: pobrana lista z³¹czy ³adowania jest pusta.");
+                throw new NoDataInDatabaseException("B³¹d podczas dodawania samochodu: pobrana lista z³¹czy ³adowania jest pusta.");
+            }
+            if (currentUser == null)
+            {
+                logger.LogError($"B³¹d podczas dodawania samochodu: nie znaleziono u¿ytkownika {User.Identity.Name} w bazie danych.");
+                throw new UserIsNullException("B³¹d podczas dodawania samochodu: nie znaleziono u¿ytkownika w bazie danych.");
+            }
         }
     }
 }

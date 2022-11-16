@@ -7,6 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Repositories\dogr1qn2.tbq~" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\css\ErrorInfo.css" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AspNetCoreRateLimit" Version="4.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Certificate" Version="5.0.13" />
     <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />

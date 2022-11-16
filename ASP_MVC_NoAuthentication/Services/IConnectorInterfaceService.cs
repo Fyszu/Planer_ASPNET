@@ -4,6 +4,6 @@ namespace ASP_MVC_NoAuthentication.Services
 {
     public interface IConnectorInterfaceService
     {
-        public Task<List<ConnectorInterface>> GetAllConnectorInterfaces();
+        public Task<List<ConnectorInterface>> GetAllConnectorInterfacesAsync();
     }
 }

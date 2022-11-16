@@ -22,13 +22,13 @@ namespace ASP_MVC_NoAuthentication.Controllers
         [HttpGet("GetAddress")]
         public async Task<string> GetAddress([FromQuery] string longitude, [FromQuery] string latitude)
         {
-            return await _service.GetAddress(longitude, latitude);
+            return await _service.GetAddressAsync(longitude, latitude);
         }
 
         [HttpGet("GetCoordinates")]
         public async Task<string> GetCoordinates([FromQuery] string address)
         {
-            return await _service.GetCoordinates(address);
+            return await _service.GetCoordinatesAsync(address);
         }
 
     }

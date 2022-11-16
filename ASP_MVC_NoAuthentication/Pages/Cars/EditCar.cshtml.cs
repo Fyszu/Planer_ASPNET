@@ -10,60 +10,102 @@ namespace ASP_MVC_NoAuthentication.Pages
     [Authorize]
     public class EditCarModel : PageModel
     {
-        private readonly SignInManager<User> _signInManager;
-        private readonly UserManager<User> _userManager;
-        private readonly ICarService _carService;
-        private readonly IUserService _userService;
-        private readonly IConnectorInterfaceService _connectorInterfacesService;
-        public List<ConnectorInterface> _connectorInterfaces = null;
-        public User _currentUser;
-        public Car _editedCar;
-        public Boolean _canEditCar;
-        private static int CarId { get; set; }
-        public EditCarModel(UserManager<User> userManager, SignInManager<User> signInManager, ICarService carService, IUserService userService, IConnectorInterfaceService connectorInterfaceService)
+        private readonly ICarService carService;
+        private readonly IConnectorInterfaceService connectorInterfacesService;
+        private readonly IUserService userService;
+        private readonly ILogger<EditCarModel> logger;
+        private static int? carId;
+        private User currentUser;
+
+        public EditCarModel(ILogger<EditCarModel> logger, IUserService userService, ICarService carService, IConnectorInterfaceService connectorInterfacesService)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
-            _carService = carService;
-            _userService = userService;
-            _connectorInterfacesService = connectorInterfaceService;
+            this.carService = carService;
+            this.userService = userService;
+            this.connectorInterfacesService = connectorInterfacesService;
+            this.logger = logger;
         }
+
+        public List<ConnectorInterface> ConnectorInterfaces { get; set; }
+        public Car EditedCar { get; set; }
 
         public async Task OnGetAsync()
         {
-            await GetPage();
-        }
-        public async Task GetPage()
-        {
-            _connectorInterfaces = await _connectorInterfacesService.GetAllConnectorInterfaces();
-            _currentUser = await _userService.GetUserByName(User.Identity.Name);
-            CarId = int.Parse(Request.Query["carid"]);
-            _editedCar = await _carService.GetCarById(CarId);
-            if (_editedCar != null)
-                _canEditCar = await _carService.CheckIfCarBelongsToUser(_currentUser, _editedCar);
+            carId = null;
+            await LoadData();
         }
         public async Task<IActionResult> OnPostAddCarAsync(string? returnUrl = null)
         {
-            _currentUser = await _userService.GetUserByName(User.Identity.Name);
-            _editedCar = await _carService.GetCarById(CarId);
-            if (await _carService.CheckIfCarBelongsToUser(_currentUser, _editedCar))
+            await LoadData();
+
+            string brand = Request.Form["brand"];
+            string model = Request.Form["carmodel"];
+            int maximumDistance = (int.Parse(Request.Form["maximumdistance"]));
+            string check;
+
+            List<ConnectorInterface> carInterfaces = new();
+            foreach (ConnectorInterface connectorInterface in ConnectorInterfaces)
             {
-                _connectorInterfaces = await _connectorInterfacesService.GetAllConnectorInterfaces();
-                string brand = Request.Form["brand"];
-                string model = Request.Form["carmodel"];
-                int maximumDistance = (int.Parse(Request.Form["maximumdistance"]));
-                string check;
-                List<ConnectorInterface> carInterfaces = new List<ConnectorInterface>();
-                foreach (ConnectorInterface cnInterface in _connectorInterfaces)
-                {
-                    string cb = "checkbox" + cnInterface.Id;
-                    check = Request.Form[cb];
-                    if (check != null)
-                        carInterfaces.Add(cnInterface);
-                }
-                await _carService.UpdateCar(new Car(_editedCar.Id, brand, model, maximumDistance, carInterfaces, _currentUser));
+                string cb = "checkbox" + connectorInterface.Id;
+                check = Request.Form[cb];
+                if (check != null)
+                    carInterfaces.Add(connectorInterface);
             }
-            return Redirect(Url.Content("~/UserPanel"));
+            if (carInterfaces.Count > 0)
+            {
+                try
+                {
+                    await carService.UpdateCarAsync(new Car(EditedCar.Id, brand, model, maximumDistance, carInterfaces, currentUser));
+                    logger.LogInformation($"Zaktualizowano samochód id: {EditedCar.Id} {brand} {model}, {maximumDistance}km dla u¿ytkownika {currentUser.UserName}.");
+                    return Redirect(Url.Content("~/UserPanel"));
+                }
+                catch
+                {
+                    logger.LogError($"Problem podczas edycji samochodu {brand} {model}, {maximumDistance}km dla u¿ytkownika {currentUser.UserName}.");
+                    throw new DatabaseException("Problem podczas edycji samochodu w bazie danych.");
+                }
+            }
+            else
+            {
+                logger.LogError($"B³¹d podczas edycji samochodu - lista interfejsów by³a pusta dla u¿ytkownika {currentUser.UserName}.");
+                throw new NoDataInDatabaseException("B³¹d podczas edycji samochodu - lista interfejsów dla samochodu nie mo¿e byæ pusta.");
+            }
+        }
+
+        private async Task LoadData()
+        {
+            ConnectorInterfaces = await connectorInterfacesService.GetAllConnectorInterfacesAsync();
+            currentUser = await userService.GetUserByNameAsync(User.Identity.Name);
+
+            if (ConnectorInterfaces == null || ConnectorInterfaces.Count == 0)
+            {
+                logger.LogError("B³¹d podczas edycji samochodu: pobrana lista z³¹czy ³adowania jest pusta.");
+                throw new NoDataInDatabaseException("B³¹d podczas dodawania samochodu: pobrana lista z³¹czy ³adowania jest pusta.");
+            }
+            if (currentUser == null)
+            {
+                logger.LogError($"B³¹d podczas edycji samochodu: nie znaleziono u¿ytkownika {User.Identity.Name} w bazie danych.");
+                throw new UserIsNullException("B³¹d podczas dodawania samochodu: nie znaleziono u¿ytkownika w bazie danych.");
+            }
+
+            if (carId == null)
+            {
+                try
+                {
+                    carId = int.Parse(Request.Query["carid"]);
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError($"Nie uda³o siê zamieniæ id na int dla u¿ytkownika {currentUser.UserName}.");
+                    throw new Exception("Z³y numer ID samochodu do edycji lub problem z odczytaniem ID.");
+                }
+            }
+
+            EditedCar = await carService.GetCarByIdAsync(carId.Value);
+
+            if (EditedCar == null && !(await carService.CheckIfCarBelongsToUserAsync(currentUser, EditedCar)))
+            {
+                throw new Exception("Samochód nie istnieje lub nie nale¿y do Ciebie.");
+            }
         }
     }
 }
