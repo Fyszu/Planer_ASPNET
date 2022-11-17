@@ -5,11 +5,11 @@ namespace ASP_MVC_NoAuthentication.Services
 {
     public class DistanceService : IDistanceService
     {
-        private readonly ILogger<DistanceService> _logger;
+        private readonly ILogger<DistanceService> logger;
 
         public DistanceService(ILogger<DistanceService> logger)
         {
-            _logger = logger;
+            this.logger = logger;
         }
 
         // Get real maximum distance in meters
@@ -27,8 +27,9 @@ namespace ASP_MVC_NoAuthentication.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError("Problem podczas przetwarzania wyniku obliczeń dystansu samochodu. " +
-                    $"Poziom baterii: {batteryLevel}, maksymalny dystans: {maximumDistance}, styl jazdy: {drivingStyle}, temperatura: {temperature}");
+                logger.LogError("Problem podczas przetwarzania wyniku obliczeń dystansu samochodu. " +
+                    $"Poziom baterii: {batteryLevel}, maksymalny dystans: {maximumDistance}, styl jazdy: {drivingStyle}, temperatura: {temperature}.\n" +
+                    $"{ex.Message}\n{ex.InnerException}");
                 return new InternalApiResponse(InternalApiResponse.StatusCode.DistanceControllerOtherError, null).GetInternalResponseJson();
             }
         }

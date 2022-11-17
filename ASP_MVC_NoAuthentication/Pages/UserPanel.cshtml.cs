@@ -11,55 +11,47 @@ namespace ASP_MVC_NoAuthentication.Pages
     [Authorize]
     public class UserPanelModel : PageModel
     {
-        private readonly ILogger<UserPanelModel> _logger;
-        private readonly SignInManager<User> _signInManager;
-        private readonly UserManager<User> _userManager;
-        private readonly IUserService _userService;
-        private readonly ICarService _carService;
+        private readonly ILogger<UserPanelModel> logger;
+        private readonly SignInManager<User> signInManager;
+        private readonly UserManager<User> userManager;
+        private readonly IUserService userService;
+        private readonly ICarService carService;
         private List<Car> cars;
         private User currentUser;
-        public User CurrentUser { get { return currentUser; } }
-        public List<Car> Cars { get { return cars; } }
-        public string ReturnUrl { get; set; }
+
         public UserPanelModel(ILogger<UserPanelModel> logger, IUserService userService, UserManager<User> userManager, SignInManager<User> signInManager, ICarService carService)
         {
-            _logger = logger;
-            _userService = userService;
-            _carService = carService;
-            _userManager = userManager;
-            _signInManager = signInManager;
+            this.logger = logger;
+            this.userService = userService;
+            this.carService = carService;
+            this.userManager = userManager;
+            this.signInManager = signInManager;
         }
+
+        public User CurrentUser { get { return currentUser; } }
+        public List<Car> Cars { get { return cars; } }
 
         public async Task OnGetAsync()
-        {
-            await GetPage();
-        }
-
-        public async Task GetPage()
         {
             if (User.Identity != null && User.Identity.IsAuthenticated)
             {
                 if (!string.IsNullOrEmpty(User.Identity.Name))
                 {
-                    currentUser = await _userService.GetUserByNameAsync(User.Identity.Name);
+                    currentUser = await userService.GetUserByNameAsync(User.Identity.Name);
                     if (currentUser != null)
                     {
-                        cars = currentUser.Cars.ToList();
-                        if (cars == null)
-                        {
-                            throw new Exception("Wyst¹pi³ b³¹d dotycz¹cy konta u¿ytkownika.");
-                        }
+                        cars = currentUser.Cars.ToList() ?? throw new Exception("Wyst¹pi³ b³¹d dotycz¹cy konta u¿ytkownika - lista samochodów nie istnieje.");
                     }
                     else
                     {
-                        _logger.LogCritical($"Nie znaleziono u¿ytkownika {User.Identity.Name} w bazie danych.");
-                        await _signInManager.SignOutAsync();
+                        logger.LogCritical($"Nie znaleziono u¿ytkownika {User.Identity.Name} w bazie danych.");
+                        await signInManager.SignOutAsync();
                         throw new Exception("Wyst¹pi³ b³¹d dotycz¹cy konta u¿ytkownika.");
                     }
                 }
                 else
                 {
-                    _logger.LogCritical("Nazwa u¿ytkownika jest pusta. " + User.Identity);
+                    logger.LogCritical("Nazwa u¿ytkownika jest pusta. " + User.Identity);
                     throw new Exception("Wyst¹pi³ b³¹d dotycz¹cy konta u¿ytkownika.");
                 }
             }
@@ -67,24 +59,24 @@ namespace ASP_MVC_NoAuthentication.Pages
                 Redirect(Url.Content("~/Login"));
         }
 
-        public async Task<IActionResult> OnPostSaveSettingsAsync(string? returnUrl = null)
+        public async Task<IActionResult> OnPostSaveSettingsAsync()
         {
             if (User.Identity != null && User.Identity.IsAuthenticated)
             {
                 if (!string.IsNullOrEmpty(User.Identity.Name))
                 {
-                    currentUser = await _userService.GetUserByNameAsync(User.Identity.Name);
+                    currentUser = await userService.GetUserByNameAsync(User.Identity.Name);
                     string check = Request.Form["showMyCarsCheckBox"];
                     if (check != null)
                         currentUser.ShowOnlyMyCars = true;
                     else
                         currentUser.ShowOnlyMyCars = false;
-                    await _userService.SaveSettingsAsync(currentUser);
+                    await userService.SaveSettingsAsync(currentUser);
                     return Redirect(Url.Content("~/UserPanel"));
                 }
                 else
                 {
-                    _logger.LogCritical("U¿ytkownik nie posiada nazwy u¿ytkownika. " + User.Identity);
+                    logger.LogCritical("Nazwa u¿ytkownika jest pusta." + User.Identity);
                     throw new Exception("Wyst¹pi³ b³¹d dotycz¹cy konta u¿ytkownika.");
                 }
             }

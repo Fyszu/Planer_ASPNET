@@ -5,23 +5,21 @@ namespace ASP_MVC_NoAuthentication.Services
 {
     public class UserService : IUserService
     {
-        private readonly ILogger<UserService> _logger;
-        private readonly IUserRepository _repository;
+        private readonly IUserRepository repository;
 
-        public UserService(ILogger<UserService> logger, IUserRepository userRepository)
+        public UserService(IUserRepository userRepository)
         {
-            _logger = logger;
-            _repository = userRepository;
+            repository = userRepository;
         }
 
         public async Task<User> GetUserByNameAsync(string name)
         {
-            return await _repository.GetByNameAsync(name);
+            return await repository.GetByNameAsync(name);
         }
 
         public async Task SaveSettingsAsync(User user)
         {
-            await _repository.UpdateAsync(user);
+            await repository.UpdateAsync(user);
         }
     }
 }

@@ -9,20 +9,20 @@ namespace ASP_MVC_NoAuthentication.Services
 {
     public class GeoService : IGeoService
     {
-        private readonly IConfiguration _configuration;
-        private readonly ILogger<GeoService> _logger;
-        private readonly string _googleApiKey;
-        private readonly HttpClient _client = new();
-        private readonly int retryCount = 3;
+        private readonly IConfiguration configuration;
+        private readonly ILogger<GeoService> logger;
+        private readonly string googleApiKey;
+        private readonly HttpClient client = new();
+        private static readonly int retryCount = 3;
         private int currentRetry;
 
         public GeoService(ILogger<GeoService> logger, IConfiguration configuration)
         {
-            _logger = logger;
-            _configuration = configuration;
-            _googleApiKey = _configuration.GetValue<string>("GoogleDirectionsGeocodingApiKey");
+            this.logger = logger;
+            this.configuration = configuration;
+            googleApiKey = this.configuration.GetValue<string>("GoogleDirectionsGeocodingApiKey")
+                ?? throw new ValueNotFoundInConfigurationException("Klucz google api dla directions/geocoding.");
         }
-
 
         //Parse result from google api to address name (passing coordinates)
         public async Task<string> GetAddressAsync(string longitude, string latitude)
@@ -45,7 +45,7 @@ namespace ASP_MVC_NoAuthentication.Services
             currentRetry++;
 
             string URL = "https://maps.googleapis.com/maps/api/geocode/json?";
-            string Key = "key=" + _googleApiKey;
+            string Key = "key=" + googleApiKey;
             string Sensor = "&sensor=false&";
 
             URL = URL + Key + Sensor + location;
@@ -56,7 +56,7 @@ namespace ASP_MVC_NoAuthentication.Services
 
             try
             {
-                HttpResponseMessage httpResponse = await _client.GetAsync(URL); //Download result from Google API
+                HttpResponseMessage httpResponse = await client.GetAsync(URL); //Download result from Google API
                 httpResponse.EnsureSuccessStatusCode();
                 string responseBody = await httpResponse.Content.ReadAsStringAsync();
 
@@ -64,106 +64,110 @@ namespace ASP_MVC_NoAuthentication.Services
 
                 if (token == null || token["status"] == null || token["status"].ToString() == null)
                 {
-                    // 
-                }
-
-                // Statuses are provided by Google Geocoding API
-                // Documentation here: https://developers.google.com/maps/documentation/geocoding/requests-geocoding?hl=pl
-                string responseStatusString = token["status"].ToString();
-
-                // If there's 'error_message' node occured in response, it means some error has occured.
-                if (token["error_message"] != null && token["error_message"].ToString() != null)
-                {
-                    switch (token["status"].ToString())
-                    {
-                        case "OVER_DAILY_LIMIT":
-                            status = InternalApiResponse.StatusCode.GoogleLimitReached;
-                            break;
-
-                        case "OVER_QUERY_LIMIT":
-                            status = InternalApiResponse.StatusCode.GoogleLimitReached;
-                            break;
-
-                        case "REQUEST_DENIED":
-                            if (token["error_message"].ToString().Contains("The provided API key is invalid."))
-                            {
-                                status = InternalApiResponse.StatusCode.GoogleInvalidApiKey;
-                                break;
-                            }
-                            else if (token["error_message"].ToString().Contains("This API key is not authorized to use this service or API."))
-                            {
-                                status = InternalApiResponse.StatusCode.GoogleUnauthorizedApiKey;
-                                break;
-                            }
-                            else
-                            {
-                                status = InternalApiResponse.StatusCode.GoogleRequestDenied;
-                                break;
-                            }
-
-                        case "INVALID_REQUEST":
-                            if (token["error_message"].ToString().Contains("Missing the 'address', 'components', 'latlng' or 'place_id' parameter."))
-                            {
-                                status = InternalApiResponse.StatusCode.GoogleNoParametersPassedError;
-                                break;
-                            }
-                            else
-                            {
-                                status = InternalApiResponse.StatusCode.GoogleInvalidRequest;
-                                break;
-                            }
-
-                        case "UNKNOWN_ERROR":
-                            status = InternalApiResponse.StatusCode.GoogleServerSideUnknownError;
-                            break;
-
-                        default:
-                            status = InternalApiResponse.StatusCode.UnknownError;
-                            break;
-                    }
+                    logger.LogError("Nie udało się odczytać statusu odpowiedzi");
+                    status = InternalApiResponse.StatusCode.UnknownError;
                 }
                 else
                 {
-                    switch (token["status"].ToString())
+
+                    // Statuses are provided by Google Geocoding API
+                    // Documentation here: https://developers.google.com/maps/documentation/geocoding/requests-geocoding?hl=pl
+                    string responseStatusString = token["status"].ToString();
+
+                    // If there's 'error_message' node occured in response, it means some error has occured.
+                    if (token["error_message"] != null && token["error_message"].ToString() != null)
                     {
-                        case "OK":
-                            status = InternalApiResponse.StatusCode.OK;
-                            break;
+                        switch (token["status"].ToString())
+                        {
+                            case "OVER_DAILY_LIMIT":
+                                status = InternalApiResponse.StatusCode.GoogleLimitReached;
+                                break;
 
-                        case "ZERO_RESULTS":
-                            status = InternalApiResponse.StatusCode.GoogleNoResults;
-                            break;
+                            case "OVER_QUERY_LIMIT":
+                                status = InternalApiResponse.StatusCode.GoogleLimitReached;
+                                break;
 
-                        default:
+                            case "REQUEST_DENIED":
+                                if (token["error_message"].ToString().Contains("The provided API key is invalid."))
+                                {
+                                    status = InternalApiResponse.StatusCode.GoogleInvalidApiKey;
+                                    break;
+                                }
+                                else if (token["error_message"].ToString().Contains("This API key is not authorized to use this service or API."))
+                                {
+                                    status = InternalApiResponse.StatusCode.GoogleUnauthorizedApiKey;
+                                    break;
+                                }
+                                else
+                                {
+                                    status = InternalApiResponse.StatusCode.GoogleRequestDenied;
+                                    break;
+                                }
+
+                            case "INVALID_REQUEST":
+                                if (token["error_message"].ToString().Contains("Missing the 'address', 'components', 'latlng' or 'place_id' parameter."))
+                                {
+                                    status = InternalApiResponse.StatusCode.GoogleNoParametersPassedError;
+                                    break;
+                                }
+                                else
+                                {
+                                    status = InternalApiResponse.StatusCode.GoogleInvalidRequest;
+                                    break;
+                                }
+
+                            case "UNKNOWN_ERROR":
+                                status = InternalApiResponse.StatusCode.GoogleServerSideUnknownError;
+                                break;
+
+                            default:
+                                status = InternalApiResponse.StatusCode.UnknownError;
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        switch (token["status"].ToString())
+                        {
+                            case "OK":
+                                status = InternalApiResponse.StatusCode.OK;
+                                break;
+
+                            case "ZERO_RESULTS":
+                                status = InternalApiResponse.StatusCode.GoogleNoResults;
+                                break;
+
+                            default:
+                                status = InternalApiResponse.StatusCode.UnknownError;
+                                break;
+                        }
+                    }
+
+                    // Error occured at google server's side - retry
+                    if (status == InternalApiResponse.StatusCode.GoogleServerSideUnknownError && currentRetry <= retryCount)
+                    {
+                        return await GetResultFromGoogleApi(location);
+                    }
+
+                    if (status == InternalApiResponse.StatusCode.OK)
+                    {
+                        //Results are pulled out from Google API response's JSON Array
+                        locationResponse = new GeoResponse(
+                            new Coordinates(
+                                token["results"][0]["geometry"]["location"]["lat"].ToString().Replace(",", "."), // Latitude, with replacement , -> .
+                                token["results"][0]["geometry"]["location"]["lng"].ToString().Replace(",", ".") // Longitude, with replacement , -> .
+                            ), token["results"][0]["formatted_address"].ToString() // Address
+                        );
+
+                        if (locationResponse.Coordinates == null || string.IsNullOrEmpty(locationResponse.Coordinates.Value.Lat) || string.IsNullOrEmpty(locationResponse.Coordinates.Value.Lng) || string.IsNullOrEmpty(locationResponse.Address))
+                        {
                             status = InternalApiResponse.StatusCode.UnknownError;
-                            break;
+                        }
                     }
-                }
-
-                // Error occured at google server's side - retry
-                if (status == InternalApiResponse.StatusCode.GoogleServerSideUnknownError && currentRetry <= retryCount)
-                {
-                    return await GetResultFromGoogleApi(location);
-                }
-
-                if (status == InternalApiResponse.StatusCode.OK)
-                {
-                    //Results are pulled out from Google API response's JSON Array
-                    locationResponse = new GeoResponse(
-                        new Coordinates(
-                            token["results"][0]["geometry"]["location"]["lat"].ToString().Replace(",", "."), // Latitude, with replacement , -> .
-                            token["results"][0]["geometry"]["location"]["lng"].ToString().Replace(",", ".") // Longitude, with replacement , -> .
-                        ), token["results"][0]["formatted_address"].ToString() // Address
-                    );
-
-                    if (locationResponse.Coordinates == null || string.IsNullOrEmpty(locationResponse.Coordinates.Value.Lat) || string.IsNullOrEmpty(locationResponse.Coordinates.Value.Lng) || string.IsNullOrEmpty(locationResponse.Address))
+                    else
                     {
-                        status = InternalApiResponse.StatusCode.UnknownError;
+                        locationResponse = new(new Coordinates(), null);
                     }
-                }
-                else
-                {
-                    locationResponse = new(new Coordinates(), null);
                 }
 
                 InternalApiResponse internalApiResponse = new(status, JsonConvert.SerializeObject(locationResponse));
@@ -175,7 +179,7 @@ namespace ASP_MVC_NoAuthentication.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Błąd podczas przetwarzania koordynatów lub adresu. {ex.Message}\n{ex.InnerException}");
+                logger.LogError($"Błąd podczas przetwarzania koordynatów lub adresu. {ex.Message}\n{ex.InnerException}");
                 status = InternalApiResponse.StatusCode.UnknownError;
                 InternalApiResponse internalApiResponse = new(status, null);
                 return internalApiResponse.GetInternalResponseJson();

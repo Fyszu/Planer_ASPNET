@@ -13,22 +13,22 @@ namespace ASP_MVC_NoAuthentication.Controllers
     [RestrictDomain("localhost", "planertras.com")]
     public class GeoController : Controller
     {
-        private readonly IGeoService _service;
+        private readonly IGeoService service;
         public GeoController(IGeoService service)
         {
-            _service = service;
+            this.service = service;
         }
 
         [HttpGet("GetAddress")]
         public async Task<string> GetAddress([FromQuery] string longitude, [FromQuery] string latitude)
         {
-            return await _service.GetAddressAsync(longitude, latitude);
+            return await service.GetAddressAsync(longitude, latitude);
         }
 
         [HttpGet("GetCoordinates")]
         public async Task<string> GetCoordinates([FromQuery] string address)
         {
-            return await _service.GetCoordinatesAsync(address);
+            return await service.GetCoordinatesAsync(address);
         }
 
     }

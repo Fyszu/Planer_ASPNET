@@ -7,20 +7,22 @@ namespace ASP_MVC_NoAuthentication.Services
 {
     public class WeatherAPIService : IWeatherAPIService
     {
-        private readonly ILogger<WeatherAPIService> _logger;
+        private readonly ILogger<WeatherAPIService> logger;
         private readonly HttpClient client = new();
         private float latitude;
         private float longitude;
-        private string Url { 
-            get
-            {
-                return "https://api.open-meteo.com/v1/forecast?latitude=" + latitude.ToString("0.00").Replace(",",".") + "&longitude=" + longitude.ToString("0.00").Replace(",", ".") + "&hourly=temperature_2m";
-            }
-        }
 
         public WeatherAPIService(ILogger<WeatherAPIService> logger)
         {
-            _logger = logger;
+            this.logger = logger;
+        }
+
+        private string Url
+        {
+            get
+            {
+                return "https://api.open-meteo.com/v1/forecast?latitude=" + latitude.ToString("0.00").Replace(",", ".") + "&longitude=" + longitude.ToString("0.00").Replace(",", ".") + "&hourly=temperature_2m";
+            }
         }
 
         // Estimated travel time is passed in hours
@@ -39,6 +41,7 @@ namespace ASP_MVC_NoAuthentication.Services
                 // Deserialize JSON to object
                 JsonSerializerOptions jsonSerializerOptions = new() { PropertyNameCaseInsensitive = true };
                 WeatherAPIResponse? weatherAPIResponseObject = JsonSerializer.Deserialize<WeatherAPIResponse>(responseBody, jsonSerializerOptions);
+
                 if (weatherAPIResponseObject != null)
                 {
                     var currentDateTimeString = DateTime.Now.Year + "-" + DateTime.Now.Month + "-" + DateTime.Now.Day + "T" + DateTime.Now.Hour.ToString("00") + ":00";
@@ -64,11 +67,11 @@ namespace ASP_MVC_NoAuthentication.Services
                     return (float)temperature;
                 }
                 else
-                    throw new Exception("WeatherAPIResponse jest nullem.");
+                    throw new Exception("Odpowiedź od Weather API jest nullem.");
             }
             catch (Exception ex)
             {
-                _logger.LogCritical($"Wystąpił wyjątek podczas pobierania temperatury (WeatherAPIService). Wyjątek: {ex.Message}\n{ex.InnerException}");
+                logger.LogCritical($"Wystąpił wyjątek podczas pobierania temperatury (WeatherAPIService). Wyjątek: {ex.Message}\n{ex.InnerException}");
                 return -300;
             }
         }

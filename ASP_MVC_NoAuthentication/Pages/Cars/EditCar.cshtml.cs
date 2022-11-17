@@ -66,7 +66,6 @@ namespace ASP_MVC_NoAuthentication.Pages
             }
             else
             {
-                logger.LogError($"B³¹d podczas edycji samochodu - lista interfejsów by³a pusta dla u¿ytkownika {currentUser.UserName}.");
                 throw new NoDataInDatabaseException("B³¹d podczas edycji samochodu - lista interfejsów dla samochodu nie mo¿e byæ pusta.");
             }
         }
@@ -78,12 +77,10 @@ namespace ASP_MVC_NoAuthentication.Pages
 
             if (ConnectorInterfaces == null || ConnectorInterfaces.Count == 0)
             {
-                logger.LogError("B³¹d podczas edycji samochodu: pobrana lista z³¹czy ³adowania jest pusta.");
                 throw new NoDataInDatabaseException("B³¹d podczas dodawania samochodu: pobrana lista z³¹czy ³adowania jest pusta.");
             }
             if (currentUser == null)
             {
-                logger.LogError($"B³¹d podczas edycji samochodu: nie znaleziono u¿ytkownika {User.Identity.Name} w bazie danych.");
                 throw new UserIsNullException("B³¹d podczas dodawania samochodu: nie znaleziono u¿ytkownika w bazie danych.");
             }
 
@@ -95,7 +92,6 @@ namespace ASP_MVC_NoAuthentication.Pages
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError($"Nie uda³o siê zamieniæ id na int dla u¿ytkownika {currentUser.UserName}.");
                     throw new Exception("Z³y numer ID samochodu do edycji lub problem z odczytaniem ID.");
                 }
             }

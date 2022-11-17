@@ -6,6 +6,8 @@ namespace ASP_MVC_NoAuthentication.Repositories
     {
         public Task<List<Car>> GetDefaultCarsAsync();
         public Task<List<Car>> GetCarsByUserAsync(User user);
+        public Task RemoveAllAsync();
+        public Task AddRangeAsync(List<Car> cars);
         Task RemoveByIdAsync(int id);
     }
 }

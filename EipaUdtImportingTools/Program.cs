@@ -25,12 +25,11 @@ ApplicationLogging.LoggerFactory = LoggerFactory.Create(
     );
 
 // Services
-builder.Services.AddScoped<ChargingStationsRepository, ChargingStationsRepository>();
-builder.Services.AddScoped<ChargingPointsRepository, ChargingPointsRepository>();
-builder.Services.AddScoped<ProvidersRepository, ProvidersRepository>();
-builder.Services.AddScoped<ConnectorInterfaceRepository, ConnectorInterfaceRepository>();
-builder.Services.AddScoped<CarRepository, CarRepository>();
-builder.Services.AddScoped<UserRepository, UserRepository>();
+builder.Services.AddScoped<IChargingStationsRepository, ChargingStationsRepository>();
+builder.Services.AddScoped<IChargingPointsRepository, ChargingPointsRepository>();
+builder.Services.AddScoped<IProvidersRepository, ProvidersRepository>();
+builder.Services.AddScoped<IConnectorInterfaceRepository, ConnectorInterfaceRepository>();
+builder.Services.AddScoped<ICarRepository, CarRepository>();
 
 var provider = builder.Services.BuildServiceProvider();
 
@@ -41,7 +40,7 @@ int retryCount = 1;
 for(int i = 0; i < retryCount; i++)
 {
     Console.WriteLine($"\n\n--------------------------------\nPróba aktualizacji bazy danych numer {i + 1}\n--------------------------------\n");
-    result = await DatabaseUpdater.UpdateDatabase(provider.GetService<MyDbContext>(), provider.GetService<ChargingStationsRepository>(), provider.GetService<ChargingPointsRepository>(), provider.GetService<ProvidersRepository>(), provider.GetService<ConnectorInterfaceRepository>(), provider.GetService<CarRepository>(), provider.GetService<UserRepository>());
+    result = await DatabaseUpdater.UpdateDatabase(provider.GetService<MyDbContext>(), provider.GetService<IChargingStationsRepository>(), provider.GetService<IChargingPointsRepository>(), provider.GetService<IProvidersRepository>(), provider.GetService<IConnectorInterfaceRepository>(), provider.GetService<ICarRepository>());
     if (result) break;
 }
 

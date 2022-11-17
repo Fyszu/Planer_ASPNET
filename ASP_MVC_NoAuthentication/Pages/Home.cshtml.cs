@@ -11,40 +11,37 @@ namespace ASP_MVC_NoAuthentication.Pages
 {
     public class HomeModel : PageModel
     {
-        private readonly ILogger<HomeModel> _logger;
-        private readonly ICarService _carService;
-        private readonly IUserService _userService;
-        private readonly IChargingStationService _chargingStationsService;
-        private readonly IConfiguration _config;
-        private readonly SignInManager<User> _signInManager;
+        private readonly ILogger<HomeModel> logger;
+        private readonly ICarService carService;
+        private readonly IUserService userService;
+        private readonly IChargingStationService chargingStationsService;
+        private readonly IConfiguration configuration;
+        private readonly SignInManager<User> signInManager;
+
+        public HomeModel(ILogger<HomeModel> logger, SignInManager<User> signInManager, ICarService carService, IUserService userService, IChargingStationService chargingStationsService, IConfiguration configuration)
+        {
+            this.logger = logger;
+            this.signInManager = signInManager;
+            this.carService = carService;
+            this.userService = userService;
+            this.chargingStationsService = chargingStationsService;
+            this.configuration = configuration;
+        }
 
         public List<Car> Cars { get; set; }
         public string JsonCars { get; set; }
         public string JsonChargingStations { get; set; }
-        public bool IsLoggedIn { get; set; }
-        internal string? BaseUrl { get; set; }
-        internal string? GeoControllerCoordinatesLocation { get; private set; }
-        internal string? GeoControllerAddressLocation { get; private set; }
-        internal string? GoogleMapApiKey { get; private set; }
-
-
-        public HomeModel(ILogger<HomeModel> logger, SignInManager<User> signInManager, ICarService carService, IUserService userService, IChargingStationService chargingStationsService, IConfiguration configuration)
-        {
-            _logger = logger;
-            _signInManager = signInManager;
-            _carService = carService;
-            _userService = userService;
-            _chargingStationsService = chargingStationsService;
-            _config = configuration;
-            Cars = new();
-        }
+        public bool IsLoggedIn { get; private set; }
+        public string? BaseUrl { get; private set; }
+        public string? GeoControllerCoordinatesLocation { get; private set; }
+        public string? GeoControllerAddressLocation { get; private set; }
+        public string? GoogleMapApiKey { get; private set; }
 
         public async void OnGetAsync()
         {
-            IsLoggedIn = _signInManager.IsSignedIn(User) && User.Identity != null && User.Identity.Name != null;
+            IsLoggedIn = signInManager.IsSignedIn(User) && User.Identity != null && User.Identity.Name != null;
             
-            _logger.LogInformation($"Uruchomiono widok g³ówny dla u¿ytkownika: {(IsLoggedIn ? User.Identity.Name : "Niezalogowany")}.");
-            _logger.LogTrace("Pobieranie listy samochodów.");
+            logger.LogInformation($"Uruchomiono widok g³ówny dla u¿ytkownika: {(IsLoggedIn ? User.Identity.Name : "Niezalogowany")}.");
 
             Stopwatch stopwatch = new();
 
@@ -52,86 +49,116 @@ namespace ASP_MVC_NoAuthentication.Pages
             Cars = await GetCarsList();
             stopwatch.Stop();
 
-            _logger.LogInformation($"Czas poœwiêcony na pobranie listy samochodów: {stopwatch.ElapsedMilliseconds}ms.");
-            _logger.LogTrace("Pobieranie listy stacji ³adowania.");
+            logger.LogInformation($"Czas poœwiêcony na pobranie listy samochodów: {stopwatch.ElapsedMilliseconds}ms.");
 
+            List<ChargingStation> chargingStations;
             stopwatch.Restart();
-            var chargingStations = await _chargingStationsService.GetAllChargingStationsAsync();
+            try
+            {
+                chargingStations = await chargingStationsService.GetAllChargingStationsAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new DatabaseException("Problem z pobraniem stacji ³adowania.", new Exception($"{ex.Message}\n{ex.InnerException}"));
+            }
             stopwatch.Stop();
 
-            _logger.LogInformation($"Czas poœwiêcony na pobranie listy stacji ³adowania: {stopwatch.ElapsedMilliseconds}ms.");
+            logger.LogInformation($"Czas poœwiêcony na pobranie listy stacji ³adowania: {stopwatch.ElapsedMilliseconds}ms.");
+
+            if (chargingStations == null || chargingStations.Count == 0)
+            {
+                throw new NoDataInDatabaseException("Nie uda³o siê pobraæ listy stacji ³adowania.", new Exception($"Lista by³a {(chargingStations == null ? "nullem" : "pusta")}."));
+            }
+
+            stopwatch.Restart();
 
             // Serialization to JSON arrays for later in-javascript usage
             JsonSerializerOptions jsonSerializerOptions = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
-            if (Cars.Count > 0)
+
+            try
             {
-                _logger.LogTrace($"Serializacja listy samochodów ³adowania.");
-                stopwatch.Restart();
                 JsonCars = JsonSerializer.Serialize(Cars, jsonSerializerOptions);
-                stopwatch.Stop();
-                _logger.LogInformation($"Czas serializacji listy samochodów: {stopwatch.ElapsedMilliseconds}ms.");
+                JsonChargingStations = JsonSerializer.Serialize(chargingStations, jsonSerializerOptions);
             }
-            else
+            catch (Exception ex)
             {
-                _logger.LogCritical("Pobrana lista samochodów by³a pusta.");
-                throw new Exception("Lista samochodów jest pusta.");
+                throw new Exception("Nie uda³o siê przetworzyæ obiektów na JSON.", new Exception($"{ex.Message}\n{ex.InnerException}"));
             }
-            if (chargingStations.Count > 0)
-            {
-                try
-                {
-                    _logger.LogTrace($"Serializacja listy stacji ³adowania.");
-                    stopwatch.Restart();
-                    JsonChargingStations = JsonSerializer.Serialize(chargingStations, jsonSerializerOptions);
-                    stopwatch.Stop();
-                    _logger.LogInformation($"Czas serializacji stacji ³adowania: {stopwatch.ElapsedMilliseconds}ms.");
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogCritical($"B³¹d podczas serializacji stacji ³adowania. {ex.Message}");
-                    Redirect(BaseUrl + "/Error");
-                }
-            }
-            else
-            {
-                _logger.LogCritical("Pobrana lista stacji ³adowania by³a pusta.");
-                throw new Exception("Lista stacji ³adowania jest pusta.");
-            }
+
+            stopwatch.Stop();
+            logger.LogInformation($"Czas poœwiêcony na serializacjê: {stopwatch.ElapsedMilliseconds}ms.");
 
             SetKeys();
         }
+
         private async Task<List<Car>> GetCarsList()
         {
             List<Car> cars = new();
+
             if (IsLoggedIn)
             {
-                User loggedUser = await _userService.GetUserByNameAsync(User.Identity.Name);
-                if (loggedUser != null)
+                User? loggedUser;
+
+                try
                 {
-                    cars = await _carService.GetCarsByUserAsync(loggedUser.UserName);
-                    if (loggedUser.ShowOnlyMyCars)
-                    {
-                        if (cars.Count > 0)
-                        {
-                            return cars;
-                        }
-                    }
-                    else if (cars.Count > 0)
-                    {
-                        return cars.Concat(await _carService.GetDefaultCarsAsync()).OrderBy(car => car.Brand).ToList();
-                    }
+                    loggedUser = await userService.GetUserByNameAsync(User.Identity.Name);
+                }
+                catch(Exception ex)
+                {
+                    logger.LogError($"Wyst¹pi³ problem z pobraniem u¿ytkownika {User.Identity.Name}.\n{ex.Message}\n{ex.InnerException}");
+                    loggedUser = null;
+                }
+
+                if (loggedUser == null)
+                {
+                    logger.LogError("SignInService zwróci³ informacjê ¿e u¿ytkownik jest zalogowany, lecz nie znaleziono go w bazie danych korzystaj¹c z UserService.");
+                    throw new DatabaseException("Nie znaleziono zalogowanego u¿ytkownika w bazie danych.");
+                }
+
+                try
+                {
+                    cars = await carService.GetCarsByUserAsync(loggedUser.UserName);
+                }
+                catch(Exception ex)
+                {
+                    logger.LogError($"Wyst¹pi³ problem z pobraniem listy samochodów dla u¿ytkownika {User.Identity.Name}.\n{ex.Message}\n{ex.InnerException}");
+                }
+
+                if (cars.Count == 0)
+                {
+                    cars = await carService.GetDefaultCarsAsync();
+                }
+                else if (!loggedUser.ShowOnlyMyCars)
+                {
+                    cars = cars.Concat(await carService.GetDefaultCarsAsync()).OrderBy(car => car.Brand).ToList();
                 }
             }
-            cars = await _carService.GetDefaultCarsAsync();
+            else
+            {
+                cars = await carService.GetDefaultCarsAsync();
+            }
+
+            if (cars == null || cars.Count == 0)
+            {
+                throw new NoDataInDatabaseException("Nie uda³o siê pobraæ listy samochodów, lub baza danych samochodów jest pusta.");
+            }
+
             return cars;
         }
 
         private void SetKeys()
         {
-            BaseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}";
-            GeoControllerCoordinatesLocation = _config.GetValue<string>("GeoControllerCoordinatesLocation");
-            GeoControllerAddressLocation = _config.GetValue<string>("GeoControllerAddressLocation");
-            GoogleMapApiKey = _config.GetValue<string>("GoogleMapApiKey");
+            BaseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}" 
+                ?? throw new Exception("Nie uda³o siê ustaliæ bazowego url.");
+
+            GeoControllerCoordinatesLocation = configuration.GetValue<string>("GeoControllerCoordinatesLocation") 
+                ?? throw new ValueNotFoundInConfigurationException("Url metody kontrolera (koordynaty).");
+
+            GeoControllerAddressLocation = configuration.GetValue<string>("GeoControllerAddressLocation")
+                ?? throw new ValueNotFoundInConfigurationException("Url metody kontrolera (adres).");
+
+            GoogleMapApiKey = configuration.GetValue<string>("GoogleMapApiKey")
+                ?? throw new ValueNotFoundInConfigurationException("Klucz google api dla map.");
         }
     }
 }

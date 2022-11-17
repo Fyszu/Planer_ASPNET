@@ -13,11 +13,10 @@ namespace EipaUdtImportingTools.Tools
 {
     internal static class DatabaseUpdater
     {
+        private static readonly ILogger logger = ApplicationLogging.CreateLogger("DatabaseUpdater");
         public static HashSet<ChargingStation> ChargingStations { get; set; }
         public static HashSet<ConnectorInterface> ConnectorInterfacesInUsage { get; set; }
-
-        private static readonly ILogger _logger = ApplicationLogging.CreateLogger("DatabaseUpdater");
-        public static async Task<bool> UpdateDatabase(MyDbContext dbContext, ChargingStationsRepository chargingStationsRepository, ChargingPointsRepository chargingPointsRepository, ProvidersRepository providersRepository, ConnectorInterfaceRepository connectorInterfaceRepository, CarRepository carRepository, UserRepository userRepository)
+        public static async Task<bool> UpdateDatabase(MyDbContext dbContext, IChargingStationsRepository chargingStationsRepository, IChargingPointsRepository chargingPointsRepository, IProvidersRepository providersRepository, IConnectorInterfaceRepository connectorInterfaceRepository, ICarRepository carRepository)
         {
             try
             {
@@ -34,64 +33,64 @@ namespace EipaUdtImportingTools.Tools
                 if (await EIPAConverter.TransformApiDataToInternal())
                 {
                     stopwatch.Stop();
-                    _logger.LogInformation($"Czas konwersji danych: {stopwatch.ElapsedMilliseconds}ms");
+                    logger.LogInformation($"Czas konwersji danych: {stopwatch.ElapsedMilliseconds}ms");
 
                     if (ChargingStations.Count == 0) throw new Exception("Lista stacji ładowania jest pusta.");
                     if (ConnectorInterfacesInUsage.Count == 0) throw new Exception("Zbiór nowych interfejsów jest pusty.");
 
                     stopwatch.Restart();
 
-                    _logger.LogTrace("Pobieranie danych samochodów.");
+                    logger.LogTrace("Pobieranie danych samochodów.");
                     List<Car> cars = await carRepository.GetAllAsync() ?? throw new Exception("Problem z pobraniem listy samochodów.");
                     if (cars.Count == 0) throw new Exception("Lista samochodów jest pusta.");
 
                     stopwatch.Stop();
-                    _logger.LogInformation($"Czas pobrania listy samochodów: {stopwatch.ElapsedMilliseconds}ms");
+                    logger.LogInformation($"Czas pobrania listy samochodów: {stopwatch.ElapsedMilliseconds}ms");
                     stopwatch.Restart();
 
                     // Begin transaction
-                    _logger.LogTrace("Rozpoczynanie transakcji.");
+                    logger.LogTrace("Rozpoczynanie transakcji.");
                     using var transaction = await dbContext.Database.BeginTransactionAsync();
 
                     // Remove old data from DB
-                    _logger.LogTrace("Usuwanie danych z bazy danych.");
+                    logger.LogTrace("Usuwanie danych z bazy danych.");
                     await chargingPointsRepository.RemoveAllAsync();
                     await chargingStationsRepository.RemoveAllAsync();
                     await connectorInterfaceRepository.RemoveAllAsync();
                     await providersRepository.RemoveAllAsync();
-                    await carRepository.RemoveAll();
+                    await carRepository.RemoveAllAsync();
 
                     stopwatch.Stop();
-                    _logger.LogInformation($"Czas usunięcia danych z bazy danych: {stopwatch.ElapsedMilliseconds}ms");
+                    logger.LogInformation($"Czas usunięcia danych z bazy danych: {stopwatch.ElapsedMilliseconds}ms");
                     stopwatch.Restart();
 
                     // Add new data to DB
-                    _logger.LogTrace("Dodawanie nowych danych do bazy danych.");
+                    logger.LogTrace("Dodawanie nowych danych do bazy danych.");
                     await chargingStationsRepository.AddRangeAsync(ChargingStations);
 
                     stopwatch.Stop();
-                    _logger.LogInformation($"Czas aktualizacji bazy ładowarek i tabel referencyjnych: {stopwatch.ElapsedMilliseconds}ms.");
+                    logger.LogInformation($"Czas aktualizacji bazy ładowarek i tabel referencyjnych: {stopwatch.ElapsedMilliseconds}ms.");
                     stopwatch.Restart();
 
                     // Update cars connector interfaces
-                    _logger.LogTrace("Odświeżanie interfejsów ładowania w samochodach.");
+                    logger.LogTrace("Odświeżanie interfejsów ładowania w samochodach.");
                     cars = RefreshCarsConnectorInterfaces(cars);
 
                     // Add cars with resolved interfaces to DB
-                    _logger.LogTrace("Dodawanie samochodów do bazy danych.");
-                    await carRepository.AddRange(cars);
+                    logger.LogTrace("Dodawanie samochodów do bazy danych.");
+                    await carRepository.AddRangeAsync(cars);
 
                     stopwatch.Stop();
-                    _logger.LogInformation($"Czas aktualizacji samochodów: {stopwatch.ElapsedMilliseconds}ms.");
+                    logger.LogInformation($"Czas aktualizacji samochodów: {stopwatch.ElapsedMilliseconds}ms.");
 
                     // End of transaction
                     await transaction.CommitAsync();
-                    _logger.LogTrace("Koniec transakcji.");
+                    logger.LogTrace("Koniec transakcji.");
 
                     generalStopwatch.Stop();
-                    _logger.LogInformation($"Czas wykonania całej operacji: {generalStopwatch.ElapsedMilliseconds}ms.");
+                    logger.LogInformation($"Czas wykonania całej operacji: {generalStopwatch.ElapsedMilliseconds}ms.");
 
-                    _logger.LogInformation("\n\n--------------------------------\nBaza danych została zaktualizowana.\n--------------------------------");
+                    logger.LogInformation("\n\n--------------------------------\nBaza danych została zaktualizowana.\n--------------------------------");
                     return true;
                 }
                 else
@@ -101,7 +100,7 @@ namespace EipaUdtImportingTools.Tools
             }
             catch (Exception ex)
             {
-                _logger.LogCritical($"Problem podczas zapisu do bazy danych: \n{ex.Message}\n{ex.InnerException}");
+                logger.LogCritical($"Problem podczas zapisu do bazy danych: \n{ex.Message}\n{ex.InnerException}");
                 return false;
             }
         }
@@ -152,19 +151,19 @@ namespace EipaUdtImportingTools.Tools
                 switch (changedConnectorInterface.Value)
                 {
                     case ConnectorInterfaceChange.Id:
-                        _logger.LogWarning($"Interfejs ładowania {changedConnectorInterface.Key.Key} zmienił wartość ID na {changedConnectorInterface.Key.Value.Id}.");
+                        logger.LogWarning($"Interfejs ładowania {changedConnectorInterface.Key.Key} zmienił wartość ID na {changedConnectorInterface.Key.Value.Id}.");
                         break;
 
                     case ConnectorInterfaceChange.Name:
-                        _logger.LogWarning($"Interfejs ładowania {changedConnectorInterface.Key.Key} zmienił nazwę na {changedConnectorInterface.Key.Value.Name}. Dopasowano po ID, lecz istnieje możliwość błędu.");
+                        logger.LogWarning($"Interfejs ładowania {changedConnectorInterface.Key.Key} zmienił nazwę na {changedConnectorInterface.Key.Value.Name}. Dopasowano po ID, lecz istnieje możliwość błędu.");
                         break;
 
                     case ConnectorInterfaceChange.Description:
-                        _logger.LogWarning($"Interfejs ładowania {changedConnectorInterface.Key.Key} zmienił opis na {changedConnectorInterface.Key.Value.Description}.");
+                        logger.LogWarning($"Interfejs ładowania {changedConnectorInterface.Key.Key} zmienił opis na {changedConnectorInterface.Key.Value.Description}.");
                         break;
 
                     case ConnectorInterfaceChange.Removed:
-                        _logger.LogWarning($"Interfejs ładowania {changedConnectorInterface.Key.Key} został usunięty z bazy danych.");
+                        logger.LogWarning($"Interfejs ładowania {changedConnectorInterface.Key.Key} został usunięty z bazy danych.");
                         break;
 
                     default:

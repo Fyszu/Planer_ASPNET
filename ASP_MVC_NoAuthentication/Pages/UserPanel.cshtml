@@ -96,7 +96,7 @@
         </h2>
         <hr class="rounded">
         <div class="settings">
-             <form asp-route-returnUrl="@Model.ReturnUrl" method="post" asp-page-handler="SaveSettings">
+             <form method="post" asp-page-handler="SaveSettings">
                  <h3>Pokazuj tylko moje samochody&nbsp;&nbsp;
                     <img src="@Url.Content("~/images/question_mark.png")" class="questionMark" data-toggle="tooltip" data-placement="bottom" title="Zaznacz, aby na liście samochodów na stronie głównej planowania trasy pojawiały się tylko Twoje samochody. Pozostaw puste, a oprócz Twoich samochodów zostaną wyświetlone domyślne."/></h3>
                  @if (Model.CurrentUser.ShowOnlyMyCars)

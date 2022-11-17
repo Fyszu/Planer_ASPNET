@@ -5,47 +5,47 @@ namespace ASP_MVC_NoAuthentication.Repositories
 {
     public class ConnectorInterfaceRepository : IConnectorInterfaceRepository
     {
-        private readonly MyDbContext _context;
+        private readonly MyDbContext context;
         public ConnectorInterfaceRepository(MyDbContext context)
         {
-            _context = context;
+            this.context = context;
         }
 
         public async Task AddAsync(ConnectorInterface connectorInterface)
         {
             if (connectorInterface != null)
-                await _context.ConnectorInterfaces.AddAsync(connectorInterface);
-            await _context.SaveChangesAsync();
+                await context.ConnectorInterfaces.AddAsync(connectorInterface);
+            await context.SaveChangesAsync();
         }
         public List<ConnectorInterface> GetAll()
         {
-            return _context.ConnectorInterfaces.ToList();
+            return context.ConnectorInterfaces.ToList();
         }
         public async Task<List<ConnectorInterface>> GetAllAsync()
         {
-            return await _context.ConnectorInterfaces.ToListAsync();
+            return await context.ConnectorInterfaces.ToListAsync();
         }
 
         public async Task<ConnectorInterface> GetByIdAsync(long id)
         {
-            return await _context.ConnectorInterfaces.Where(cni => cni.Id.Equals(id)).SingleOrDefaultAsync();
+            return await context.ConnectorInterfaces.Where(cni => cni.Id.Equals(id)).SingleOrDefaultAsync();
         }
 
         public async Task RemoveAsync(ConnectorInterface connectorInterface)
         {
             if (connectorInterface != null)
-                _context.ConnectorInterfaces.Remove(connectorInterface);
-            await _context.SaveChangesAsync();
+                context.ConnectorInterfaces.Remove(connectorInterface);
+            await context.SaveChangesAsync();
         }
 
         // Removes all records from ConnectorInterfaces table
         public async Task RemoveAllAsync()
         {
-            await _context.ConnectorInterfaces.ForEachAsync(cInterface => {
+            await context.ConnectorInterfaces.ForEachAsync(cInterface => {
                 if (cInterface != null)
-                    _context.ConnectorInterfaces.Remove(cInterface);
+                    context.ConnectorInterfaces.Remove(cInterface);
             });
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
         }
 
         public async Task UpdateAsync(ConnectorInterface connectorInterface)
@@ -55,7 +55,7 @@ namespace ASP_MVC_NoAuthentication.Repositories
                 ConnectorInterface dbConnectorInterface = await GetByIdAsync(connectorInterface.Id);
                 dbConnectorInterface.Description = connectorInterface.Description;
                 dbConnectorInterface.Name = connectorInterface.Name;
-                await _context.SaveChangesAsync();
+                await context.SaveChangesAsync();
             }
         }
     }

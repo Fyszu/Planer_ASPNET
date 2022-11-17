@@ -6,30 +6,30 @@ namespace ASP_MVC_NoAuthentication.Repositories
 {
     public class ChargingStationsRepository : IChargingStationsRepository
     {
-        private readonly MyDbContext _context;
+        private readonly MyDbContext context;
         public ChargingStationsRepository(MyDbContext context)
         {
-            _context = context;
+            this.context = context;
         }
 
 
 
         public async Task<ChargingStation> GetByIdAsync(long id)
         {
-            return await _context.ChargingStations.Include(station => station.Provider).Include(station => station.OperatingHours).Include(station => station.ChargingPoints).ThenInclude(point => point.Connectors).ThenInclude(connector => connector.Interfaces).Where(station => station.Id.Equals(id)).SingleOrDefaultAsync();
+            return await context.ChargingStations.Include(station => station.Provider).Include(station => station.OperatingHours).Include(station => station.ChargingPoints).ThenInclude(point => point.Connectors).ThenInclude(connector => connector.Interfaces).Where(station => station.Id.Equals(id)).SingleOrDefaultAsync();
         }
 
         public async Task AddAsync(ChargingStation chargingStation)
         {
             if(chargingStation != null)
-                await _context.ChargingStations.AddAsync(chargingStation);
-            await _context.SaveChangesAsync();
+                await context.ChargingStations.AddAsync(chargingStation);
+            await context.SaveChangesAsync();
         }
 
         public async Task AddRangeAsync(HashSet<ChargingStation> chargingStations)
         {
-            await _context.ChargingStations.AddRangeAsync(chargingStations);
-            await _context.SaveChangesAsync();
+            await context.ChargingStations.AddRangeAsync(chargingStations);
+            await context.SaveChangesAsync();
         }
 
         public async Task UpdateAsync(ChargingStation chargingStation)
@@ -54,34 +54,34 @@ namespace ASP_MVC_NoAuthentication.Repositories
                 dbChargingStation.AuthenticationMethods = chargingStation.AuthenticationMethods;
                 dbChargingStation.ChargingPoints = chargingStation.ChargingPoints;
             }
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
         }
 
         public async Task RemoveAsync(ChargingStation chargingStation)
         {
             if (chargingStation != null)
-                _context.ChargingStations.Remove(chargingStation);
-            await _context.SaveChangesAsync();
+                context.ChargingStations.Remove(chargingStation);
+            await context.SaveChangesAsync();
         }
 
         // Removes all records from ChargingStations repository
         public async Task RemoveAllAsync()
         {
-            await _context.ChargingStations
+            await context.ChargingStations
                 .Include(station => station.OperatingHours)
                 .Include(station => station.ChargingPoints)
                 .ThenInclude(point => point.Connectors)
                 .ThenInclude(connector => connector.Interfaces)
                 .ForEachAsync(station => {
                 if (station != null)
-                    _context.ChargingStations.Remove(station);
+                    context.ChargingStations.Remove(station);
             });
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
         }
 
         public async Task<List<ChargingStation>> GetAllAsync()
         {
-            return await _context.ChargingStations.Include(station => station.Provider).Include(station => station.OperatingHours).Include(station => station.ChargingPoints).ThenInclude(point => point.Connectors).ThenInclude(connector => connector.Interfaces).ToListAsync();
+            return await context.ChargingStations.Include(station => station.Provider).Include(station => station.OperatingHours).Include(station => station.ChargingPoints).ThenInclude(point => point.Connectors).ThenInclude(connector => connector.Interfaces).ToListAsync();
         }
     }
 }

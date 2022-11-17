@@ -12,17 +12,13 @@ namespace ASP_MVC_NoAuthentication.Controllers
     public class DistanceController : Controller
     {
 
-        private readonly IDistanceService _distanceService;
-        private readonly IWeatherAPIService _weatherService;
-        private readonly SignInManager<User> _signInManager;
-        private readonly UserManager<User> _userManager;
+        private readonly IDistanceService distanceService;
+        private readonly IWeatherAPIService weatherService;
 
-        public DistanceController(IDistanceService service, IWeatherAPIService weatherService, UserManager<User> userManager, SignInManager<User> signInManager)
+        public DistanceController(IDistanceService service, IWeatherAPIService weatherService)
         {
-            _distanceService = service;
-            _weatherService = weatherService;
-            _signInManager = signInManager;
-            _userManager = userManager;
+            distanceService = service;
+            this.weatherService = weatherService;
         }
 
         [HttpGet("GetRealDistance")]
@@ -31,11 +27,11 @@ namespace ASP_MVC_NoAuthentication.Controllers
             estimatedTravelTime = estimatedTravelTime / 3600; // seconds -> hours
             estimatedTravelTime = estimatedTravelTime == 0 ? 1 : estimatedTravelTime;
             estimatedTravelTime = estimatedTravelTime > 24 ? 24 : estimatedTravelTime;
-            float temperatureOfOrigin = await _weatherService.GetTemperatureForLocationAsync(origLat, origLng, estimatedTravelTime);
-            float temperatureOfDestination = await _weatherService.GetTemperatureForLocationAsync(destLat, destLng, estimatedTravelTime);
+            float temperatureOfOrigin = await weatherService.GetTemperatureForLocationAsync(origLat, origLng, estimatedTravelTime);
+            float temperatureOfDestination = await weatherService.GetTemperatureForLocationAsync(destLat, destLng, estimatedTravelTime);
             if (temperatureOfOrigin != -300f && temperatureOfDestination != -300f) // -300 is error code for weather service
             {
-                return _distanceService.GetRealMaximumDistanceAsync(batteryLevel, maximumDistance, (DataHelper.DrivingStyle)drivingStyle, (temperatureOfDestination + temperatureOfOrigin) / 2);
+                return distanceService.GetRealMaximumDistanceAsync(batteryLevel, maximumDistance, (DataHelper.DrivingStyle)drivingStyle, (temperatureOfDestination + temperatureOfOrigin) / 2);
             }
             else
             {

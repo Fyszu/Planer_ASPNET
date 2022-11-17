@@ -83,7 +83,6 @@ namespace ASP_MVC_NoAuthentication.Pages
             currentUser = await userService.GetUserByNameAsync(User.Identity.Name);
             if (ConnectorInterfaces == null || ConnectorInterfaces.Count == 0)
             {
-                logger.LogError("B³¹d podczas dodawania samochodu: pobrana lista z³¹czy ³adowania jest pusta.");
                 throw new NoDataInDatabaseException("B³¹d podczas dodawania samochodu: pobrana lista z³¹czy ³adowania jest pusta.");
             }
             if (currentUser == null)

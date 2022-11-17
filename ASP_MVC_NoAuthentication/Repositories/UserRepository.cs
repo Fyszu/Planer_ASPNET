@@ -5,51 +5,51 @@ namespace ASP_MVC_NoAuthentication.Repositories
 {
 	public class UserRepository : IUserRepository
 	{
-        private readonly MyDbContext _context;
+        private readonly MyDbContext context;
         public UserRepository(MyDbContext context)
         {
-            _context = context;
+            this.context = context;
         }
 
 
 
         public async Task<User> GetByIdAsync(string id)
         {
-            return await _context.Users.FindAsync(id);
+            return await context.Users.FindAsync(id);
         }
 
         public async Task AddAsync(User user)
         {
             if (user != null)
-                await _context.Users.AddAsync(user);
-            await _context.SaveChangesAsync();
+                await context.Users.AddAsync(user);
+            await context.SaveChangesAsync();
         }
 
         public async Task UpdateAsync(User user)
         {
-            User dbUser = _context.Users.Find(user.Id);
+            User dbUser = context.Users.Find(user.Id);
             if (dbUser != null)
             {
                 dbUser.ShowOnlyMyCars = user.ShowOnlyMyCars;
             }
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
         }
 
         public async Task RemoveAsync(User user)
         {
             if (user != null)
-                _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
+                context.Users.Remove(user);
+            await context.SaveChangesAsync();
         }
 
         public async Task<List<User>> GetAllAsync()
         {
-            return await _context.Users.ToListAsync();
+            return await context.Users.ToListAsync();
         }
 
         public async Task<User> GetByNameAsync(string name)
         {
-            return await _context.Users.Include(user => user.Cars).ThenInclude(car => car.ConnectorInterfaces).Where(u => u.UserName == name).SingleOrDefaultAsync();
+            return await context.Users.Include(user => user.Cars).ThenInclude(car => car.ConnectorInterfaces).Where(u => u.UserName == name).SingleOrDefaultAsync();
         }
     }
 }
