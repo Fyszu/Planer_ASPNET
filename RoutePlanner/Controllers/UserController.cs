@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using RoutePlanner.Services;
 
 namespace RoutePlanner.Controllers
 {
@@ -10,12 +11,12 @@ namespace RoutePlanner.Controllers
     [Authorize]
     public class UserController : Controller
     {
-        private readonly UserManager<User> userManager;
+        private readonly IUserService userService;
         private readonly ILogger<UserController> logger;
         private readonly SignInManager<User> signInManager;
-        public UserController(SignInManager<User> signInManager, UserManager<User> userManager, ILogger<UserController> logger)
+        public UserController(SignInManager<User> signInManager, IUserService userService, ILogger<UserController> logger)
         {
-            this.userManager = userManager;
+            this.userService = userService;
             this.logger = logger;
             this.signInManager = signInManager;
         }
@@ -23,7 +24,7 @@ namespace RoutePlanner.Controllers
         [HttpGet("DeleteUser")]
         public async Task<IActionResult> DeleteUser([FromQuery] string userId)
         {
-            User? user = await userManager.FindByIdAsync(userId);
+            User? user = await userService.GetByIdAsync(userId);
             if (User.Identity != null && User.Identity.Name != null && User.Identity.IsAuthenticated)
             {
                 if (user == null)
@@ -33,9 +34,9 @@ namespace RoutePlanner.Controllers
                 }
                 else if (User.Identity.Name == user.UserName)
                 {
-                    await userManager.DeleteAsync(user);
+                    await userService.DeleteAsync(user);
                     logger.LogInformation($"Użytkownik {user.UserName} o ID: {user.Id} został usunięty z bazy danych.");
-                    if (await userManager.FindByIdAsync(userId) != null)
+                    if (await userService.GetByIdAsync(userId) != null)
                     {
                         // User found after removal - something went wrong.
                         logger.LogCritical($"Nie udało się usunąć konta użytkownika {user.UserName}.");

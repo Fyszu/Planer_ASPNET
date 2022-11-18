@@ -1,5 +1,6 @@
 ﻿using RoutePlanner.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Xml.Linq;
 
 namespace RoutePlanner.Repositories
 {
@@ -15,7 +16,7 @@ namespace RoutePlanner.Repositories
 
         public async Task<User> GetByIdAsync(string id)
         {
-            return await context.Users.FindAsync(id);
+            return await context.Users.Include(user => user.Cars).ThenInclude(car => car.ConnectorInterfaces).Where(u => u.Id == id).SingleOrDefaultAsync();
         }
 
         public async Task AddAsync(User user)
@@ -37,9 +38,32 @@ namespace RoutePlanner.Repositories
 
         public async Task RemoveAsync(User user)
         {
-            if (user != null)
-                context.Users.Remove(user);
-            await context.SaveChangesAsync();
+            if (user != null && user.Cars != null)
+            {
+                foreach (Car car in user.Cars)
+                {
+                    if (car.ConnectorInterfaces == null)
+                    {
+                        throw new Exception($"Błąd podczas usuwania samochodu {car.Brand} {car.Model}.");
+                    }
+                }
+                try
+                {
+                    using var transaction = await context.Database.BeginTransactionAsync();
+                    context.Cars.RemoveRange(user.Cars);
+                    context.Users.Remove(user);
+                    await context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("Problem podczas usuwania użytkownika i jego samochodów.", new Exception(ex.InnerException?.ToString()));
+                }
+            }
+            else
+            {
+                throw new Exception("Błąd podczas usuwania użytkownika.", new Exception("Użytkownik lubj jego lista samochodów była nullem."));
+            }
         }
 
         public async Task<List<User>> GetAllAsync()

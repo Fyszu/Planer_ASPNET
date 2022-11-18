@@ -17,6 +17,17 @@ namespace RoutePlanner.Services
             return await repository.GetByNameAsync(name);
         }
 
+        public async Task<User> GetByIdAsync(string userId)
+        {
+            return await repository.GetByIdAsync(userId);
+        }
+
+        public async Task DeleteAsync(User user)
+        {
+
+            await repository.RemoveAsync(user);
+        }
+
         public async Task SaveSettingsAsync(User user)
         {
             await repository.UpdateAsync(user);
