@@ -1,9 +1,5 @@
 ﻿using ASP_MVC_NoAuthentication.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
-using System.Net;
-using System.Text;
 
 namespace ASP_MVC_NoAuthentication.Controllers
 {

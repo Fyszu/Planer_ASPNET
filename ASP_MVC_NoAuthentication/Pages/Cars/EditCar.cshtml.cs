@@ -1,7 +1,6 @@
 using ASP_MVC_NoAuthentication.Data;
 using ASP_MVC_NoAuthentication.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -92,7 +91,7 @@ namespace ASP_MVC_NoAuthentication.Pages
                 }
                 catch (Exception ex)
                 {
-                    throw new Exception("Z³y numer ID samochodu do edycji lub problem z odczytaniem ID.");
+                    throw new Exception($"Z³y numer ID samochodu do edycji lub problem z odczytaniem ID.",new Exception($"{ex.Message}\n{ex.InnerException}"));
                 }
             }
 

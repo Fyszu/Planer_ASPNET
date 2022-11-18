@@ -1,6 +1,5 @@
 ﻿using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ASP_MVC_NoAuthentication.Data
 {

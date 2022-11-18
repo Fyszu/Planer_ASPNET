@@ -2,10 +2,8 @@ using ASP_MVC_NoAuthentication.Data;
 using ASP_MVC_NoAuthentication.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Newtonsoft.Json.Serialization;
 using System.Diagnostics;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace ASP_MVC_NoAuthentication.Pages
 {

@@ -1,6 +1,5 @@
 ﻿using ASP_MVC_NoAuthentication.Data;
 using Microsoft.EntityFrameworkCore;
-using System.Diagnostics.Metrics;
 
 namespace ASP_MVC_NoAuthentication.Repositories
 {

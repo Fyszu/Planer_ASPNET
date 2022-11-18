@@ -1,8 +1,6 @@
 ﻿using ASP_MVC_NoAuthentication.Data;
 using ASP_MVC_NoAuthentication.Services;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.RegularExpressions;
 
 namespace ASP_MVC_NoAuthentication.Controllers
 {

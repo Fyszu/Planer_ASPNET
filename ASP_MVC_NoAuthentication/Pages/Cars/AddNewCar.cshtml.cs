@@ -1,8 +1,6 @@
 using ASP_MVC_NoAuthentication.Data;
-using ASP_MVC_NoAuthentication.Repositories;
 using ASP_MVC_NoAuthentication.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 

@@ -1,9 +1,6 @@
 ﻿using ASP_MVC_NoAuthentication.Data;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Net;
-using System.Security.Policy;
-using System.Text;
 
 namespace ASP_MVC_NoAuthentication.Services
 {

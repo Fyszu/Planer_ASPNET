@@ -1,7 +1,6 @@
 ﻿using ASP_MVC_NoAuthentication.Data;
 using AspNetCoreRateLimit;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 
 namespace ASP_MVC_NoAuthentication.Filters
 {

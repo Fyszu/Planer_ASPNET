@@ -1,6 +1,4 @@
 ﻿using ASP_MVC_NoAuthentication.Data;
-using System.Net;
-using System.Security.Policy;
 using System.Text.Json;
 
 namespace ASP_MVC_NoAuthentication.Services
