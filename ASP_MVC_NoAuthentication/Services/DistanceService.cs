@@ -13,7 +13,7 @@ namespace ASP_MVC_NoAuthentication.Services
         }
 
         // Get real maximum distance in meters
-        public string GetRealMaximumDistanceAsync(int batteryLevel, int maximumDistance, DataHelper.DrivingStyle drivingStyle, float temperature) 
+        public string GetRealMaximumDistance(int batteryLevel, int maximumDistance, DataHelper.DrivingStyle drivingStyle, float temperature) 
         {
             float realDistance = ((float)batteryLevel / 100f) * (maximumDistance * 1000); // *1000: conversion to meters, /100: conversion to precentage
             realDistance = CalculateDistanceByTemperature(realDistance, temperature);

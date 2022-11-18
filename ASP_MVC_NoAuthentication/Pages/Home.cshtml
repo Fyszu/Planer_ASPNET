@@ -80,6 +80,9 @@
         </div>
     </form>
 
+    <!--- Real estimated travel distance --->
+    <div class="userInfo" id="userInfo" style="text-align:center"></div>
+
     <!-- Stops on the route form -->
     <div class="stopsForm" id="stopsForm">
         <h2>Twoja trasa</h2>
@@ -129,10 +132,9 @@
         const originField = document.getElementById("origin");
         const destinationField = document.getElementById("destination");
         var stopCount = 1;
+        const userInfoElement = document.getElementById("userInfo");
 
         window.onload = init(); //Call init function on page load
-
-
 
         //Google map initialization
         function initMap() {
@@ -271,6 +273,8 @@
                 chargingRadius.setMap(null);
                 chargingRadius.setMap(map);
                 resetStopsList();
+                userInfoElement.innerHTML = "Trwa wyznaczanie trasy, proszę czekać...     " + "<img class='userInfoImage' src='/images/loading.gif' alt='Italian Trulli'>";
+                $("#userInfo").show(300);
 
                 // Convert address for coordinates
                 var originCoordinates = await fetchAddress(originField.value);
@@ -304,12 +308,21 @@
                     directionsRenderer.setDirections(googleApiRequestResponse); // Visual route on map
                     routeEstimatedTravelTime = route.legs[0].duration.value; // Estimated time in seconds 
 
-                    // Get charging radius and set in on the map
+                    // Get charging radius and set in on the map - provided in meters
                     const radius = await fetchRealDistance(carList[carListComboBox.selectedIndex].maximumDistance, batteryLevel, originCoordinates, destinationCoordinates, routeEstimatedTravelTime, choosedDrivingStyle);
-                    if (radius == -1 || radius == null)
+                    if (radius == 0 || radius == null)
                     {
                         window.alert("Wystąpił błąd przy określaniu zasięgu samochodu.");
                         radius = 0;
+                        userInfoElement.innerHTML = "";
+                        $("#userInfo").hide(0);
+                    }
+                    else
+                    {
+                        userInfoElement.innerHTML = "Obliczony realny zasięg samochodu to " + Math.floor(radius/1000) + "km";
+                        if ($("#userInfo").is(':hidden')) {
+                            $("#userInfo").show(300);
+                        }
                     }
                     chargingRadius.setCenter(originCoordinates);
                     chargingRadius.setRadius(radius);
@@ -498,7 +511,7 @@
                 }
                 else {
                     if (responseArray["ErrorMessage"])
-                        alert(responseArray["ErrorMessage"] + " Zasięg nie zostanie naniesiony.")
+                        alert(responseArray["ErrorMessage"] + " Zasięg nie zostanie naniesiony. Spróbuj jeszcze raz.")
                     else
                         alert("Wystąpił nieznany błąd podczas wyznaczania zasięgu realnego samochodu. Zasięg nie zostanie naniesiony");
                     return 0;

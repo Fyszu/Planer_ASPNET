@@ -242,6 +242,21 @@ p {
         width: 19%;
         float: left;
     }
+
+    .userInfo {
+        font-family: 'Avenir Next LT Pro';
+        font-weight: 400;
+        margin-top: 1.5vh;
+        margin-bottom: 1.5vh;
+        color: #0111a2;
+        font-size: 2vw;
+        display: none;
+    }
+
+    .userInfoImage {
+        width: 1em;
+        height: 1em;
+    }
 }
 /* PC resolution END */
 
@@ -313,6 +328,20 @@ p {
     .stop-remove-btn {
         width: 19%;
         float: left;
+    }
+
+    .userInfo {
+        font-family: 'Avenir Next LT Pro';
+        font-weight: 400;
+        margin-top: 1.2vh;
+        color: #0111a2;
+        font-size: 3.7vw;
+        display: none;
+    }
+
+    .userInfoImage {
+        width: 1em;
+        height: 1em;
     }
 }
 /* Mobile resolution END */

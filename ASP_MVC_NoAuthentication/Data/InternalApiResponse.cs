@@ -35,7 +35,7 @@ namespace ASP_MVC_NoAuthentication.Data
             { StatusCode.GoogleServerSideUnknownError, "Wystąpił błąd po stronie serwera Google podczas przetwarzania adresu. Spróbuj ponownie później." },
             { StatusCode.GoogleNoParametersPassedError, "Błąd po stronie aplikacji - nie przekazano parametrów zapytania." },
             { StatusCode.GoogleInvalidRequest, "Błąd po stronie aplikacji - złe zapytanie." },
-            { StatusCode.DistanceControllerWeatherAPIError, "Błąd po stronie aplikacji - błąd podczas przetwarzania temperatury z zewnętrznego API." },
+            { StatusCode.DistanceControllerWeatherAPIError, "API pogodowe nie odpowiada." },
             { StatusCode.DistanceControllerOtherError, "Błąd po stronie aplikacji - błąd podczas przetwarzania wyniku obliczeń dystansu samochodu." },
             { StatusCode.UnknownError, "Wystąpił nieznany błąd. Spróbuj ponownie." }
         }; 

@@ -5,10 +5,14 @@ namespace ASP_MVC_NoAuthentication.Services
 {
     public class WeatherAPIService : IWeatherAPIService
     {
+        private static readonly int retryCount = 5;
+        private static readonly int retryWaitTime = 1500;
         private readonly ILogger<WeatherAPIService> logger;
         private readonly HttpClient client = new();
         private float latitude;
         private float longitude;
+        private int retryNo = 1;
+        
 
         public WeatherAPIService(ILogger<WeatherAPIService> logger)
         {
@@ -69,8 +73,17 @@ namespace ASP_MVC_NoAuthentication.Services
             }
             catch (Exception ex)
             {
-                logger.LogCritical($"Wystąpił wyjątek podczas pobierania temperatury (WeatherAPIService). Wyjątek: {ex.Message}\n{ex.InnerException}");
-                return -300;
+                logger.LogError($"Wystąpił wyjątek podczas pobierania temperatury (WeatherAPIService). Wyjątek: {ex.Message}\n{ex.InnerException}");
+                if (retryNo <= retryCount)
+                {
+                    retryNo++;
+                    logger.LogInformation($"Ponawianie próby.. próba nr. {retryNo}");
+                    return await GetTemperatureForLocationAsync(lat, lng, estimatedTravelTime);
+                }
+                else
+                {
+                    return -300;
+                }
             }
         }
     }

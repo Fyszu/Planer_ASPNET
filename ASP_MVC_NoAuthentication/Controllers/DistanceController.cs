@@ -29,7 +29,7 @@ namespace ASP_MVC_NoAuthentication.Controllers
             float temperatureOfDestination = await weatherService.GetTemperatureForLocationAsync(destLat, destLng, estimatedTravelTime);
             if (temperatureOfOrigin != -300f && temperatureOfDestination != -300f) // -300 is error code for weather service
             {
-                return distanceService.GetRealMaximumDistanceAsync(batteryLevel, maximumDistance, (DataHelper.DrivingStyle)drivingStyle, (temperatureOfDestination + temperatureOfOrigin) / 2);
+                return distanceService.GetRealMaximumDistance(batteryLevel, maximumDistance, (DataHelper.DrivingStyle)drivingStyle, (temperatureOfDestination + temperatureOfOrigin) / 2);
             }
             else
             {

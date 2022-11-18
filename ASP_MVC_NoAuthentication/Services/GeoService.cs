@@ -11,6 +11,7 @@ namespace ASP_MVC_NoAuthentication.Services
         private readonly string googleApiKey;
         private readonly HttpClient client = new();
         private static readonly int retryCount = 3;
+        private static readonly int retryWaitTime = 1500; // ms
         private int currentRetry;
 
         public GeoService(ILogger<GeoService> logger, IConfiguration configuration)
@@ -141,8 +142,9 @@ namespace ASP_MVC_NoAuthentication.Services
                     }
 
                     // Error occured at google server's side - retry
-                    if (status == InternalApiResponse.StatusCode.GoogleServerSideUnknownError && currentRetry <= retryCount)
+                    if ((status == InternalApiResponse.StatusCode.GoogleServerSideUnknownError || status == InternalApiResponse.StatusCode.GoogleLimitReached) && currentRetry <= retryCount)
                     {
+                        Thread.Sleep(retryWaitTime);
                         return await GetResultFromGoogleApi(location);
                     }
 
