@@ -1,4 +1,4 @@
-﻿using ASP_MVC_NoAuthentication.Data;
+﻿using RoutePlanner.Data;
 using EipaUdtImportingTools.Data;
 using Microsoft.Extensions.Logging;
 using System;
@@ -8,8 +8,8 @@ using System.Security.Policy;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using static ASP_MVC_NoAuthentication.Data.ChargingPoint;
-using static ASP_MVC_NoAuthentication.Data.ChargingStation;
+using static RoutePlanner.Data.ChargingPoint;
+using static RoutePlanner.Data.ChargingStation;
 
 namespace EipaUdtImportingTools.Tools
 {
@@ -41,16 +41,16 @@ namespace EipaUdtImportingTools.Tools
             try
             {
                 // Initialize
-                HashSet<ASP_MVC_NoAuthentication.Data.ConnectorInterface> internalConnectorInterfaces = new();
-                HashSet<ASP_MVC_NoAuthentication.Data.Provider> internalProviders = new();
-                HashSet<ASP_MVC_NoAuthentication.Data.ConnectorInterface> connectorInterfacesInUsage = new();
+                HashSet<RoutePlanner.Data.ConnectorInterface> internalConnectorInterfaces = new();
+                HashSet<RoutePlanner.Data.Provider> internalProviders = new();
+                HashSet<RoutePlanner.Data.ConnectorInterface> connectorInterfacesInUsage = new();
 
                 logger.LogTrace("Pobieranie interfejsów ładowania ze słownika.");
                 // Get connector interfaces from dictionaries
                 foreach (var connectorInterface in dictionaries.ConnectorInterface)
                 {
                     internalConnectorInterfaces.Add(
-                        new ASP_MVC_NoAuthentication.Data.ConnectorInterface
+                        new RoutePlanner.Data.ConnectorInterface
                         {
                             Id = connectorInterface.Id,
                             Name = connectorInterface.Name,
@@ -61,7 +61,7 @@ namespace EipaUdtImportingTools.Tools
                 logger.LogTrace("Przetwarzanie stacji ładowania.");
 
                 // Create charging stations
-                HashSet<ASP_MVC_NoAuthentication.Data.ChargingStation> internalChargingStations = new();
+                HashSet<RoutePlanner.Data.ChargingStation> internalChargingStations = new();
                 foreach (var poolData in poolsData)
                 {
                     ChargingStationData? chargingStationData = null;
@@ -84,7 +84,7 @@ namespace EipaUdtImportingTools.Tools
                         continue;
 
                     // Get charging station's services provider (operator)
-                    ASP_MVC_NoAuthentication.Data.Provider? internalProvider = null;
+                    RoutePlanner.Data.Provider? internalProvider = null;
                     internalProvider = internalProviders.Where(provider => provider.Id == poolData.OperatorId).SingleOrDefault();
                     if (internalProvider == null)
                     {
@@ -92,7 +92,7 @@ namespace EipaUdtImportingTools.Tools
                         if (providerData != null && providerData.Name != null)
                         {
                             string? companyType = dictionaries.CompanyType.FirstOrDefault(companyType => companyType.Id.Equals(providerData.Type))?.Name;
-                            internalProvider = new ASP_MVC_NoAuthentication.Data.Provider()
+                            internalProvider = new RoutePlanner.Data.Provider()
                             {
                                 Id = providerData.Id,
                                 Name = providerData.Name,
@@ -111,13 +111,13 @@ namespace EipaUdtImportingTools.Tools
                     }
 
                     // Get operating hours of station
-                    List<ASP_MVC_NoAuthentication.Data.ChargingStation.OperatingHour> internalOperatingHours = new();
+                    List<RoutePlanner.Data.ChargingStation.OperatingHour> internalOperatingHours = new();
                     foreach (var operatingHourData in poolData.OperatingHours)
                     {
                         string? weekday = dictionaries.Weekday.FirstOrDefault(wkd => wkd.Id == operatingHourData.Weekday)?.Name;
                         if (!string.IsNullOrEmpty(weekday))
                         {
-                            var operatingHours = new ASP_MVC_NoAuthentication.Data.ChargingStation.OperatingHour()
+                            var operatingHours = new RoutePlanner.Data.ChargingStation.OperatingHour()
                             {
                                 FromTime = operatingHourData.FromTime,
                                 ToTime = operatingHourData.ToTime,
@@ -136,7 +136,7 @@ namespace EipaUdtImportingTools.Tools
                     }
 
                     // Get charging points for station
-                    List<ASP_MVC_NoAuthentication.Data.ChargingPoint> internalChargingPoints = new();
+                    List<RoutePlanner.Data.ChargingPoint> internalChargingPoints = new();
                     foreach (ChargingPointData chargingPointData in chargingPointsData.Where(point => point.StationId == chargingStationData.Id))
                     {
                         double? chargingPointPrice = null;
@@ -172,11 +172,11 @@ namespace EipaUdtImportingTools.Tools
                         }
 
                         // Get connectors for charging point
-                        HashSet<ASP_MVC_NoAuthentication.Data.ChargingPoint.Connector> internalConnectors = new();
+                        HashSet<RoutePlanner.Data.ChargingPoint.Connector> internalConnectors = new();
                         foreach (EipaUdtImportingTools.Data.Connector connectorData in chargingPointData.Connectors)
                         {
                             // Get interfaces for connector
-                            HashSet<ASP_MVC_NoAuthentication.Data.ConnectorInterface> interfacesForConnector = new();
+                            HashSet<RoutePlanner.Data.ConnectorInterface> interfacesForConnector = new();
                             foreach (var connectorInterface in internalConnectorInterfaces.Where(cni => connectorData.Interfaces.Contains(cni.Id)))
                             {
                                 interfacesForConnector.Add(connectorInterface);
@@ -185,7 +185,7 @@ namespace EipaUdtImportingTools.Tools
                             }
 
                             internalConnectors.Add(
-                                new ASP_MVC_NoAuthentication.Data.ChargingPoint.Connector
+                                new RoutePlanner.Data.ChargingPoint.Connector
                                 {
                                     CableAttached = connectorData.CableAttached,
                                     ChargingPower = connectorData.Power != 0 ? connectorData.Power : null,
@@ -193,7 +193,7 @@ namespace EipaUdtImportingTools.Tools
                                 });
                         }
 
-                        ASP_MVC_NoAuthentication.Data.ChargingPoint internalChargingPoint = new()
+                        RoutePlanner.Data.ChargingPoint internalChargingPoint = new()
                         {
                             Id = chargingPointData.Id,
                             Price = chargingPointPrice,
@@ -212,7 +212,7 @@ namespace EipaUdtImportingTools.Tools
                         internalChargingPoints.Add(internalChargingPoint);
                     }
 
-                    ASP_MVC_NoAuthentication.Data.ChargingStation internalChargingStation = new()
+                    RoutePlanner.Data.ChargingStation internalChargingStation = new()
                     {
                         Id = chargingStationData.Id,
                         Provider = internalProvider,
@@ -226,7 +226,7 @@ namespace EipaUdtImportingTools.Tools
                         Community = chargingStationData.Location.Community,
                         District = chargingStationData.Location.District,
                         Province = chargingStationData.Location.Province,
-                        OperatingHours = allTimeOpen ? new List<ASP_MVC_NoAuthentication.Data.ChargingStation.OperatingHour>() : internalOperatingHours,
+                        OperatingHours = allTimeOpen ? new List<RoutePlanner.Data.ChargingStation.OperatingHour>() : internalOperatingHours,
                         AllTimeOpen = allTimeOpen,
                         Accessibility = poolData.Accessibility,
                         ChargingPoints = internalChargingPoints

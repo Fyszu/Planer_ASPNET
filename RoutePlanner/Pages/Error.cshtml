@@ -1,0 +1,17 @@
+﻿@page "/Error"
+
+@model RoutePlanner.Pages.ErrorModel
+@{
+    ViewData["Title"] = "Informacja o błędzie";
+    Layout = "_Layout";
+}
+
+<!-- CSS -->
+<link rel="stylesheet" href="~/css/ErrorInfo.css">
+
+<h1><b>Wystąpił błąd.</b></h1>
+<br />
+<h2>@Model.ExceptionMessage</h2>
+<a href="~/">Naciśnij tutaj, by powrócić na stronę główną</a>
+<br /><br />
+<p>@Model.InnerException</p>

@@ -1,0 +1,652 @@
+﻿@page "/"
+
+@using RoutePlanner.Data
+@using System.Net
+@using System.Text;
+@using System.Web;
+@using Newtonsoft.Json;
+@using System.Globalization
+
+@model RoutePlanner.Pages.HomeModel
+
+@{
+    ViewData["Title"] = "Planer tras";
+    Layout = "_Layout";
+}
+
+
+<head>
+    <!-- My CSS -->
+    <link rel="stylesheet" href="~/css/Home.css">
+
+    <!--- Header font import --->
+    <style>
+        @@import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@1,900&display=swap');
+    </style>
+
+    <!-- JQuery -->
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+</head>
+
+
+<body>
+    <!-- Main top image -->
+    <img src="/images/ecars_banner.jpg" class="img-fluid" id="headerImage" alt="Header image">
+    <!-- Header -->
+    <h1>Planer tras dla samochodów elektrycznych</h1>
+
+    <!-- Short description -->
+    <p>Cześć! Witaj na stronie aplikacji automatyzującej planowanie podróży samochodem elektrycznym.</p>
+    <p>Wypełnij pola poniżej oraz klknij "<b>Szukaj ładowarek</b>", a zostaną znalezione ładowarki w pobliżu Twojej trasy podróży.</p>
+    <p>Aplikacja korzysta z <b>Google API</b> do wyznaczania tras oraz bierze pod uwagę realny zasięg Twojego samochodu. <br /><em><a href="/Info">Kliknij aby dowiedzieć się więcej.</a></em></p>
+    @if (!Model.IsLoggedIn)
+    {
+            <p><b><a href="/Login">Zaloguj się</a></b> w celu dodania swojego samochodu do listy oraz zmiany ustawień.</p>
+    }
+
+    <!-- Route form  --->
+    <form id="fr">
+        <div class="row align-items-end" style="margin-left:3%; margin-right: 3%; margin-top:4%">
+            <div class="col-sm top-buffer text-center origin-column">
+                <h2 style="margin-right:12%;">Początek podróży</h2>
+                <input class="inputForm align-middle" type="text" id="origin" style="width:86%; max-width:70vw; min-height: 5vh;" placeholder="Początek podróży" required>
+                <input class="align-middle" type="image" id="currentLocationButton" name="currentLocationButton" src="/images/currentLocation.png" onClick="getCurrentLocation(); return false;">
+            </div>
+            <div class="col-sm top-buffer text-center">
+                <h2>Koniec podróży</h2>
+                <input class="inputForm align-middle" type="text" style="width:100%; max-width:70vw; min-height: 5vh;" id="destination" placeholder="Cel podróży" required>
+            </div>
+            <div class="col-sm top-buffer text-center">
+                <h2><img src="@Url.Content("~/images/question_mark.png")" class="questionMark" data-toggle="tooltip" data-placement="bottom" title="Nie możesz znaleźć swojego samochodu na liście? Zaloguj się i dodaj własny!" /> Samochód:</h2>
+                <select class="inputForm align-middle" id="selectCar" style="width:100%; max-width:70vw; min-height: 5vh;"></select>
+            </div>
+            <div class="col-sm top-buffer text-center">
+                <h2><img src="@Url.Content("~/images/question_mark.png")" class="questionMark" data-toggle="tooltip" data-placement="bottom" title="Podaj aktualny (lub planowany) stan baterii Twojego samochodu." /> Stan baterii</h2>
+                <input class="inputForm align-middle" type=number id="batteryLevelSelect" style="width:100%; max-width:70vw; min-height: 5vh;" placeholder="Poziom baterii [%]" min=1 max=100>
+            </div>
+            <div class="col-sm top-buffer text-center">
+                <h2><img src="@Url.Content("~/images/question_mark.png")" class="questionMark" data-toggle="tooltip" data-placement="bottom" title="Prędkość przejazdu ma bardzo duży wpływ na szybkość rozładowania baterii. Wybierz prędkość, która będzie utrzymywana przez większość podróży." /> Prędkość:</h2>
+                <select class="inputForm align-middle" id="drivingStyleComboBox" style="width:100%; max-width:70vw; min-height: 5vh;">
+                    <option value="1">Miejska (50km/h - 70km/h)</option>
+                    <option value="2">Mieszana (70km/h - 100km/h)</option>
+                    <option value="3">Autostrada (do 120km/h)</option>
+                    <option selected value="4">Autostrada (do 140km/h)</option>
+                    <option value="5">Autostrada (powyżej 140km/h)</option>
+                </select>
+            </div>
+            <div class="col-sm top-buffer text-center" style="min-height:100%">
+                <button class="inputForm search-button align-middle" type="button" style="width:100%; max-width:70vw; min-height: 5vh;" id="findRouteButton">Szukaj ładowarek</button>
+            </div>
+        </div>
+    </form>
+
+    <!--- Real estimated travel distance --->
+    <div class="userInfo" id="userInfo" style="text-align:center"></div>
+
+    <!-- Stops on the route form -->
+    <div class="stopsForm" id="stopsForm">
+        <h2>Twoja trasa</h2>
+        <ul id="originStopList" style="list-style: none;">
+
+        </ul>
+        <br />
+        <ul id="sortable" style="list-style: none;">
+
+        </ul>
+        <br />
+        <ul id="destinationStopList" style="list-style: none;">
+
+        </ul>
+        <div style="text-align: center;">
+            <button class="inputForm charger-button" id="openStopsInGoogleButton">Otwórz w google maps</button>
+        </div>
+    </div>
+
+    <!-- Map -->
+    <div class="map" id="map"></div>
+
+    <!------------------- End of HTML ------------------->
+
+
+
+
+
+    <!--- JS Libraries --->
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    
+    <!--------------- JavaScript functions --------------->
+    <script type="text/javascript">
+        
+        var map; //Google map object
+        var directionsService; //Google map routes services for javascript
+        var directionsRenderer;
+        var chargingStations = @Html.Raw(Model.JsonChargingStations); //Charging stations from page model
+        var chargingRadius; //Real distance which car can travel on current battery level (MEASURE UNIT IS METER)
+        var carList = @Html.Raw(Model.JsonCars); //List of cars to choose (from page model, default cars + user cars)
+        var carListComboBox = document.getElementById('selectCar'); //Html combo box for car selection
+        var markersArray = []; //Array of charging stations markers
+        var stops = new Array(); // array for stops in format [["1.000,1.000",name,id,order],["2.000,2.000",name2,id2,order2]]
+        const originField = document.getElementById("origin");
+        const destinationField = document.getElementById("destination");
+        var stopCount = 1;
+        const userInfoElement = document.getElementById("userInfo");
+
+        window.onload = init(); //Call init function on page load
+
+        //Google map initialization
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: 53.082100, lng: 18.228580 },
+                zoom: 8,
+            });
+            directionsService = new google.maps.DirectionsService();
+            directionsRenderer = new google.maps.DirectionsRenderer();
+            chargingRadius = new google.maps.Circle({
+                strokeColor: "#14f562",
+                strokeOpacity: 0.8,
+                strokeWeight: 2,
+                fillColor: "#14f562",
+                fillOpacity: 0.35,
+            });
+
+            //----Autocomplete init----
+            const originSearchBox = new google.maps.places.SearchBox(originField);
+            const destinationSearchBox = new google.maps.places.SearchBox(destinationField);
+
+            map.addListener("bounds_changed", () => {
+                originSearchBox.setBounds(map.getBounds());
+                destinationSearchBox.setBounds(map.getBounds());
+            });
+
+            originSearchBox.addListener("places_changed", () => {
+                const places = originSearchBox.getPlaces();
+
+                if (places.length == 0) {
+                    return;
+                }
+
+                const bounds = new google.maps.LatLngBounds();
+
+                places.forEach((place) => {
+                    if (!place.geometry || !place.geometry.location) {
+                        console.log("Returned place contains no geometry.");
+                        return;
+                    }
+
+                    const icon = {
+                        url: place.icon,
+                        size: new google.maps.Size(71, 71),
+                        origin: new google.maps.Point(17, 34),
+                        scaledSize: new google.maps.Size(25, 25),
+                    };
+
+                    if (place.geometry.viewport) {
+                        bounds.union(place.geometry.viewport);
+                    } else {
+                        bounds.extend(place.geometry.location);
+                    }
+                });
+                map.fitBounds(bounds);
+            });
+        }
+
+        //Function called on page load - parsing list of cars array to JavaScript, initializing and adding list to choice box
+        function init() {
+            console.log("Initializing.");
+            document.getElementById("findRouteButton").addEventListener("click", function () { calcRoute(); });
+            document.getElementById("openStopsInGoogleButton").addEventListener("click", function () { openStopsInGoogleMaps(); });
+            @for (int i = 0; i < Model.Cars.Count; i++)
+            {
+                @:$("#selectCar").append("<option value='" + @i + "'>" + "@Model.Cars[i].Brand" + " " + "@Model.Cars[i].Model" + " Zasięg: " + "@Model.Cars[i].MaximumDistance" + "km (" + "@Model.Cars[i].CarConnectorInterfacesToString()" + ")" + "</option>");
+            }
+        }
+
+        // Add sortable function for stops list
+        $( function() {
+            $( "#sortable" ).sortable({
+                 start: function(e, ui) {
+                    $(this).attr('stopOrder', ui.item.index() + 1);
+                    ui.item.css('color','#22e0b1');
+                },
+                update: function(event, ui) {
+                    var newIndex = ui.item.index() + 1;
+                    var oldIndex = $(this).attr('stopOrder');
+                    stops.forEach(stop => {
+                        if (newIndex < oldIndex && (oldIndex > stop[3] && newIndex <= stop[3]))
+                            stop[3]++;
+                        if (newIndex > oldIndex && (newIndex >= stop[3] && oldIndex < stop[3]))
+                            stop[3]--;
+                    });
+                    stops[oldIndex][3] = newIndex;
+                    stops.sort((a,b) => (a[3] > b[3]) ? 1 : -1);
+                    $(this).removeAttr('stopOrder');
+                },
+                stop: function(e, ui) {
+                    ui.item.css('color','#0111a2');
+                }
+            });
+        } );
+        
+        // Delete stop on removal button click
+        $("#sortable").on('click','.btn-delete',function() {
+            r = confirm('Usunąć ten przystanek?');
+            if(r) {
+                let stopName = $(this).closest('li').text().replace('Usuń','');
+                $(this).closest('li').remove();
+                order = stops.find(stop => stop[1] == stopName)[3];
+                stops = stops.filter(stop => stop[1] != stopName);
+                stops.forEach(stop => {
+                    if (stop[3] > order)
+                        stop[3]--;
+                });
+                stops.sort((a,b) => (a[3] > b[3]) ? 1 : -1);
+                stopCount--;
+                if (stopCount <= 1) {
+                    $("#stopsForm").hide(300);
+                }
+            }
+        });
+        
+        // Set route, find charging stations near route and set markers
+        async function calcRoute() {
+            var batteryLevel = document.getElementById("batteryLevelSelect").value;
+            if (!originField.value || !destinationField.value) {
+                window.alert("Proszę wypełnić pola trasy.");
+            }
+            else if (!batteryLevel) {
+                window.alert("Proszę podać stan baterii.");
+            }
+            else if ((batteryLevel > 100) || batteryLevel < 1) {
+                window.alert("Proszę podać realny stan baterii.");
+            }
+            else { // All forms are filled properly - calculate route
+                var choosedCar = carList[carListComboBox.selectedIndex];
+                var choosedDrivingStyle = document.getElementById("drivingStyleComboBox").value;
+
+                // Reset map, markers and stops
+                directionsRenderer.setMap(null);
+                clearMarkers();
+                directionsRenderer.setMap(map);
+                chargingRadius.setMap(null);
+                chargingRadius.setMap(map);
+                resetStopsList();
+                userInfoElement.innerHTML = "Trwa wyznaczanie trasy, proszę czekać...     " + "<img class='userInfoImage' src='/images/loading.gif' alt='Italian Trulli'>";
+                $("#userInfo").show(300);
+
+                // Convert address for coordinates
+                var originCoordinates = await fetchAddress(originField.value);
+                var destinationCoordinates = await fetchAddress(destinationField.value);
+
+                // Add origin and destination as stops in floating form
+                addStopToArray(originCoordinates.lat(), originCoordinates.lng(), originField.value, "originStop");
+                addStopToArray(destinationCoordinates.lat(), destinationCoordinates.lng(), destinationField.value, "destinationStop");
+
+                var routeGoogleApiRequest = {
+                    origin: originCoordinates,
+                    destination: destinationCoordinates,
+                    travelMode: 'DRIVING'
+                };
+                
+                var googleApiRequestResponse;
+                var googleApiRequestStatus;
+                await directionsService.route(routeGoogleApiRequest, function (response, status) {
+                    googleApiRequestResponse = response;
+                    googleApiRequestStatus = status;
+                });
+
+                if (googleApiRequestStatus == "ZERO_RESULTS")
+                    alert("Nie znaleziono żadnej trasy dla podanych adresów.");
+                else if (googleApiRequestStatus != google.maps.DirectionsStatus.OK)
+                    alert("Błąd wyznaczania trasy. Status: " + googleApiRequestStatus); //obsługa błędu
+                else //Status is OK
+                {
+                    var route = googleApiRequestResponse.routes[0];
+                    var routePolyline = new google.maps.Polyline({ path: google.maps.geometry.encoding.decodePath(route.overview_polyline) }); // Polyline for finding charging stations afterwards
+                    directionsRenderer.setDirections(googleApiRequestResponse); // Visual route on map
+                    routeEstimatedTravelTime = route.legs[0].duration.value; // Estimated time in seconds 
+
+                    // Get charging radius and set in on the map - provided in meters
+                    const radius = await fetchRealDistance(carList[carListComboBox.selectedIndex].maximumDistance, batteryLevel, originCoordinates, destinationCoordinates, routeEstimatedTravelTime, choosedDrivingStyle);
+                    if (radius == 0 || radius == null)
+                    {
+                        window.alert("Wystąpił błąd przy określaniu zasięgu samochodu.");
+                        radius = 0;
+                        userInfoElement.innerHTML = "";
+                        $("#userInfo").hide(0);
+                    }
+                    else
+                    {
+                        userInfoElement.innerHTML = "Obliczony realny zasięg samochodu to " + Math.floor(radius/1000) + "km";
+                        if ($("#userInfo").is(':hidden')) {
+                            $("#userInfo").show(300);
+                        }
+                    }
+                    chargingRadius.setCenter(originCoordinates);
+                    chargingRadius.setRadius(radius);
+
+                    //Filter stations to near-route stations
+                    var chargingStationsNearRoute = new Array();
+                    chargingStations.forEach(station => {
+                        var stationCoordinates = new google.maps.LatLng(station.latitude, station.longitude);
+                        if (google.maps.geometry.poly.isLocationOnEdge(stationCoordinates, routePolyline, 0.05)) // 0.001 is approx 100m
+                            chargingStationsNearRoute.push(station);
+                    });
+
+                    if (chargingStationsNearRoute.length == 0)
+                        window.alert("Brak ładowarek elektrycznych w pobliżu wyznaczonej trasy!");
+                    else {
+                        //Set charging stations as markers with info
+                        chargingStationsNearRoute.forEach(station => {
+                            var marker = getMarkerForStation(station, choosedCar);
+                            markersArray.push(marker);
+                        });
+                    }
+                }
+            }
+        } //End of calcRoute function
+        
+        // 
+        function getMarkerForStation(station, car) {
+            var marker = new google.maps.Marker({
+                position: { lat: station.latitude, lng: station.longitude },
+                map: map,
+            });
+            
+            var providerContent = "<br><b>Operator stacji: ";
+            if (station.provider.shortName)
+                providerContent += station.provider.shortName + "</b>";
+            else
+                providerContent += station.provider.name + "</b>";
+            if (station.provider.phone)
+                providerContent += "<br>Telefon do operatora: " + station.provider.phone;
+            if (station.provider.email)
+                providerContent += "<br>Adres email operatora: " + station.provider.email;
+            if (station.provider.website)
+                providerContent += "<br>Strona internetowa operatora: <a href='" + station.provider.website +"'target='_blank'>" + station.provider.website + "</a>";
+
+            var addressContent = "<br><b>Adres: </b>";
+            if (station.postalCode)
+                addressContent += station.postalCode + " ";
+            if (station.city)
+                addressContent += station.city + ", ";
+            if (station.street)
+                addressContent += station.street + " ";
+            if (station.houseNumber)
+                addressContent += station.houseNumber;
+
+            var openingHoursContent = "<br><b>Godziny otwarcia: </b><br>";
+            openingHoursContent += station.operatingHoursString;
+
+            var stationHasCorrectConnector = false;
+            var chargingPointsContent = "<br><b>Punkty ładowania: </b>";
+            var i = 0;
+            station.chargingPoints.forEach(chargingPoint => {
+                i++;
+                if (chargingPoint.status)
+                    chargingPointsContent += "<cpContent style='color:green'>";
+                else
+                    chargingPointsContent += "<cpContent style='color:red'><br><b>PUNKT OZNACZONY JAKO WYŁĄCZONY Z UŻYTKU</b>";
+                chargingPointsContent += "<br><b>" + i + ": " + chargingPoint.chargingModes + ".</b> ";
+                if (chargingPoint.price && chargingPoint.priceUnit)
+                    chargingPointsContent += "Cena: " + chargingPoint.price + "zł za 1" + chargingPoint.priceUnit + ". ";
+                else if (chargingPoint.price)
+                    chargingPointsContent += ". Cena: " + chargingPoint.price + "zł. ";
+                chargingPointsContent += "Przyłącza punktu:";
+                chargingPoint.connectors.forEach(connector => {
+                    chargingPointsContent += "<br>";
+                    connector.interfaces.forEach(interface => {
+                        chargingPointsContent += interface.name + ", ";
+                        if (!stationHasCorrectConnector && chargingPoint.status) {
+                            car.connectorInterfaces.every (cni => {
+                                if (cni.name == interface.name) {
+                                    stationHasCorrectConnector = true;
+                                    return false;
+                                }
+                                return true;
+                            });
+                        }
+                    });
+                    chargingPointsContent += "moc ładowania: " + connector.chargingPower + "kW. ";
+                    if (connector.cableAttached)
+                        chargingPointsContent += "Przewód ładowania jest dołączony."
+                    else
+                        chargingPointsContent += "<r style='color:red'>Przewód ładowania nie jest dołączony.</r>"
+                });
+                chargingPointsContent += "</cpContent>";
+            });
+
+            var warning = "";
+            if (!stationHasCorrectConnector)
+                warning = "<br><br><b style='color:red'>UWAGA: Twój samochód nie ma komptatybilnego gniazda ładowania.</b>";
+
+            var paymentMethodsContent = "";
+            var authenticationMethodsContent = "";
+            var accessibilityContent = "";
+            if (station.paymentMethods)
+                paymentMethodsContent = "<br><b>Metody płatności: </b><br>" + station.paymentMethods;
+            if (station.authenticationMethods)
+                authenticationMethodsContent = "<br><b>Metody autoryzacji: </b><br>" + station.authenticationMethods;
+            if (station.accessibility)
+                accessibilityContent = "<br><b>Wskazówki dojazdu: </b><br>" + station.accessibility;
+
+            var markerContent = "<div class='infoWindowContent'><b>Stacja: " + station.name + "</b>"
+                + "<br>"
+                + addressContent
+                + providerContent
+                + "<br>"
+                + openingHoursContent
+                + "<br>"
+                + chargingPointsContent
+                + warning
+                + "<br>"
+                + paymentMethodsContent
+                + authenticationMethodsContent
+                + accessibilityContent
+                + "<div style='text-align: center;'>"
+                + "<br><br><button class='inputForm charger-button' onclick='addStopToArray(\"" + station.latitude + "\",\"" + station.longitude + "\",\"" + station.name +"\"," + station.id +");'>Dodaj jako przystanek</button>"
+                + "<br>Lub:"
+                + "<br><button class='inputForm charger-button' onclick='openStationInGoogleMaps(\"" + station.latitude + "\",\"" + station.longitude + "\");'>Otwórz w google maps</button></div>";
+
+            if (!stationHasCorrectConnector) {
+                marker.setIcon('http://maps.google.com/mapfiles/ms/icons/orange-dot.png');
+            }
+            else
+                marker.setIcon('http://maps.google.com/mapfiles/ms/icons/green-dot.png');
+
+            markerContent += "</div>";
+
+            //Create of marker's information window
+            var markerDetails = new google.maps.InfoWindow({
+                content: markerContent
+            });
+
+            //Attach click listener so info window will show up
+            google.maps.event.addListener(marker, "click", () => {
+                markerDetails.open(map, marker);
+            });
+
+            return marker;
+        }
+
+        //Converting address to coordinates, using GeoController (getCoordinates), ultimately using google api
+        async function fetchAddress(address) {
+            try {
+                const response = await fetch("@Model.BaseUrl" + "/" + "@Model.GeoControllerCoordinatesLocation" + "?address=" + address);
+                const geoArray = await response.json();
+                if (geoArray["Status"] == @((int)InternalApiResponse.StatusCode.OK))
+                    return new google.maps.LatLng(parseFloat(geoArray["Response"]["Coordinates"]["Lat"]), parseFloat(geoArray["Response"]["Coordinates"]["Lng"]));
+                else if (geoArray["ErrorMessage"])
+                    alert(geoArray["ErrorMessage"])
+                else
+                    alert("Wystąpił nieznany błąd podczas przetwarzania adresu.");
+            } catch (error) {
+                alert("Wystąpił nieznany błąd podczas przetwarzania adresu.");
+                console.error(error);
+            }
+        }
+
+        //Get real distance from api controller (DistanceController -> GetRealDistance)
+        async function fetchRealDistance(maxDistance, batteryLevel, originCoordinates, destinationCoordinates, routeEstimatedTravelTime, choosedDrivingStyle) {
+            try {
+                const response = await fetch("@Model.BaseUrl" + "/" + "distance/GetRealDistance?maximumDistance=" + maxDistance + "&batteryLevel=" + batteryLevel + "&origLat=" + originCoordinates.lat() + "&origLng=" + originCoordinates.lng() + "&destLat=" + destinationCoordinates.lat() + "&destLng=" + destinationCoordinates.lng() + "&estimatedTravelTime=" + routeEstimatedTravelTime + "&drivingStyle=" + choosedDrivingStyle);
+                const responseArray = await response.json();
+                if (responseArray["Status"] == @((int)InternalApiResponse.StatusCode.OK)) {
+                    if (responseArray["Response"]) {
+                        try {
+                            return parseInt(responseArray["Response"]);
+                        }
+                        catch (error) {
+                            alert("Wystąpił nieznany błąd podczas wyznaczania zasięgu realnego samochodu. Zasięg nie zostanie naniesiony");
+                            console.error(error);
+                            return 0;
+                        }
+                    }
+                    else {
+                        alert("Wystąpił nieznany błąd podczas wyznaczania zasięgu realnego samochodu. Zasięg nie zostanie naniesiony");
+                        return 0;
+                    }
+                }
+                else {
+                    if (responseArray["ErrorMessage"])
+                        alert(responseArray["ErrorMessage"] + " Zasięg nie zostanie naniesiony. Spróbuj jeszcze raz.")
+                    else
+                        alert("Wystąpił nieznany błąd podczas wyznaczania zasięgu realnego samochodu. Zasięg nie zostanie naniesiony");
+                    return 0;
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        //Clear charging station markers from map
+        function clearMarkers() {
+            markersArray.forEach(marker => {
+                marker.setMap(null);
+            });
+            markersArray.length = 0;
+        }
+
+        //Get user's current location function
+        function getCurrentLocation() {
+            document.getElementById("currentLocationButton").src = "/images/loading.gif";
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(useLocation);
+            }
+            else {
+                window.alert("Wystąpił problem z pobraniem Twojej lokalizacji (brak uprawnień).");
+                document.getElementById("currentLocationButton").src = "/images/currentLocation.png";
+            }
+        }
+
+        //User's location parsing coordinates -> address and set it to origin field
+        function useLocation(position) {
+            url = "@Model.BaseUrl" + "/" + "@Model.GeoControllerAddressLocation" + "?longitude=" + position.coords.longitude + "&latitude=" + position.coords.latitude;
+            fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    if (data["Status"] == @((int)InternalApiResponse.StatusCode.OK))
+                        originField.value = data["Response"]["Address"];
+                    else if (data["ErrorMessage"])
+                        alert(data["ErrorMessage"]);
+                    else
+                        alert("Wystąpił nieznany problem z wyznaczaniem Twojej lokalizacji. Wprowadź proszę adres ręcznie.");
+                });
+            document.getElementById("currentLocationButton").src = "/images/currentLocation.png";
+        }
+
+        // Add stop to floating form
+        function addStopToArray(latitude, longitude, stopName, stopId) {
+            if (stopCount >= 20) {
+                window.alert("Maksymalna liczba przystanków to 20.");
+            }
+            else {
+                var coordinates = latitude + "," + longitude;
+                var stopsListElement;
+                var node = document.createElement("li");
+                node.setAttribute('class', 'stops-form-list');
+                var stopElement = document.createElement("div");
+                stopElement.innerText = stopName;
+                stopElement.setAttribute('id', stopId);
+                var removeButton;
+
+                if (stopId == "originStop") {
+                    stopsListElement = document.getElementById("originStopList");
+                    node.setAttribute('class', 'stops-form-list origin-element');
+                    node.appendChild(stopElement);
+                    stopsListElement.appendChild(node);
+                    stopElement.setAttribute('stopOrder',1);
+                    var stop = [coordinates, stopName, stopId, 0];
+                    stops.push(stop);
+                }
+                else if (stopId == "destinationStop") {
+                    stopsListElement = document.getElementById("destinationStopList");
+                    node.appendChild(stopElement);
+                    stopsListElement.appendChild(node);
+                    stopElement.setAttribute('stopOrder',20);
+                    var stop = [coordinates, stopName, stopId, 20];
+                    stops.push(stop);
+                    stops.sort((a,b) => (a[3] > b[3]) ? 1 : -1);
+                }
+                else {
+                    stopsListElement = document.getElementById("sortable");
+                    stopElement.setAttribute('class', 'ui-state-default stop-element');
+                    stopElement.setAttribute("style", "font-family: 'Avenir Next LT Pro'; font-weight: 400; color: #0111a2;");
+                    removeButton = document.createElement("a");
+                    removeButton.innerText = "Usuń";
+                    removeButton.setAttribute('class', 'btn btn-delete btn-danger btn-sm stop-remove-btn');
+                    node.appendChild(stopElement);
+                    node.appendChild(removeButton);
+                    stopsListElement.appendChild(node);
+                    stopElement.setAttribute('stopOrder',stopCount);
+                    var stop = [coordinates, stopName, stopId, stopCount];
+                    stops.push(stop);
+                    stopCount++;
+                    stops.sort((a,b) => (a[3] > b[3]) ? 1 : -1);
+
+                    // Show if form is hidden and stop has been added
+                    if ($("#stopsForm").is(':hidden')) {
+                        $("#stopsForm").show(300);
+                    }
+                }
+            }
+        }
+
+        function openStopsInGoogleMaps() {
+            var link = "https://www.google.com/maps/dir/";
+            var destinationCoordinates = "";
+            stops.sort((a,b) => (a[3] > b[3]) ? 1 : -1);
+            stops.forEach(stop => {
+                link += stop[0] + "/";
+            });
+            link += destinationCoordinates;
+            window.open(link);
+        }
+
+        function openStationInGoogleMaps(latitude, longitude) {
+            var link = "https://www.google.pl/maps?q=" + latitude + "," + longitude;
+            window.open(link);
+        }
+
+        // remove stops from array and from list in form
+        function resetStopsList() {
+            $("#stopsForm").hide(300);
+            stops = new Array();
+            $("#sortable").empty();
+            $("#originStopList").empty();
+            $("#destinationStopList").empty();
+            stopCount = 1;
+        }
+
+        // Tooltip appearance script
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+        })
+    </script>
+
+    <!-- Google map initialization using personal api key and creating map -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=@(Model.GoogleMapApiKey + "&callback=initMap&libraries=places")" async defer></script>
+
+</body>

@@ -32,7 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ASP_MVC_NoAuthentication\ASP_MVC_NoAuthentication.csproj" />
+    <ProjectReference Include="..\RoutePlanner\RoutePlanner.csproj" />
   </ItemGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>

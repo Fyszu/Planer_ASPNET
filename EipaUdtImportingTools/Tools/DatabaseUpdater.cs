@@ -1,5 +1,5 @@
-﻿using ASP_MVC_NoAuthentication.Data;
-using ASP_MVC_NoAuthentication.Repositories;
+﻿using RoutePlanner.Data;
+using RoutePlanner.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
