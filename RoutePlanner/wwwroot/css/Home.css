@@ -257,6 +257,10 @@ p {
         width: 1em;
         height: 1em;
     }
+
+    .stopBaterryLevel {
+        width: 10%;
+    }
 }
 /* PC resolution END */
 
@@ -342,6 +346,10 @@ p {
     .userInfoImage {
         width: 1em;
         height: 1em;
+    }
+
+    .stopBaterryLevel {
+        width: 20%;
     }
 }
 /* Mobile resolution END */
