@@ -141,6 +141,14 @@ builder.Services.Configure<IpRateLimitOptions>(options =>
                 Period = "10s",
                 Limit = 10,
             },
+
+            // UserController -> *
+            new RateLimitRule
+            {
+                Endpoint = "*:/user/*",
+                Period = "10s",
+                Limit = 10,
+            }
         };
 });
 
