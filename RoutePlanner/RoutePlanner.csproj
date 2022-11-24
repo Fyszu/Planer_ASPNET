@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <None Include="wwwroot\css\ErrorInfo.css" />
+    <None Include="wwwroot\favicon.ico" />
   </ItemGroup>
 
   <ItemGroup>
