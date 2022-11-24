@@ -49,24 +49,24 @@
         <div class="row align-items-end" style="margin-left:3%; margin-right: 3%; margin-top:4%">
             <div class="col-sm top-buffer text-center origin-column">
                 <h2 style="margin-right:12%;">Początek podróży</h2>
-                <input class="inputForm align-middle" type="text" id="origin" style="width:86%; max-width:70vw; min-height: 5vh;" placeholder="Początek podróży" required>
-                <input class="align-middle" type="image" id="currentLocationButton" name="currentLocationButton" src="/images/currentLocation.png" onClick="getCurrentLocation(); return false;">
+                <input class="inputForm align-middle" type="text" id="origin" style="width:86%;" placeholder="Początek podróży" required>
+                <input class="align-middle" type="image" id="currentLocationButton" name="currentLocationButton" alt="l" src="/images/currentLocation.png" onClick="getCurrentLocation(); return false;">
             </div>
             <div class="col-sm top-buffer text-center">
                 <h2>Koniec podróży</h2>
-                <input class="inputForm align-middle" type="text" style="width:100%; max-width:70vw; min-height: 5vh;" id="destination" placeholder="Cel podróży" required>
+                <input class="inputForm align-middle" type="text" style="width:100%;" id="destination" placeholder="Cel podróży" required>
             </div>
             <div class="col-sm top-buffer text-center">
                 <h2><img src="@Url.Content("~/images/question_mark.png")" class="questionMark" data-toggle="tooltip" data-placement="bottom" title="Nie możesz znaleźć swojego samochodu na liście? Zaloguj się i dodaj własny!" /> Samochód:</h2>
-                <select class="inputForm align-middle" id="selectCar" style="width:100%; max-width:70vw; min-height: 5vh;"></select>
+                <select class="inputForm align-middle" id="selectCar" style="width:100%;"></select>
             </div>
             <div class="col-sm top-buffer text-center">
                 <h2><img src="@Url.Content("~/images/question_mark.png")" class="questionMark" data-toggle="tooltip" data-placement="bottom" title="Podaj aktualny (lub planowany) stan baterii Twojego samochodu." /> Stan baterii [%]</h2>
-                <input class="inputForm align-middle" type=number id="batteryLevelSelect" style="width:100%; max-width:70vw; min-height: 5vh;" placeholder="Poziom baterii [%]" min=1 max=100>
+                <input class="inputForm align-middle" type=number id="batteryLevelSelect" style="width:100%;" placeholder="Poziom baterii [%]" min=1 max=100>
             </div>
             <div class="col-sm top-buffer text-center">
                 <h2><img src="@Url.Content("~/images/question_mark.png")" class="questionMark" data-toggle="tooltip" data-placement="bottom" title="Prędkość przejazdu ma bardzo duży wpływ na szybkość rozładowania baterii. Wybierz prędkość, która będzie utrzymywana przez większość podróży." /> Prędkość:</h2>
-                <select class="inputForm align-middle" id="drivingStyleComboBox" style="width:100%; max-width:70vw; min-height: 5vh;">
+                <select class="inputForm align-middle" id="drivingStyleComboBox" style="width:100%;">
                     <option value="1">Miejska (50km/h - 70km/h)</option>
                     <option value="2">Mieszana (70km/h - 100km/h)</option>
                     <option value="3">Autostrada (do 120km/h)</option>
@@ -75,7 +75,7 @@
                 </select>
             </div>
             <div class="col-sm top-buffer text-center" style="min-height:100%">
-                <button class="inputForm search-button align-middle" type="button" style="width:100%; max-width:70vw; min-height: 5vh;" id="findRouteButton">Szukaj ładowarek</button>
+                <button class="inputForm search-button align-middle" type="button" style="width:100%;" id="findRouteButton">Szukaj ładowarek</button>
             </div>
         </div>
     </form>
