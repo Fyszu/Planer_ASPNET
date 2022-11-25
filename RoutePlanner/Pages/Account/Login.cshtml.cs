@@ -28,10 +28,7 @@ namespace RoutePlanner.Pages.Account
 
         [BindProperty]
         public InputLoginModel InputLogin { get; set; }
-        public bool IsReturnFromRegisterPost { get { return Handler != null && Handler.Equals("Register"); } }
-
-        [BindProperty(SupportsGet = true)]
-        private string Handler { get; set; }
+        public bool IsReturnFromRegisterPost { get; set; }
         private static string ReturnUrl { get; set; }
 
         public class InputRegisterModel
@@ -73,6 +70,7 @@ namespace RoutePlanner.Pages.Account
 
         public async Task OnGetAsync(string? returnUrl = null)
         {
+            IsReturnFromRegisterPost = false;
             ReturnUrl = returnUrl ?? "~/";
         }
 
@@ -103,11 +101,14 @@ namespace RoutePlanner.Pages.Account
                         break;
                     }
                 }
+                IsReturnFromRegisterPost = true;
+                return Page();
             }
 
             // If we got this far, something failed, redisplay form  
             ModelState.AddModelError("Register", "Coœ posz³o nie tak. Spróbuj jeszcze raz.");
             logger.LogError($"Nietypowy b³¹d podczas rejestracji - walidacja nie powiod³a siê.");
+            IsReturnFromRegisterPost = true;
             return Page();
         }
 

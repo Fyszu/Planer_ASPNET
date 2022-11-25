@@ -2,7 +2,7 @@
 
 
 /* PC Resolution */
-@media (min-width: 576px) {
+@media (min-width: 1201px) {
     .login-page {
         min-width: 320px;
         width: 100%;
@@ -15,13 +15,13 @@
     .vertical-center {
         margin: 0;
         position: relative;
-        top: 50%;
+        top: 57%;
         -ms-transform: translateY(-50%);
         transform: translateY(-50%);
     }
 
     .form {
-        width: 30%;
+        width: 35%;
         min-width: 320px;
         z-index: 1;
         font-size: 1.2vw;
@@ -45,7 +45,7 @@
         border: 0;
         border-color: #f2f2f2;
         border-radius: 1em;
-        margin-bottom: 8%;
+        margin-bottom: 4%;
         padding: 0.9vw;
         box-sizing: border-box;
         transition: all 0.5s;
@@ -55,43 +55,44 @@
             box-shadow: 0 0 0.7em #719ECE;
         }
 
-        .form button {
-            font-family: "Roboto", sans-serif;
-            font-size: 1.4vw;
-            letter-spacing: 0.1vw;
-            font-weight: 900;
-            text-transform: uppercase;
-            outline: 0;
-            background: #0111a2;
-            width: 100%;
-            border: 0;
-            border-radius: 1em;
-            padding: 15px;
-            color: #FFFFFF;
-            -webkit-transition: all 0.3s ease;
-            transition: all 0.3s ease;
-            cursor: pointer;
+    .form button {
+        font-family: "Roboto", sans-serif;
+        font-size: 1.4vw;
+        letter-spacing: 0.1vw;
+        font-weight: 900;
+        text-transform: uppercase;
+        outline: 0;
+        background: #0111a2;
+        width: 100%;
+        border: 0;
+        border-radius: 1.5em;
+        padding: 0.8em;
+        color: #FFFFFF;
+        -webkit-transition: all 0.3s ease;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        margin-top: 3%;
+    }
+
+        .form button:hover, .form button:active, .form button:focus {
+            background: #22e0b1;
+            color: #0111a2;
         }
 
-            .form button:hover, .form button:active, .form button:focus {
-                background: #22e0b1;
-                color: #0111a2;
-            }
+    .form .message {
+        margin: 3vh 0 0;
+        color: #b3b3b3;
+        font-size: 1.3vw;
+    }
 
-        .form .message {
-            margin: 3vh 0 0;
-            color: #b3b3b3;
-            font-size: 1vw;
+        .form .message a {
+            color: #4CAF50;
+            text-decoration: none;
         }
 
-            .form .message a {
-                color: #4CAF50;
-                text-decoration: none;
-            }
-
-        .form .register-form {
-            display: none;
-        }
+    .form .register-form {
+        display: none;
+    }
 
     .form-check {
         margin-bottom: 3vh;
@@ -99,10 +100,12 @@
         margin-right: auto;
     }
 }
+/* PC Resolution END */
 
 
-/* Mobile resolution */
-@media (max-width: 576px) {
+
+/* Vertical devices resolution */
+@media (min-width: 577px) and (max-width: 1200px) and (min-height: 1000px) {
     .login-page {
         min-width: 320px;
         width: 100%;
@@ -115,20 +118,226 @@
     .vertical-center {
         margin: 0;
         position: relative;
-        top: 50%;
+        top: 53%;
         -ms-transform: translateY(-50%);
         transform: translateY(-50%);
     }
 
     .form {
-        width: 30%;
+        width: 70%;
         min-width: 320px;
         z-index: 1;
-        font-size: 5vw;
+        font-size: 3vw;
+        font-weight: 700;
+        color: #0111a2;
+        background: #FFFFFF;
+        border-radius: 4vw;
+        margin: 0 auto 5vw;
+        padding: 7vw;
+        text-align: center;
+        box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+    }
+
+    .input-field {
+        font-family: "Roboto", sans-serif;
+        font-size: 3.5vw;
+        color: #0111a2;
+        outline: 0;
+        background: #f2f2f2;
+        width: 100%;
+        border: 0;
+        border-color: #f2f2f2;
+        border-radius: 1em;
+        margin-bottom: 8%;
+        padding: 1.2vw;
+        box-sizing: border-box;
+        transition: all 0.5s;
+    }
+
+        .input-field:focus {
+            box-shadow: 0 0 0.7em #719ECE;
+        }
+
+    .form button {
+        font-family: "Roboto", sans-serif;
+        font-size: 3.6vw;
+        letter-spacing: 0.1vw;
+        margin-top: 4%;
+        font-weight: 900;
+        text-transform: uppercase;
+        outline: 0;
+        background: #0111a2;
+        width: 100%;
+        border: 0;
+        border-radius: 1em;
+        padding: 15px;
+        color: #FFFFFF;
+        -webkit-transition: all 0.3s ease;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+        .form button:hover, .form button:active, .form button:focus {
+            background: #22e0b1;
+            color: #0111a2;
+        }
+
+    .form .message {
+        margin: 3vh 0 0;
+        color: #b3b3b3;
+        font-size: 3vw;
+    }
+
+        .form .message a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+
+    .form .register-form {
+        display: none;
+    }
+
+    .form-check {
+        margin-bottom: 3vh;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+/* Vertical devices resolution END */
+
+
+
+/* Tablet Resolution */
+@media (min-width: 577px) and (max-width: 1200px) and (max-height: 999px) {
+    .login-page {
+        min-width: 320px;
+        width: 100%;
+        height: 95vh;
+        text-align: center;
+        position: relative;
+        margin-top:2%;
+    }
+
+    .vertical-center {
+        margin: 0;
+        position: relative;
+        top: 54%;
+        -ms-transform: translateY(-50%);
+        transform: translateY(-50%);
+    }
+
+    .form {
+        width: 60%;
+        min-width: 320px;
+        z-index: 1;
+        font-size: 1.45vw;
         font-weight: 700;
         color: #0111a2;
         background: #FFFFFF;
         border-radius: 3vw;
+        margin: 0 auto 2vw;
+        padding: 3vw;
+        text-align: center;
+        box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+    }
+
+    .input-field {
+        font-family: "Roboto", sans-serif;
+        font-size: 1.6vw;
+        color: #0111a2;
+        outline: 0;
+        background: #f2f2f2;
+        width: 100%;
+        border: 0;
+        border-color: #f2f2f2;
+        border-radius: 1em;
+        margin-bottom: 3%;
+        padding: 0.9vw;
+        box-sizing: border-box;
+        transition: all 0.5s;
+    }
+
+        .input-field:focus {
+            box-shadow: 0 0 0.7em #719ECE;
+        }
+
+    .form button {
+        font-family: "Roboto", sans-serif;
+        font-size: 1.8vw;
+        letter-spacing: 0.1vw;
+        font-weight: 900;
+        text-transform: uppercase;
+        outline: 0;
+        background: #0111a2;
+        width: 100%;
+        border: 0;
+        border-radius: 1.5em;
+        padding: 15px;
+        color: #FFFFFF;
+        -webkit-transition: all 0.3s ease;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        margin-top:5%;
+    }
+
+        .form button:hover, .form button:active, .form button:focus {
+            background: #22e0b1;
+            color: #0111a2;
+        }
+
+    .form .message {
+        margin: 3vh 0 0;
+        color: #b3b3b3;
+        font-size: 1.6vw;
+    }
+
+        .form .message a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+
+    .form .register-form {
+        display: none;
+    }
+
+    .form-check {
+        margin-bottom: 3vh;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+/* Tablet Resolution END */
+
+
+
+/* Mobile resolution */
+@media (max-width: 576px) {
+    .login-page {
+        min-width: 250px;
+        width: 100%;
+        height: 95vh;
+        text-align: center;
+        position: relative;
+        margin: 0;
+    }
+
+    .vertical-center {
+        margin: 0;
+        position: relative;
+        top: 53%;
+        -ms-transform: translateY(-50%);
+        transform: translateY(-50%);
+    }
+
+    .form {
+        width: 90%;
+        min-width: 250px;
+        z-index: 1;
+        font-size: 4vw;
+        font-weight: 700;
+        color: #0111a2;
+        background: #FFFFFF;
+        border-radius: 6vw;
         margin: 0 auto 5vw;
         padding: 8vw;
         text-align: center;
@@ -137,7 +346,7 @@
 
     .input-field {
         font-family: "Roboto", sans-serif;
-        font-size: 5vw;
+        font-size: 4.5vw;
         color: #0111a2;
         outline: 0;
         background: #f2f2f2;
@@ -156,7 +365,7 @@
 
         .form button {
             font-family: "Roboto", sans-serif;
-            font-size: 6vw;
+            font-size: 5vw;
             letter-spacing: 0.5vw;
             font-weight: 900;
             text-transform: uppercase;
@@ -164,12 +373,13 @@
             background: #0111a2;
             width: 100%;
             border: 0;
-            border-radius: 1em;
+            border-radius: 1.4em;
             padding: 15px;
             color: #FFFFFF;
             -webkit-transition: all 0.3 ease;
             transition: all 0.3 ease;
             cursor: pointer;
+            margin-top: 3%;
         }
 
             .form button:hover, .form button:active, .form button:focus {

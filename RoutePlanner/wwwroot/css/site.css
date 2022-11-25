@@ -56,11 +56,25 @@ body {
 
 /* Responsive */
 
+/* 4K resolution */
+@media (min-width: 3839px) and (min-height:2159px) {
+    .nav-item {
+        margin-left: 4%;
+        margin-top: 0.8%;
+        margin-bottom: 0.8%;
+        font-size: 2.3vw;
+    }
+}
+/* PC resoultion END */
+
+
+
 /* PC resolution */
-@media (min-width: 1201px) {
+@media (min-width: 1201px) and (max-width:3838px) {
     .nav-item {
         margin-left: 3%;
         margin-top: 0.3%;
+        margin-bottom: 0.2%;
         font-size: 2vw;
     }
 }
@@ -72,8 +86,8 @@ body {
 @media (min-width: 577px) and (max-width: 1200px) and (min-height: 1000px) {
     .nav-item {
         margin-left: 3.5%;
-        margin-top: 2%;
-        font-size: 2.7vw;
+        margin-top: 1%;
+        font-size: 3.2vw;
     }
 }
 /* Vertical devices resolution END */
