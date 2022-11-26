@@ -3,26 +3,133 @@ h1 {
     font-family: 'Avenir Next LT Pro';
     color: red;
     font-weight: 900;
-    font-size:xx-large;
 }
 
 h2 {
     font-family: 'Avenir Next LT Pro';
     color: orangered;
     font-weight: 700;
-    font-size: large;
 }
 
 p {
     font-family: 'Avenir Next LT Pro';
     color: black;
     font-weight: 100;
-    font-size: small;
 }
 
 a {
     font-family: 'Avenir Next LT Pro';
     color: green;
     font-weight: 700;
-    font-size: large;
+}
+
+
+/* PC resolution */
+@media (min-width: 1201px) {
+    h1 {
+        font-size: 4vw;
+        margin-top: 17vh;
+        margin-bottom: 5.5vh;
+    }
+
+    h2 {
+        text-align: left;
+        font-size: 2vw;
+        margin-top: 7vh;
+        margin-bottom: 2vh;
+    }
+
+    p {
+        font-size: 1vw;
+        text-align: left;
+        margin-bottom: 2vh;
+    }
+
+    .errorLink {
+        font-size: 2.5vw;
+    }
+}
+/* PC resolution END */
+
+
+
+/* Vertical devices resolution */
+@media (min-width: 577px) and (max-width: 1200px) and (min-height: 1000px) {
+    h1 {
+        margin-top: 10vh;
+        font-size: 7vw;
+        margin-bottom: 5vh;
+    }
+
+    h2 {
+        text-align: left;
+        font-size: 3.5vw;
+        margin-top: 3.7vh;
+    }
+
+    p {
+        font-size: 3vw;
+        text-align: left;
+    }
+
+    .errorLink {
+        font-size: 4vw;
+    }
+}
+/* Vertical devices resolution END */
+
+
+
+/* Tablet Resolution */
+@media (min-width: 577px) and (max-width: 1200px) and (max-height: 999px) {
+    h1 {
+        font-size: 4.5vw;
+        margin-top: 17vh;
+        margin-bottom: 5.5vh;
+    }
+
+    h2 {
+        text-align: left;
+        font-size: 2.5vw;
+        margin-top: 7vh;
+        margin-bottom: 2vh;
+    }
+
+    p {
+        font-size: 1.5vw;
+        text-align: left;
+        margin-bottom: 2vh;
+    }
+
+    .errorLink {
+        font-size: 2.5vw;
+    }
+}
+/* Tablet Resolution END */
+
+
+
+/* Mobile resolution */
+@media (max-width: 576px) {
+    h1 {
+        font-size: 10vw;
+        margin-top: 12vh;
+        margin-bottom: 6vh;
+    }
+
+    h2 {
+        text-align: center;
+        font-size: 6vw;
+        margin-top: 5vh;
+    }
+
+    p {
+        font-size: 5vw;
+        text-align: center;
+    }
+
+    .errorLink {
+        text-align: center;
+        font-size: 6vw;
+    }
 }
