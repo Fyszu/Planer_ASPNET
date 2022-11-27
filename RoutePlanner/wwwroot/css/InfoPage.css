@@ -16,6 +16,14 @@ h2 {
     color: #0111a2;
 }
 
+ul {
+    font-family: 'Avenir Next LT Pro';
+    font-weight: 400;
+    margin-left: 5vw;
+    margin-right: 4vw;
+    color: #0111a2;
+}
+
 /* PC resolution */
 @media (min-width: 1201px) {
     h1 {
@@ -32,6 +40,12 @@ h2 {
     }
 
     p {
+        font-size: 1.5vw;
+        text-align: left;
+        margin-bottom: 2vh;
+    }
+
+    ul {
         font-size: 1.5vw;
         text-align: left;
         margin-bottom: 2vh;
@@ -56,6 +70,11 @@ h2 {
     }
 
     p {
+        font-size: 3vw;
+        text-align: left;
+    }
+
+    ul {
         font-size: 3vw;
         text-align: left;
     }
@@ -84,6 +103,12 @@ h2 {
         text-align: left;
         margin-bottom: 2vh;
     }
+
+    ul {
+        font-size: 1.5vw;
+        text-align: left;
+        margin-bottom: 2vh;
+    }
 }
 /* Tablet Resolution END */
 
@@ -106,5 +131,10 @@ h2 {
     p {
         font-size: 5vw;
         text-align: center;
+    }
+
+    ul {
+        font-size: 5vw;
+        text-align: left;
     }
 }

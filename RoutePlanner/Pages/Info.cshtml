@@ -11,7 +11,7 @@
 
 <h1>O aplikacji</h1>
 <h2>Ogólnie o aplikacji</h2>
-<p>Aplikacja automatycznie wyszukuje ładowarki na trasie pomiędzy podanymi punktami, jednocześnie wskazując zasięg jazdy wybranego samochodu.
+<p>Aplikacja wyszukuje ładowarki na trasie pomiędzy podanymi punktami podróży, jednocześnie wskazując zasięg jazdy wybranego samochodu.
 	Po zalogowaniu użytkownik otrzymuje możliwość dodania własnych samochodów, które zostaną zapisane na jego koncie.<br />
 	Aby wyznaczyć trasę, należy wpisać w pola "Początek podróży" punkt początkowy, oraz cel w "Koniec podróży". Następnie należy wybrać samochód, podać stan baterii i kliknąć "Szukaj ładowarek".
 </p>
@@ -19,13 +19,29 @@
 <p>Trasa jest wyznaczana poprzez Google API - do API jest wysyłane żądanie z współrzędnymi początkowymi i końcowymi trasy, a zwracana jest trasa która jest następnie nasieniona na mapę poprzez Javascript.<br>
 Współrzędnie są wyznaczane z nazwy miejsca również z użyciem Google API (geolokalizacja).<br>
 Następnie z bazy danych pobierane są ładowarki, które znajdują się wzdłuż trasy.</p>
+<h2>Źródło danych ładowarek</h2>
+<p>Dane ładowarek są na bieżąco aktualizowane z Ewidencji Infrastruktury Paliw Alternatywnych (EIPA). Jest to ewidencja z bazy UDT, a dane są pobierane z API w formacie JSON. Więcej informacji o EIPA i dokumemtację API można znaleźć na stronie <a href="https://eipa.udt.gov.pl/">www.eipa.udt.gov.pl</a>.</p>
 <h2>Obliczanie zasięgu maksymalnego</h2>
-<p>Na zasięg maksymalny składa się kilka czynników: m. in. styl jazdy, początkowy stan baterii oraz warunki na drodze takie jak temperatura.<br />
-Zasięg jest obliczany w dużym przybliżeniu, ponieważ aplikacja nie przewiduje częstotliwości korzystania użytkownika z klimatyzacji czy ogrzewania, oraz zakłada że styl jazdy będzie taki sam przez całą drogę. Należy wziąć to pod uwagę przy planowaniu podróży.<br />
-Niektóre z ustawień można zmienić na swoim koncie w panelu użytkownika.</p>
+<p>Na zasięg maksymalny składa się kilka czynników: m. in. prędkość jazdy, początkowy stan baterii oraz średnią temperaturę na trasie.<br />
+Zasięg jest obliczany w dużym przybliżeniu, ponieważ aplikacja nie przewiduje częstotliwości korzystania użytkownika z klimatyzacji czy ogrzewania. Należy wziąć to pod uwagę przy planowaniu podróży.<br />
+Temperatura jest pobierana z API Open Meteo, o którym informacje można znaleźć tutaj: <a href="https://open-meteo.com/">www.open-meteo.com</a>. Temperatura jest uśredniana dla dwóch wartości: pierwsza to temperatura w lokalizacji początku trasy w momencie jej wyznaczenia, a druga to przewidywana temperatura w lokalizacji końca trasy w momencie estymowanego dotarcia do celu.</p>
+<p>Więcej informacji na temat wpływu temperatur i prędkości na zasięg jazdy: <a href="https://www.geotab.com/blog/ev-range/">WPŁYW TEMPERATURY</a>, <a href="https://insideevs.com/news/566954/bev-epa-range-comparison-february2022/">WPŁYW PRĘDKOŚCI</a>.</p>
 <h2>Wykorzystane technologie</h2>
-<p>Strona internetowa została wykonana w technologii ASP .NET, z wykorzystaniem:<br />
-- C#,<br />
-- Entity Framework, <br />
-- Javascript, <br />
-- HTML, CSHTML, CSS (również Bootstrap). </p>
+<p>Strona internetowa została wykonana w technologii ASP .NET Core. Wykorzystane technologie i techniki to m.in.:<br />
+<ul>
+    <li>.NET Core 6.0</li>
+    <li>C# 10</li>
+    <li>Razor Pages</li>
+    <li>Konwencja MVC</li>
+    <li>Entity Framework 5.0.13 z MySql.EntityFrameworkCore 5.0.8</li>
+    <li>Konwencja Code First</li>
+    <li>Baza danych - MySQL</li>
+    <li>Google API</li>
+    <li>Open Meteo API</li>
+    <li>Javascript</li>
+    <li>JQuery</li>
+    <li>Bootstrap</li>
+    <li>HTML (CSHTML), CSS</li>
+</ul>
+<h2><i>Autor</i></h2>
+<p><i>Autorem aplikacji jest Patryk Fysz, student politechniki bydgoskiej.</i></p>
