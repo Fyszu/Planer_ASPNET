@@ -49,7 +49,7 @@
         <div class="row align-items-end" style="margin-left:3%; margin-right: 3%; margin-top:4%">
             <div class="col-sm top-buffer text-center origin-column">
                 <h2 style="margin-right:12%;">Początek podróży</h2>
-                <input class="inputForm align-middle" type="text" id="origin" style="width:86%;" placeholder="Początek podróży" required>
+                <input class="inputForm align-middle" type="text" id="origin" placeholder="Początek podróży" required>
                 <input class="align-middle" type="image" id="currentLocationButton" name="currentLocationButton" alt="l" src="/images/currentLocation.png" onClick="getCurrentLocation(); return false;">
             </div>
             <div class="col-sm top-buffer text-center">
@@ -571,8 +571,19 @@
 
         // Add stop to floating form
         async function addStopToArray(latitude, longitude, stopName, stopId) {
+            var alreadyInArray = false;
+            stops.every(stop => {
+                if (stop[2] == stopId) {
+                    alreadyInArray = true;
+                    return false;
+                }
+                return true;
+            });
             if (stopCount >= 20) {
                 window.alert("Maksymalna liczba przystanków to 20.");
+            }
+            else if (alreadyInArray) {
+                alert("Przystanek jest już dodany do listy.");
             }
             else {
                 var coordinates = latitude + "," + longitude;

@@ -40,15 +40,14 @@ p {
 }
 
 .inputForm {
-    border: 2px solid;
-    border-color: #0111a2;
-    border-radius: 1em;
+    border: 0.15em solid #0111a2;
+    border-radius: 3em;
     text-indent: 0.3vw;
     font-family: 'Avenir Next LT Pro';
     max-width: 70vw;
 }
     .inputForm:focus {
-        border: 2px solid #22e0b1;
+        border: 0.27em solid #22e0b1;
     }
 
 .map {
@@ -103,8 +102,8 @@ p {
     }
 
 #currentLocationButton {
-    height: 10%;
-    width: 10%;
+    width: 11%;
+    height: 11%;
 }
 
 .tooltip {
@@ -178,21 +177,155 @@ p {
     margin-right: 5px;
 }
 
-/* PC Resolution */
-@media (min-width: 1201px) {
+
+
+/* 4K resolution */
+@media (min-width: 3839px) and (min-height:2159px) {
     h1 {
         font-size: 4.3vw;
         margin-top: 15vh;
         margin-bottom: 42vh;
     }
 
-    p
-    {
+    p {
         font-size: 1.5vw;
     }
 
     #headerImage {
-        top:0;
+        top: 0;
+    }
+
+    h2 {
+        font-size: 1.3vw;
+        text-align: center;
+    }
+
+    .pac-item { /* Searchbox (google maps autofilling) */
+        font-size: 0.8vw !important;
+        padding: 0.5em;
+    }
+
+    .pac-item-query {
+        font-size: 0.8vw !important;
+        margin-left: 2% !important;
+        padding: 0.2em;
+    }
+
+    .pac-icon {
+        transform: scale(2);
+    }
+
+    .inputForm {
+        font-size: 1.2vw;
+        min-height: 5vh;
+    }
+
+    #origin {
+        width: 82%;
+    }
+
+    .tooltip-inner {
+        font-size: 1.2vw;
+        min-width: 25vw;
+        border-radius: 1em;
+        padding: 0.6em;
+    }
+
+    .infoWindowContent {
+        font-size: 1.2vw;
+        font-weight: 400;
+        font-family: 'Avenir Next LT Pro';
+        color: #0111a2;
+        margin: 0.3em, 0.3em, 0.3em, 0.3em;
+    }
+
+    .gm-style .gm-style-iw { /* Info window - google maps */
+        max-width: 45vw !important;
+        width: 100% !important;
+        border-radius: 2em !important;
+        padding: 2em !important;
+    }
+
+    button.gm-ui-hover-effect { /* Info window close button */
+        min-width: 1vw !important;
+        min-height: 1vw !important;
+        width: 1vw !important;
+        height: 1vw !important;
+    }
+
+    .stopsForm {
+        font-size: 0.8vw;
+        position: fixed;
+        height: 60vh;
+        width: 25vw;
+        top: 30vh;
+        left: 2.5vw;
+        padding: 1em;
+        display: none;
+    }
+
+    .stop-bullet {
+        float: left;
+        width: 10%;
+    }
+
+    .stop-element {
+        font-size: 1vw;
+        width: 66%;
+        float: left;
+        margin-right: 5%;
+        margin-left: 3%;
+        padding: 0.2em;
+    }
+
+        .stop-element::before {
+            margin-left: -65px;
+            margin-right: 8px;
+        }
+
+    .stop-remove-btn {
+        font-size: 0.9vw;
+        width: 19%;
+        float: left;
+    }
+
+    .userInfo {
+        font-family: 'Avenir Next LT Pro';
+        font-weight: 400;
+        margin-top: 1.5vh;
+        margin-bottom: 1.5vh;
+        color: #0111a2;
+        font-size: 2vw;
+        display: none;
+    }
+
+    .userInfoImage {
+        width: 1em;
+        height: 1em;
+    }
+
+    .stopBaterryLevel {
+        width: 6.5%;
+        min-width: 100px;
+    }
+}
+
+
+
+/* PC Resolution */
+@media (min-width: 1201px) and (max-width:3838px) {
+    h1 {
+        font-size: 4.3vw;
+        margin-top: 15vh;
+        margin-bottom: 42vh;
+    }
+
+    p {
+        font-size: 1.5vw;
+    }
+
+    #headerImage {
+        top: 0;
     }
 
     h2 {
@@ -205,10 +338,15 @@ p {
         min-height: 5vh;
     }
 
+    #origin {
+        width: 82%;
+    }
+
     .tooltip-inner {
         font-size: 1.2vw;
         min-width: 25vw;
         border-radius: 1em;
+        padding: 0.6em;
     }
 
     .infoWindowContent {
@@ -219,7 +357,15 @@ p {
         margin: 0.3em, 0.3em, 0.3em, 0.3em;
     }
 
+    .gm-style .gm-style-iw { /* Info window - google maps */
+        max-width: 45vw !important;
+        width: 100% !important;
+        border-radius: 1.2em !important;
+        padding: 1em !important;
+    }
+
     .stopsForm {
+        font-size: 0.8vw;
         position: fixed;
         height: 60vh;
         width: 25vw;
@@ -240,7 +386,13 @@ p {
         float: left;
         padding: 0.25em;
         margin-right: 5%;
+        margin-left: 0.4em;
     }
+
+        .stop-element::before {
+            margin-left: -12%;
+            margin-right: 8px;
+        }
 
     .stop-remove-btn {
         font-size: 0.9vw;
@@ -265,6 +417,7 @@ p {
 
     .stopBaterryLevel {
         width: 10%;
+        min-width: 70px;
     }
 }
 /* PC resolution END */
@@ -302,16 +455,15 @@ p {
         margin-left: 10%;
     }
 
-    #currentLocationButton {
-        height: 5%;
-        width: 5%;
-        margin-right: 6%;
+    #origin {
+        width: 88%;
     }
 
     .tooltip-inner {
         font-size: 3vw;
         min-width: 35vw;
         border-radius: 1em;
+        padding: 0.6em;
     }
 
     .infoWindowContent {
@@ -342,10 +494,16 @@ p {
         font-size: 2.2vw;
         width: 66%;
         float: left;
-        padding: 0.1em;
+        padding: 0.25em;
         margin-right: 5%;
+        margin-left: 0.4em;
         margin-bottom: 1%;
     }
+
+        .stop-element::before {
+            margin-left: -1.8em;
+            margin-right: 8px;
+        }
 
     .stop-remove-btn {
         font-size: 2vw;
@@ -370,6 +528,7 @@ p {
 
     .stopBaterryLevel {
         width: 10%;
+        min-width: 35px;
     }
 }
 /* Vertical devices resolution END */
@@ -402,15 +561,15 @@ p {
         min-height: 5vh;
     }
 
-    #currentLocationButton {
-        height: 10%;
-        width: 10%;
+    #origin {
+        width: 82%;
     }
 
     .tooltip-inner {
         font-size: 1.7vw;
         min-width: 35vw;
         border-radius: 1em;
+        padding: 0.6em;
     }
 
     .infoWindowContent {
@@ -468,6 +627,7 @@ p {
 
     .stopBaterryLevel {
         width: 10%;
+        min-width: 70px;
     }
 }
 /* Tablet resolution END */
@@ -502,7 +662,11 @@ p {
     .origin-column {
         margin-left: 6%;
     }
-    
+
+    #origin {
+        width: 84%;
+    }
+
     .search-button {
         margin-top: 2vh;
     }
@@ -511,6 +675,7 @@ p {
         font-size: 5vw;
         min-width: 80vw;
         border-radius: 1em;
+        padding: 0.6em;
     }
 
     .infoWindowContent {
@@ -521,7 +686,15 @@ p {
         margin: 0.1em, 0.1em, 0.1em, 0.1em;
     }
 
+    .gm-style .gm-style-iw { /* Info window - google maps */
+        max-width: 80vw !important;
+        width: 100% !important;
+        border-radius: 1em !important;
+        padding: 0.5em !important;
+    }
+
     .stopsForm {
+        font-size: 3.5vw;
         position: static;
         height: 25vh;
         width: 90%;
@@ -537,6 +710,21 @@ p {
         float: left;
         padding: 0.25em;
         margin-right: 5%;
+    }
+
+        .stop-element::before {
+            margin-left: -1.8em;
+            margin-right: 8px;
+        }
+
+    #originStop::before {
+        margin-left: -1.8em;
+        margin-right: 8px;
+    }
+
+    #destinationStop::before {
+        margin-left: -1.8em;
+        margin-right: 8px;
     }
 
     .stop-remove-btn {
@@ -560,6 +748,7 @@ p {
 
     .stopBaterryLevel {
         width: 20%;
+        min-width: 30px;
     }
 }
 /* Mobile resolution END */
