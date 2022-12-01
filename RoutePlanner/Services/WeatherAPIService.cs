@@ -46,7 +46,7 @@ namespace RoutePlanner.Services
 
                 if (weatherAPIResponseObject != null)
                 {
-                    var currentDateTimeString = DateTime.Now.Year + "-" + DateTime.Now.Month + "-" + DateTime.Now.Day + "T" + DateTime.Now.Hour.ToString("00") + ":00";
+                    var currentDateTimeString = DateTime.Now.Year + "-" + DateTime.Now.Month.ToString("00") + "-" + DateTime.Now.Day.ToString("00") + "T" + DateTime.Now.Hour.ToString("00") + ":00";
 
                     int i;
                     for (i = 0; i < weatherAPIResponseObject.Hourly.Time.Count; i++)
