@@ -42,7 +42,7 @@ namespace RoutePlanner.Services
 
                 // Deserialize JSON to object
                 JsonSerializerOptions jsonSerializerOptions = new() { PropertyNameCaseInsensitive = true };
-                WeatherAPIResponse? weatherAPIResponseObject = JsonSerializer.Deserialize<WeatherAPIResponse>(responseBody, jsonSerializerOptions);
+                WeatherApiResponse? weatherAPIResponseObject = JsonSerializer.Deserialize<WeatherApiResponse>(responseBody, jsonSerializerOptions);
 
                 if (weatherAPIResponseObject != null)
                 {

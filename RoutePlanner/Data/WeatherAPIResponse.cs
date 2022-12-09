@@ -3,7 +3,7 @@
     using System.Collections.Generic;
     using Newtonsoft.Json;
 
-    public partial class WeatherAPIResponse
+    public partial class WeatherApiResponse
     {
         [JsonProperty("latitude")]
         public double Latitude { get; set; }

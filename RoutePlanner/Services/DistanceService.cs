@@ -13,9 +13,9 @@ namespace RoutePlanner.Services
         }
 
         // Get real maximum distance in meters
-        public string GetRealMaximumDistance(int batteryLevel, int maximumDistance, DataHelper.DrivingStyle drivingStyle, float temperature) 
+        public string GetRealMaximumDistance(int currentBatteryLevel, int maximumDistance, DataHelper.DrivingStyle drivingStyle, float temperature) 
         {
-            float realDistance = ((float)batteryLevel / 100f) * (maximumDistance * 1000); // *1000: conversion to meters, /100: conversion to precentage
+            float realDistance = ((float)currentBatteryLevel / 100f) * (maximumDistance * 1000); // *1000: conversion to meters, /100: conversion to precentage
             realDistance = CalculateDistanceByTemperature(realDistance, temperature);
             realDistance = CalculateDistanceByDrivingStyle(realDistance, drivingStyle);
 
@@ -28,7 +28,7 @@ namespace RoutePlanner.Services
             catch (Exception ex)
             {
                 logger.LogError("Problem podczas przetwarzania wyniku obliczeń dystansu samochodu. " +
-                    $"Poziom baterii: {batteryLevel}, maksymalny dystans: {maximumDistance}, styl jazdy: {drivingStyle}, temperatura: {temperature}.\n" +
+                    $"Poziom baterii: {currentBatteryLevel}, maksymalny dystans: {maximumDistance}, styl jazdy: {drivingStyle}, temperatura: {temperature}.\n" +
                     $"{ex.Message}\n{ex.InnerException}");
                 return new InternalApiResponse(InternalApiResponse.StatusCode.DistanceControllerOtherError, null).GetInternalResponseJson();
             }

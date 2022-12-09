@@ -57,9 +57,9 @@ D:\Moje\Różne\OneDrive\Programowanie_Chmura\C#\PlanerTras\RoutePlanner\RoutePl
 D:\Moje\Różne\OneDrive\Programowanie_Chmura\C#\PlanerTras\RoutePlanner\RoutePlanner\Services\IDistanceService.cs
 D:\Moje\Różne\OneDrive\Programowanie_Chmura\C#\PlanerTras\RoutePlanner\RoutePlanner\Services\IGeoService.cs
 D:\Moje\Różne\OneDrive\Programowanie_Chmura\C#\PlanerTras\RoutePlanner\RoutePlanner\Services\IUserService.cs
-D:\Moje\Różne\OneDrive\Programowanie_Chmura\C#\PlanerTras\RoutePlanner\RoutePlanner\Services\IWeatherAPIService.cs
+D:\Moje\Różne\OneDrive\Programowanie_Chmura\C#\PlanerTras\RoutePlanner\RoutePlanner\Services\IWeatherApiService.cs
 D:\Moje\Różne\OneDrive\Programowanie_Chmura\C#\PlanerTras\RoutePlanner\RoutePlanner\Services\UserService.cs
-D:\Moje\Różne\OneDrive\Programowanie_Chmura\C#\PlanerTras\RoutePlanner\RoutePlanner\Services\WeatherAPIService.cs
+D:\Moje\Różne\OneDrive\Programowanie_Chmura\C#\PlanerTras\RoutePlanner\RoutePlanner\Services\WeatherApiService.cs
 D:\Moje\Różne\OneDrive\Programowanie_Chmura\C#\PlanerTras\RoutePlanner\RoutePlanner\obj\Debug\net6.0\RoutePlanner.GlobalUsings.g.cs
 D:\Moje\Różne\OneDrive\Programowanie_Chmura\C#\PlanerTras\RoutePlanner\RoutePlanner\obj\Debug\net6.0\.NETCoreApp,Version=v6.0.AssemblyAttributes.cs
 D:\Moje\Różne\OneDrive\Programowanie_Chmura\C#\PlanerTras\RoutePlanner\RoutePlanner\obj\Debug\net6.0\RoutePlanner.AssemblyInfo.cs
