@@ -12,7 +12,7 @@ D:\Moje\Różne\OneDrive\Programowanie_Chmura\C#\PlanerTras\RoutePlanner\RoutePl
 D:\Moje\Różne\OneDrive\Programowanie_Chmura\C#\PlanerTras\RoutePlanner\RoutePlanner\Data\MyDbContext.cs
 D:\Moje\Różne\OneDrive\Programowanie_Chmura\C#\PlanerTras\RoutePlanner\RoutePlanner\Data\Provider.cs
 D:\Moje\Różne\OneDrive\Programowanie_Chmura\C#\PlanerTras\RoutePlanner\RoutePlanner\Data\User.cs
-D:\Moje\Różne\OneDrive\Programowanie_Chmura\C#\PlanerTras\RoutePlanner\RoutePlanner\Data\WeatherAPIResponse.cs
+D:\Moje\Różne\OneDrive\Programowanie_Chmura\C#\PlanerTras\RoutePlanner\RoutePlanner\Data\WeatherApiResponse.cs
 D:\Moje\Różne\OneDrive\Programowanie_Chmura\C#\PlanerTras\RoutePlanner\RoutePlanner\Filters\InternalIPRateLimitMiddleware.cs
 D:\Moje\Różne\OneDrive\Programowanie_Chmura\C#\PlanerTras\RoutePlanner\RoutePlanner\Filters\RestrictDomainAttribute.cs
 D:\Moje\Różne\OneDrive\Programowanie_Chmura\C#\PlanerTras\RoutePlanner\RoutePlanner\Migrations\20221031223044_UpdateDBStructureAccordingToUDTApi.cs
