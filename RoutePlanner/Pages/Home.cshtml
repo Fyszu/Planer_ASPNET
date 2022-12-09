@@ -26,22 +26,26 @@
 
     <!-- JQuery -->
     <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+
+    <!--- Title ---->
+    <title>Planer tras dla samochodów elektrycznych</title>
 </head>
 
 
 <body>
+    <!--- Header --->
+    <h1>Planer tras dla samochodów elektrycznych</h1>
+
     <!-- Main top image -->
     <img src="/images/ecars_banner.jpg" class="img-fluid" id="headerImage" alt="Header image">
-    <!-- Header -->
-    <h1>Planer tras dla samochodów elektrycznych</h1>
 
     <!-- Short description -->
     <p>Cześć! Witaj na stronie aplikacji automatyzującej planowanie podróży samochodem elektrycznym.</p>
-    <p>Wypełnij pola poniżej oraz klknij "<b>Szukaj ładowarek</b>", a zostaną znalezione ładowarki w pobliżu Twojej trasy podróży.</p>
-    <p>Aplikacja korzysta z <b>Google API</b> do wyznaczania tras oraz bierze pod uwagę realny zasięg Twojego samochodu. <br /><em><a href="/Info">Kliknij aby dowiedzieć się więcej.</a></em></p>
+    <p>Wypełnij pola poniżej oraz klknij "<strong>Szukaj ładowarek</strong>", a zostaną znalezione ładowarki w pobliżu Twojej trasy podróży.</p>
+    <p>Aplikacja korzysta z <strong>Google API</strong> do wyznaczania tras oraz bierze pod uwagę realny zasięg Twojego samochodu. <br /><em><a href="/Info">Kliknij aby dowiedzieć się więcej.</a></em></p>
     @if (!Model.IsLoggedIn)
     {
-            <p><b><a href="/Login">Zaloguj się</a></b> w celu dodania swojego samochodu do listy oraz zmiany ustawień.</p>
+            <p><strong><a href="/Login">Zaloguj się</a></strong> w celu dodania swojego samochodu do listy oraz zmiany ustawień.</p>
     }
 
     <!-- Route form  --->
@@ -57,15 +61,15 @@
                 <input class="inputForm align-middle" type="text" style="width:100%;" id="destination" placeholder="Cel podróży" required>
             </div>
             <div class="col-sm top-buffer text-center">
-                <h2><img src="@Url.Content("~/images/question_mark.png")" class="questionMark" data-toggle="tooltip" data-placement="bottom" title="Nie możesz znaleźć swojego samochodu na liście? Zaloguj się i dodaj własny!" /> Samochód:</h2>
+                <h2><img src="@Url.Content("~/images/question_mark.png")" class="questionMark" data-toggle="tooltip" data-placement="bottom" title="Nie możesz znaleźć swojego samochodu na liście? Zaloguj się i dodaj własny!" alt="Znak zapytania"/> Samochód:</h2>
                 <select class="inputForm align-middle" id="selectCar" style="width:100%;"></select>
             </div>
             <div class="col-sm top-buffer text-center">
-                <h2><img src="@Url.Content("~/images/question_mark.png")" class="questionMark" data-toggle="tooltip" data-placement="bottom" title="Podaj aktualny (lub planowany) stan baterii Twojego samochodu." /> Stan baterii [%]</h2>
+                <h2><img src="@Url.Content("~/images/question_mark.png")" class="questionMark" data-toggle="tooltip" data-placement="bottom" title="Podaj aktualny (lub planowany) stan baterii Twojego samochodu." alt="Znak zapytania"/> Stan baterii [%]</h2>
                 <input class="inputForm align-middle" type=number id="batteryLevelSelect" style="width:100%;" placeholder="Poziom baterii [%]" min=1 max=100>
             </div>
             <div class="col-sm top-buffer text-center">
-                <h2><img src="@Url.Content("~/images/question_mark.png")" class="questionMark" data-toggle="tooltip" data-placement="bottom" title="Prędkość przejazdu ma bardzo duży wpływ na szybkość rozładowania baterii. Wybierz prędkość, która będzie utrzymywana przez większość podróży." /> Prędkość:</h2>
+                <h2><img src="@Url.Content("~/images/question_mark.png")" class="questionMark" data-toggle="tooltip" data-placement="bottom" title="Prędkość przejazdu ma bardzo duży wpływ na szybkość rozładowania baterii. Wybierz prędkość, która będzie utrzymywana przez większość podróży." alt="Znak zapytania"/> Prędkość:</h2>
                 <select class="inputForm align-middle" id="drivingStyleComboBox" style="width:100%;">
                     <option value="1">Miejska (50km/h - 70km/h)</option>
                     <option value="2">Mieszana (70km/h - 100km/h)</option>
@@ -365,11 +369,11 @@
                 map: map,
             });
             
-            var providerContent = "<br><b>Operator stacji: ";
+            var providerContent = "<br><strong>Operator stacji: ";
             if (station.provider.shortName)
-                providerContent += station.provider.shortName + "</b>";
+                providerContent += station.provider.shortName + "</strong>";
             else
-                providerContent += station.provider.name + "</b>";
+                providerContent += station.provider.name + "</strong>";
             if (station.provider.phone)
                 providerContent += "<br>Telefon do operatora: " + station.provider.phone;
             if (station.provider.email)
@@ -377,7 +381,7 @@
             if (station.provider.website)
                 providerContent += "<br>Strona internetowa operatora: <a href='" + station.provider.website +"'target='_blank'>" + station.provider.website + "</a>";
 
-            var addressContent = "<br><b>Adres: </b>";
+            var addressContent = "<br><strong>Adres: </strong>";
             if (station.postalCode)
                 addressContent += station.postalCode + " ";
             if (station.city)
@@ -387,19 +391,19 @@
             if (station.houseNumber)
                 addressContent += station.houseNumber;
 
-            var openingHoursContent = "<br><b>Godziny otwarcia: </b><br>";
+            var openingHoursContent = "<br><strong>Godziny otwarcia: </strong><br>";
             openingHoursContent += station.operatingHoursString;
 
             var stationHasCorrectConnector = false;
-            var chargingPointsContent = "<br><b>Punkty ładowania: </b>";
+            var chargingPointsContent = "<br><strong>Punkty ładowania: </strong>";
             var i = 0;
             station.chargingPoints.forEach(chargingPoint => {
                 i++;
                 if (chargingPoint.status)
                     chargingPointsContent += "<cpContent style='color:green'>";
                 else
-                    chargingPointsContent += "<cpContent style='color:red'><br><b>PUNKT OZNACZONY JAKO WYŁĄCZONY Z UŻYTKU</b>";
-                chargingPointsContent += "<br><b>" + i + ": " + chargingPoint.chargingModes + ".</b> ";
+                    chargingPointsContent += "<cpContent style='color:red'><br><strong>PUNKT OZNACZONY JAKO WYŁĄCZONY Z UŻYTKU</strong>";
+                chargingPointsContent += "<br><strong>" + i + ": " + chargingPoint.chargingModes + ".</strong> ";
                 if (chargingPoint.price && chargingPoint.priceUnit)
                     chargingPointsContent += "Cena: " + chargingPoint.price + "zł za 1" + chargingPoint.priceUnit + ". ";
                 else if (chargingPoint.price)
@@ -430,19 +434,19 @@
 
             var warning = "";
             if (!stationHasCorrectConnector)
-                warning = "<br><br><b style='color:red'>UWAGA: Twój samochód nie ma komptatybilnego gniazda ładowania.</b>";
+                warning = "<br><br><b style='color:red'>UWAGA: Twój samochód nie ma komptatybilnego gniazda ładowania.</strong>";
 
             var paymentMethodsContent = "";
             var authenticationMethodsContent = "";
             var accessibilityContent = "";
             if (station.paymentMethods)
-                paymentMethodsContent = "<br><b>Metody płatności: </b><br>" + station.paymentMethods;
+                paymentMethodsContent = "<br><strong>Metody płatności: </strong><br>" + station.paymentMethods;
             if (station.authenticationMethods)
-                authenticationMethodsContent = "<br><b>Metody autoryzacji: </b><br>" + station.authenticationMethods;
+                authenticationMethodsContent = "<br><strong>Metody autoryzacji: </strong><br>" + station.authenticationMethods;
             if (station.accessibility)
-                accessibilityContent = "<br><b>Wskazówki dojazdu: </b><br>" + station.accessibility;
+                accessibilityContent = "<br><strong>Wskazówki dojazdu: </strong><br>" + station.accessibility;
 
-            var markerContent = "<div class='infoWindowContent'><b>Stacja: " + station.name + "</b>"
+            var markerContent = "<div class='infoWindowContent'><strong>Stacja: " + station.name + "</strong>"
                 + "<br>"
                 + addressContent
                 + providerContent
@@ -456,7 +460,7 @@
                 + authenticationMethodsContent
                 + accessibilityContent
                 + "<div style='text-align: center;'>"
-                + "<br><br><b>Poziom baterii, do którego będzie naładowana [%]:</b><br>"
+                + "<br><br><strong>Poziom baterii, do którego będzie naładowana [%]:</strong><br>"
                 + "<input class='inputForm stopBaterryLevel' id='stopBatteryLevel" + station.id + "' type=number style='margin-top:1%;' value=80 min=1 max=100>"
                 + "<br><br><button class='inputForm charger-button' onclick='addStopToArray(\"" + station.latitude + "\",\"" + station.longitude + "\",\"" + station.name +"\"," + station.id +");'>Dodaj jako przystanek</button>"
                 + "<br>Lub:"
@@ -616,7 +620,7 @@
                 else {
                     stopsListElement = document.getElementById("sortable");
                     stopElement.setAttribute('class', 'ui-state-default stop-element');
-                    stopElement.setAttribute("style", "font-family: 'Avenir Next LT Pro'; font-weight: 400; color: #0111a2;");
+                    stopElement.setAttribute("style", "font-family: 'Avenir Next LT Pro', sans-serif; font-weight: 400; color: #0111a2;");
                     removeButton = document.createElement("a");
                     removeButton.innerText = "Usuń";
                     removeButton.setAttribute('class', 'btn btn-delete btn-danger btn-sm stop-remove-btn');

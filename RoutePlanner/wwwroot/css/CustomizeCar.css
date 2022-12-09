@@ -43,12 +43,12 @@ h2 {
     padding-right: 0.6em;
     color: #0111a2;
     font-weight:600;
-    font-family: 'Avenir Next LT Pro';
+    font-family: 'Avenir Next LT Pro', sans-serif;
 }
 
 .myButton {
     color: #0111a2;
-    font-family: 'Avenir Next LT Pro';
+    font-family: 'Avenir Next LT Pro', sans-serif;
     font-weight: 600;
     border-color: #0111a2;
     background-color: #ebffff;
@@ -63,7 +63,7 @@ h2 {
 
 h3 {
     color: #0111a2;
-    font-family: 'Avenir Next LT Pro';
+    font-family: 'Avenir Next LT Pro', sans-serif;
     font-weight: 700;
 }
 
@@ -88,14 +88,14 @@ input[type=range]::-webkit-slider-thumb {
 
 .slider-label {
     color: #0111a2;
-    font-family: 'Avenir Next LT Pro';
+    font-family: 'Avenir Next LT Pro', sans-serif;
     vertical-align: middle;
     font-weight: 600;
 }
 
 .connector-label {
     color: #0111a2;
-    font-family: 'Avenir Next LT Pro';
+    font-family: 'Avenir Next LT Pro', sans-serif;
 }
 
 input[type="checkbox"] {

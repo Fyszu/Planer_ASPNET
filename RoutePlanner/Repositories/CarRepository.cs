@@ -89,11 +89,10 @@ namespace RoutePlanner.Repositories
             {
                 if (car.User != null)
                 {
-                    car.User = users.Where(user => car.User.Id.Equals(user.Id)).FirstOrDefault() ?? throw new Exception("Nie znaleziono użytkownika po ID na nowej liście.");
+                    car.User = users.Where(user => car.User.Id.Equals(user.Id)).FirstOrDefault() ?? throw new ArgumentNullException("Nie znaleziono użytkownika po ID na nowej liście.");
                 }
             }
             await context.Cars.AddRangeAsync(cars);
-            HashSet<User> usersTracked = new();
             cars.ForEach(c => {
                 if (c.User != null)
                 {

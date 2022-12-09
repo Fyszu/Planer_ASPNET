@@ -5,10 +5,6 @@ namespace RoutePlanner.Data
 {
     public class Car
     {
-        public Car()
-        {
-            ConnectorInterfaces = new HashSet<ConnectorInterface>();
-        }
         public int Id { get; set; }
         [Required]
         public string Brand { set; get; }
@@ -19,6 +15,10 @@ namespace RoutePlanner.Data
         public ICollection<ConnectorInterface> ConnectorInterfaces { get; set; }
         [JsonIgnore]
         public User? User { get; set; }
+        public Car()
+        {
+            ConnectorInterfaces = new HashSet<ConnectorInterface>();
+        }
         public Car(int id, string brand, string model, int maximumDistance, ICollection<ConnectorInterface> interfaces, User user)
 		{
             this.Id = id;

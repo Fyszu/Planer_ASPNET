@@ -64,7 +64,7 @@ builder.Services.AddScoped<IDistanceService, DistanceService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IConnectorInterfaceService, ConnectorInterfaceService>();
 builder.Services.AddScoped<ICarService, CarService>();
-builder.Services.AddScoped<IWeatherAPIService, WeatherAPIService>();
+builder.Services.AddScoped<IWeatherApiService, WeatherApiService>();
 
 // Repositories
 builder.Services.AddScoped<ICarRepository, CarRepository>();

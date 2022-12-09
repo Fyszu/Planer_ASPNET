@@ -1,0 +1,10 @@
+﻿D:\Moje\Różne\OneDrive\Programowanie_Chmura\C#\PlanerTras\RoutePlanner\EipaUdtImportingTools\Data\ChargingPoint.cs
+D:\Moje\Różne\OneDrive\Programowanie_Chmura\C#\PlanerTras\RoutePlanner\EipaUdtImportingTools\Data\ChargingStation.cs
+D:\Moje\Różne\OneDrive\Programowanie_Chmura\C#\PlanerTras\RoutePlanner\EipaUdtImportingTools\Data\Dictionaries.cs
+D:\Moje\Różne\OneDrive\Programowanie_Chmura\C#\PlanerTras\RoutePlanner\EipaUdtImportingTools\Data\Dynamic.cs
+D:\Moje\Różne\OneDrive\Programowanie_Chmura\C#\PlanerTras\RoutePlanner\EipaUdtImportingTools\Data\Pool.cs
+D:\Moje\Różne\OneDrive\Programowanie_Chmura\C#\PlanerTras\RoutePlanner\EipaUdtImportingTools\Data\Provider.cs
+D:\Moje\Różne\OneDrive\Programowanie_Chmura\C#\PlanerTras\RoutePlanner\EipaUdtImportingTools\Program.cs
+D:\Moje\Różne\OneDrive\Programowanie_Chmura\C#\PlanerTras\RoutePlanner\EipaUdtImportingTools\Tools\DatabaseUpdater.cs
+D:\Moje\Różne\OneDrive\Programowanie_Chmura\C#\PlanerTras\RoutePlanner\EipaUdtImportingTools\Tools\EIPAConverter.cs
+D:\Moje\Różne\OneDrive\Programowanie_Chmura\C#\PlanerTras\RoutePlanner\EipaUdtImportingTools\appsettings.json

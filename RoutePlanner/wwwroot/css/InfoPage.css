@@ -1,7 +1,7 @@
 ﻿@import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@1,900&display=swap');
 
 p {
-    font-family: 'Avenir Next LT Pro';
+    font-family: 'Avenir Next LT Pro', sans-serif;
     font-weight: 400;
     margin-left: 4vw;
     margin-right: 4vw;
@@ -17,7 +17,7 @@ h2 {
 }
 
 ul {
-    font-family: 'Avenir Next LT Pro';
+    font-family: 'Avenir Next LT Pro', sans-serif;
     font-weight: 400;
     margin-left: 5vw;
     margin-right: 4vw;

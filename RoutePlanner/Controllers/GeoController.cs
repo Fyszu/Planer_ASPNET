@@ -6,7 +6,7 @@ namespace RoutePlanner.Controllers
     //GeoController - provider of responses from google api (parsing coordinates and addresses)
     [ApiController]
     [Route("[controller]")]
-    [RestrictDomain("localhost", "planertras.com")]
+    [Filters.RestrictDomain("localhost", "planertras.com")]
     public class GeoController : Controller
     {
         private readonly IGeoService service;

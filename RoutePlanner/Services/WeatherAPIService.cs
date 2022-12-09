@@ -3,18 +3,18 @@ using System.Text.Json;
 
 namespace RoutePlanner.Services
 {
-    public class WeatherAPIService : IWeatherAPIService
+    public class WeatherApiService : IWeatherApiService
     {
         private static readonly int retryCount = 5;
         private static readonly int retryWaitTime = 1500;
-        private readonly ILogger<WeatherAPIService> logger;
+        private readonly ILogger<WeatherApiService> logger;
         private readonly HttpClient client = new();
         private float latitude;
         private float longitude;
         private int retryNo = 1;
         
 
-        public WeatherAPIService(ILogger<WeatherAPIService> logger)
+        public WeatherApiService(ILogger<WeatherApiService> logger)
         {
             this.logger = logger;
         }
@@ -73,7 +73,7 @@ namespace RoutePlanner.Services
             }
             catch (Exception ex)
             {
-                logger.LogError($"Wystąpił wyjątek podczas pobierania temperatury (WeatherAPIService). Wyjątek: {ex.Message}\n{ex.InnerException}");
+                logger.LogError($"Wystąpił wyjątek podczas pobierania temperatury (WeatherApiService). Wyjątek: {ex.Message}\n{ex.InnerException}");
                 if (retryNo <= retryCount)
                 {
                     retryNo++;

@@ -70,7 +70,6 @@ namespace RoutePlanner.Services
 
                     // Statuses are provided by Google Geocoding API
                     // Documentation here: https://developers.google.com/maps/documentation/geocoding/requests-geocoding?hl=pl
-                    string responseStatusString = token["status"].ToString();
 
                     // If there's 'error_message' node occured in response, it means some error has occured.
                     if (token["error_message"] != null && token["error_message"].ToString() != null)
@@ -185,7 +184,7 @@ namespace RoutePlanner.Services
             }
         }
 
-        private class GeoResponse
+        private sealed class GeoResponse
         {
             public Coordinates? Coordinates { get; }
             public string? Address { get; }

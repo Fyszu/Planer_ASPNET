@@ -6,14 +6,14 @@ namespace RoutePlanner.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    [RestrictDomain("localhost", "planertras.com")]
+    [Filters.RestrictDomain("localhost", "planertras.com")]
     public class DistanceController : Controller
     {
 
         private readonly IDistanceService distanceService;
-        private readonly IWeatherAPIService weatherService;
+        private readonly IWeatherApiService weatherService;
 
-        public DistanceController(IDistanceService service, IWeatherAPIService weatherService)
+        public DistanceController(IDistanceService service, IWeatherApiService weatherService)
         {
             distanceService = service;
             this.weatherService = weatherService;

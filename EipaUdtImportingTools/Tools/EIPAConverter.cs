@@ -13,7 +13,7 @@ using static RoutePlanner.Data.ChargingStation;
 
 namespace EipaUdtImportingTools.Tools
 {
-    public static class EIPAConverter
+    public static class EipaConverter
     {
         private static readonly Dictionary<string, string> ApiUrls = new()
         {
@@ -26,16 +26,16 @@ namespace EipaUdtImportingTools.Tools
         };
 
         private static readonly HttpClient client = new HttpClient();
-        private static readonly ILogger logger = ApplicationLogging.CreateLogger("EIPAConverter");
+        private static readonly ILogger logger = ApplicationLogging.CreateLogger("EipaConverter");
         public async static Task<bool> TransformApiDataToInternal()
         {
             logger.LogTrace("Pobieranie danych z API.");
-            List<ProviderData>? providersData = await GetProvidersData() ?? throw new ArgumentNullException(nameof(providersData));
-            List<PoolData>? poolsData = await GetPoolsData() ?? throw new ArgumentNullException(nameof(poolsData));
-            List<ChargingStationData>? chargingStationsData = await GetChargingStationsData() ?? throw new ArgumentNullException(nameof(chargingStationsData));
-            List<ChargingPointData>? chargingPointsData = await GetChargingPointsData() ?? throw new ArgumentNullException(nameof(chargingPointsData));
-            List<DynamicData>? dynamicData = await GetDynamicData() ?? throw new ArgumentNullException(nameof(dynamicData));
-            Dictionaries? dictionaries = await GetDictionaries() ?? throw new ArgumentNullException(nameof(dictionaries));
+            List<ProviderData>? providersData = await GetProvidersData() ?? throw new ArgumentNullException("ProvidersData");
+            List<PoolData>? poolsData = await GetPoolsData() ?? throw new ArgumentNullException("PoolsData");
+            List<ChargingStationData>? chargingStationsData = await GetChargingStationsData() ?? throw new ArgumentNullException("ChargingStationsData");
+            List<ChargingPointData>? chargingPointsData = await GetChargingPointsData() ?? throw new ArgumentNullException("ChargingPointsData");
+            List<DynamicData>? dynamicData = await GetDynamicData() ?? throw new ArgumentNullException("DynamicData");
+            Dictionaries? dictionaries = await GetDictionaries() ?? throw new ArgumentNullException("Dictionaries");
             logger.LogTrace("Pobieranie danych z API zakończone.");
 
             try
@@ -85,7 +85,7 @@ namespace EipaUdtImportingTools.Tools
 
                     // Get charging station's services provider (operator)
                     RoutePlanner.Data.Provider? internalProvider = null;
-                    internalProvider = internalProviders.Where(provider => provider.Id == poolData.OperatorId).SingleOrDefault();
+                    internalProvider = internalProviders.SingleOrDefault(provider => provider.Id == poolData.OperatorId);
                     if (internalProvider == null)
                     {
                         ProviderData? providerData = providersData.FirstOrDefault(providerData => providerData.Id == poolData.OperatorId);
@@ -249,8 +249,8 @@ namespace EipaUdtImportingTools.Tools
                 logger.LogTrace("Przetwarzanie stacji ładowania zakończone.");
 
                 // Save data into static updater properties
-                DatabaseUpdater.ChargingStations = internalChargingStations ?? throw new ArgumentNullException(nameof(internalChargingStations));
-                DatabaseUpdater.ConnectorInterfacesInUsage = connectorInterfacesInUsage ?? throw new ArgumentNullException(nameof(connectorInterfacesInUsage));
+                DatabaseUpdater.ChargingStations = internalChargingStations ?? throw new ArgumentNullException("InternalChargingStations");
+                DatabaseUpdater.ConnectorInterfacesInUsage = connectorInterfacesInUsage ?? throw new ArgumentNullException("ConnectorInterfacesInUsage");
                 return true;
             }
             catch (ArgumentNullException ex)
@@ -283,10 +283,10 @@ namespace EipaUdtImportingTools.Tools
                     if (providersInstance != null && providersInstance.Data != null && providersInstance.Data.Count > 0)
                         return providersInstance.Data;
                     else
-                        throw new Exception("ProviderInstance lub jego lista danych jest pusta lub jest nullem.");
+                        throw new ArgumentNullException("ProviderInstance lub jego lista danych jest pusta lub jest nullem.");
                 }
                 else
-                    throw new Exception("Nie znaleziono URL dostawców w słowniku.");
+                    throw new ArgumentException("Nie znaleziono URL dostawców w słowniku.");
             }
             catch (Exception ex)
             {
@@ -313,10 +313,10 @@ namespace EipaUdtImportingTools.Tools
                     if (poolsInstance != null && poolsInstance.Data != null && poolsInstance.Data.Count > 0)
                         return poolsInstance.Data;
                     else
-                        throw new Exception("PoolInstance lub jego lista danych jest pusta lub jest nullem.");
+                        throw new ArgumentNullException("PoolInstance lub jego lista danych jest pusta lub jest nullem.");
                 }
                 else
-                    throw new Exception("Nie znaleziono URL baz w słowniku.");
+                    throw new ArgumentException("Nie znaleziono URL baz w słowniku.");
             }
             catch (Exception ex)
             {
@@ -343,10 +343,10 @@ namespace EipaUdtImportingTools.Tools
                     if (chargingStationsInstance != null && chargingStationsInstance.Data != null)
                         return chargingStationsInstance.Data;
                     else
-                        throw new Exception("ChargingStationInstance lub jego lista danych jest pusta lub jest nullem.");
+                        throw new ArgumentNullException("ChargingStationInstance lub jego lista danych jest pusta lub jest nullem.");
                 }
                 else
-                    throw new Exception("Nie znaleziono URL stacji ładowania w słowniku.");
+                    throw new ArgumentException("Nie znaleziono URL stacji ładowania w słowniku.");
             }
             catch (Exception ex)
             {
@@ -373,10 +373,10 @@ namespace EipaUdtImportingTools.Tools
                     if (chargingPointsInstance != null && chargingPointsInstance.Data != null && chargingPointsInstance.Data.Count > 0)
                         return chargingPointsInstance.Data;
                     else
-                        throw new Exception("ChargingPointsInstance lub jego lista danych jest pusta lub jest nullem.");
+                        throw new ArgumentNullException("ChargingPointsInstance lub jego lista danych jest pusta lub jest nullem.");
                 }
                 else
-                    throw new Exception("Nie znaleziono URL punktów ładowania w słowniku.");
+                    throw new ArgumentException("Nie znaleziono URL punktów ładowania w słowniku.");
             }
             catch (Exception ex)
             {
@@ -403,10 +403,10 @@ namespace EipaUdtImportingTools.Tools
                     if (dictionariesInstance != null)
                         return dictionariesInstance;
                     else
-                        throw new Exception("Dictionaries jest nullem.");
+                        throw new ArgumentNullException("Dictionaries jest nullem.");
                 }
                 else
-                    throw new Exception("Nie znaleziono URL słowników w słowniku.");
+                    throw new ArgumentException("Nie znaleziono URL słowników w słowniku.");
             }
             catch (Exception ex)
             {
@@ -433,10 +433,10 @@ namespace EipaUdtImportingTools.Tools
                     if (dynamicInstance != null && dynamicInstance.Data != null && dynamicInstance.Data.Count > 0)
                         return dynamicInstance.Data;
                     else
-                        throw new Exception("DynamicInstance lub jego lista danych jest pusta lub jest nullem.");
+                        throw new ArgumentNullException("DynamicInstance lub jego lista danych jest pusta lub jest nullem.");
                 }
                 else
-                    throw new Exception("Nie znaleziono URL danych dynamicznych w słowniku.");
+                    throw new ArgumentException("Nie znaleziono URL danych dynamicznych w słowniku.");
             }
             catch (Exception ex)
             {

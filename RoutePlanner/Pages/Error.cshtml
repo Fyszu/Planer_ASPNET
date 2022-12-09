@@ -6,10 +6,14 @@
     Layout = "_Layout";
 }
 
-<!-- CSS -->
-<link rel="stylesheet" href="~/css/ErrorInfo.css">
+<head>
+    <!-- CSS -->
+    <link rel="stylesheet" href="~/css/ErrorInfo.css">
 
-<h1><b>Wystąpił błąd.</b></h1>
+    <title>Błąd</title>
+</head>
+
+<h1><strong>Wystąpił błąd.</strong></h1>
 <br />
 <h2>@Model.ExceptionMessage</h2>
 <a class="errorLink" href="~/">Naciśnij tutaj, by powrócić na stronę główną</a>

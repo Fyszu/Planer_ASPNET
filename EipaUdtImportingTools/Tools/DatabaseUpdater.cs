@@ -20,29 +20,29 @@ namespace EipaUdtImportingTools.Tools
         {
             try
             {
-                if (chargingStationsRepository == null) throw new Exception("Wystąpił błąd - przekazane repozytorium stacji ładowania jest nullem.");
-                if (chargingPointsRepository == null) throw new Exception("Wystąpił błąd - przekazane  puntków ładowania jest nullem.");
-                if (providersRepository == null) throw new Exception("Wystąpił błąd - przekazane repozytorium operatorów jest nullem.");
-                if (connectorInterfaceRepository == null) throw new Exception("Wystąpił błąd - przekazane repozytorium interfejsów jest nullem.");
+                if (chargingStationsRepository == null) throw new ArgumentNullException("Wystąpił błąd - przekazane repozytorium stacji ładowania jest nullem.");
+                if (chargingPointsRepository == null) throw new ArgumentNullException("Wystąpił błąd - przekazane  puntków ładowania jest nullem.");
+                if (providersRepository == null) throw new ArgumentNullException("Wystąpił błąd - przekazane repozytorium operatorów jest nullem.");
+                if (connectorInterfaceRepository == null) throw new ArgumentNullException("Wystąpił błąd - przekazane repozytorium interfejsów jest nullem.");
                 
                 Stopwatch generalStopwatch = new();
                 Stopwatch stopwatch = new();
                 generalStopwatch.Start();
                 stopwatch.Start();
                 
-                if (await EIPAConverter.TransformApiDataToInternal())
+                if (await EipaConverter.TransformApiDataToInternal())
                 {
                     stopwatch.Stop();
                     logger.LogInformation($"Czas konwersji danych: {stopwatch.ElapsedMilliseconds}ms");
 
-                    if (ChargingStations.Count == 0) throw new Exception("Lista stacji ładowania jest pusta.");
-                    if (ConnectorInterfacesInUsage.Count == 0) throw new Exception("Zbiór nowych interfejsów jest pusty.");
+                    if (ChargingStations.Count == 0) throw new ArgumentException("Lista stacji ładowania jest pusta.");
+                    if (ConnectorInterfacesInUsage.Count == 0) throw new ArgumentException("Zbiór nowych interfejsów jest pusty.");
 
                     stopwatch.Restart();
 
                     logger.LogTrace("Pobieranie danych samochodów.");
-                    List<Car> cars = await carRepository.GetAllAsync() ?? throw new Exception("Problem z pobraniem listy samochodów.");
-                    if (cars.Count == 0) throw new Exception("Lista samochodów jest pusta.");
+                    List<Car> cars = await carRepository.GetAllAsync() ?? throw new ArgumentNullException("Problem z pobraniem listy samochodów.");
+                    if (cars.Count == 0) throw new ArgumentException("Lista samochodów jest pusta.");
 
                     stopwatch.Stop();
                     logger.LogInformation($"Czas pobrania listy samochodów: {stopwatch.ElapsedMilliseconds}ms");
@@ -95,7 +95,7 @@ namespace EipaUdtImportingTools.Tools
                 }
                 else
                 {
-                    throw new Exception("Aktualizacja nie może być kontynuowana.");
+                    throw new ArgumentException("Aktualizacja nie może być kontynuowana.");
                 }
             }
             catch (Exception ex)
@@ -167,7 +167,7 @@ namespace EipaUdtImportingTools.Tools
                         break;
 
                     default:
-                        throw new Exception("Błąd podczas przekazywania informacji o zmienionych interfejsach ładowania.");
+                        throw new ArgumentException($"Błąd podczas przekazywania informacji o zmienionych interfejsach ładowania: {changedConnectorInterface.Value}");
                 }
             }
             return cars;

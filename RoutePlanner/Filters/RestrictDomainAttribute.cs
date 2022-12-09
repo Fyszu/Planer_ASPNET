@@ -1,24 +1,28 @@
 ﻿using RoutePlanner.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-public class RestrictDomainAttribute : Attribute, IAuthorizationFilter
+
+namespace RoutePlanner.Filters
 {
-    public IEnumerable<string> AllowedHosts { get; }
-    public RestrictDomainAttribute(params string[] allowedHosts) => AllowedHosts = allowedHosts;
-
-    public void OnAuthorization(AuthorizationFilterContext context)
+    public class RestrictDomainAttribute : Attribute, IAuthorizationFilter
     {
-        string host = context.HttpContext.Request.Host.Host;
-        if (!AllowedHosts.Contains(host, StringComparer.OrdinalIgnoreCase))
+        public IEnumerable<string> AllowedHosts { get; }
+        public RestrictDomainAttribute(params string[] allowedHosts) => AllowedHosts = allowedHosts;
+
+        public void OnAuthorization(AuthorizationFilterContext context)
         {
-            //  Request came from an authorized host, return bad request
-
-            InternalApiResponse internalApiResponse = new(InternalApiResponse.StatusCode.HostNotAllowed, null)
+            string host = context.HttpContext.Request.Host.Host;
+            if (!AllowedHosts.Contains(host, StringComparer.OrdinalIgnoreCase))
             {
-                ErrorMessage = "Host nie jest dopuszczony do tych zasobów."
-            };
+                //  Request came from an authorized host, return bad request
 
-            context.Result = new BadRequestObjectResult(internalApiResponse.GetInternalResponseJson());
+                InternalApiResponse internalApiResponse = new(InternalApiResponse.StatusCode.HostNotAllowed, null)
+                {
+                    ErrorMessage = "Host nie jest dopuszczony do tych zasobów."
+                };
+
+                context.Result = new BadRequestObjectResult(internalApiResponse.GetInternalResponseJson());
+            }
         }
     }
 }

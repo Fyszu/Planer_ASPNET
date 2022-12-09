@@ -1,24 +1,24 @@
 h1 {
     margin-top:15vh;
-    font-family: 'Avenir Next LT Pro';
+    font-family: 'Avenir Next LT Pro', sans-serif;
     color: red;
     font-weight: 900;
 }
 
 h2 {
-    font-family: 'Avenir Next LT Pro';
+    font-family: 'Avenir Next LT Pro', sans-serif;
     color: orangered;
     font-weight: 700;
 }
 
 p {
-    font-family: 'Avenir Next LT Pro';
+    font-family: 'Avenir Next LT Pro', sans-serif;
     color: black;
     font-weight: 100;
 }
 
 a {
-    font-family: 'Avenir Next LT Pro';
+    font-family: 'Avenir Next LT Pro', sans-serif;
     color: green;
     font-weight: 700;
 }
