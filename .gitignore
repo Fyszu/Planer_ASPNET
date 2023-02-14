@@ -362,3 +362,6 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /ASP_MVC_NoAuthentication/appsettings.json
+/RoutePlanner/appsettings.json
+/EipaUdtImportingTools/appsettings.json
+/RoutePlanner/appsettings.Development.json
